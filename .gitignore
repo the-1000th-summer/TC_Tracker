@@ -1,0 +1,7 @@
+# build
+/code/pureCpp/build
+# cache
+/code/pureCpp/.cache
+
+# data
+/data/
