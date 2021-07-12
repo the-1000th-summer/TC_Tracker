@@ -2,6 +2,7 @@
 /code/pureCpp/build
 # cache
 /code/pureCpp/.cache
-
+# vscode
+.vscode
 # data
 /data/

@@ -2,6 +2,8 @@
 
 #include <ctime>
 #include <string>
+#include <netcdf>
+#include <vector>
 
 namespace Constants {
     constexpr int TODAY_MAX_TP_NUM = 5;
@@ -16,6 +18,9 @@ namespace Constants {
 }
 
 namespace UtilFunc {
-    inline bool ifFileExists (const std::string& name);
-    std::time_t getEpochTime(const std::wstring& dateTime);
+    bool ifFileExists (const std::string& name);
+    std::time_t getEpochTime(const std::string& dateTime, const std::string& dateTimeFormat="%Y-%m-%dT%H:%M:%SZ");
+    void getTimeData(netCDF::NcFile &iFile);
+    void getLatLonData(netCDF::NcFile *iFile, std::vector<float> &latVec, std::vector<float> &lonVec);
+    void getVorField(netCDF::NcFile *iFile, float *vor);
 }
