@@ -17,11 +17,28 @@ void tryReadNCFile() {
     cout << "sdf" << endl;
 }
 
+void tryMKTIME() {
+    // tm dt{0, 0, 0, };
+
+}
+
+void vv(float a[1000][Constants::latGridNum][Constants::lonGridNum]) {
+
+}
+
 int main(int, char**) {
-    netCDF::NcFile iFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read);
-    // Processor p(iFile);
+    
+    netCDF::NcFile iFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly_timeIndex19.nc", netCDF::NcFile::read);
+    float aaa[Constants::latGridNum][Constants::lonGridNum];
+    auto vorVar = iFile.getVar("Vorticity");
+    vorVar.getVar(aaa);
+    iFile.close();
+
+    // cout << "CO" << endl;
+    // 
+    // 
     Processor p(iFile);
-    p.a();
+    p.recognizeTyphoon(aaa);
 
     // time_t timep = 0;
     // auto a = gmtime(&timep);
@@ -29,9 +46,15 @@ int main(int, char**) {
     // Typhoon a;
     // a.sayHello();
     // tryReadNCFile();
+    // UtilFunc::num2Date(45, "hours since 1800-01-01 00:00");
     // UtilFunc::getEpochTime(L"1970-01-01T00:00:00Z");
-    
-    // auto aa = UtilFunc::getEpochTime("hours since 1800-sd01-01 00:00", "hours since %Y-%m-%d %H:%M");
+    // tryMKTIME();
+    // auto aa = UtilFunc::getEpochTime("hours since 1800-01-01 00:00", "hours since %Y-%m-%d %H:%M");
+
+    // std::tm dt{};
+    // UtilFunc::num2Date(0, dt, "hours since 0000-01-01 00:00");
+    // cout << asctime(&dt) << endl;
+
     // cout << aa << endl;
     // cout << UtilFunc::ifFileExists("sdf") << endl;
     // cout << UtilFunc::ifFileExists("const std::string &name") << endl;
