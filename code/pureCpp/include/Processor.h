@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include "Utils.h"
+#include <unordered_set>
 
 class Processor {
 public:
@@ -13,8 +14,8 @@ public:
     void removeNoise();
     void a();
     void getVortexNum1Day(float vorField[Constants::latGridNum][Constants::lonGridNum]);
-    void getVortexCells(float vorField[Constants::latGridNum][Constants::lonGridNum], std::pair<int, int> maxValIndex, std::vector<std::pair<int, int>> &allCells);
-    void getOuterCells();
+    void getVortexCells(float vorField[Constants::latGridNum][Constants::lonGridNum], std::pair<int, int> maxValIndex, std::unordered_set<std::pair<int, int>, pair_hash> &allCells);
+    std::unordered_set<std::pair<int, int>, pair_hash> getSurroundingCells(float vorField[Constants::latGridNum][Constants::lonGridNum], std::pair<int, int> cellIndex);
     
     // std::string a("dsf");
 private:

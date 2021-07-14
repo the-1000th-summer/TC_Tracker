@@ -8,6 +8,7 @@
 #include <ostream>
 #include <utility>
 #include <vector>
+#include <unordered_set>
 
 Processor::Processor(netCDF::NcFile &iFile) {
     iiFile = &iFile;
@@ -50,7 +51,7 @@ void Processor::getVortexNum1Day(float vorField[Constants::latGridNum][Constants
 
     for (int i = 0; i < Constants::TODAY_MAX_TP_NUM; ++i) {
         auto maxVorCell = UtilFunc::max_element_2d(vorField);
-        std::vector<std::pair<int, int>> allCells;
+        std::unordered_set<std::pair<int, int>, pair_hash> allCells;
         getVortexCells(vorField, maxVorCell.first, allCells);
         std::cout << "df" << std::endl;
     }
@@ -59,10 +60,60 @@ void Processor::getVortexNum1Day(float vorField[Constants::latGridNum][Constants
 /// 此函数接受一个点，递归返回所有在台风内的点（阈值采用相对涡度）
 /// @param[in] vorField 涡度场（2d array）
 /// @param[in] maxValIndex 涡度最大值的格点对应的纬度、经度index
-void Processor::getVortexCells(float vorField[Constants::latGridNum][Constants::lonGridNum], std::pair<int, int> maxValIndex, std::vector<std::pair<int, int>> &allCells) {
+void Processor::getVortexCells(float vorField[Constants::latGridNum][Constants::lonGridNum], std::pair<int, int> maxValIndex, std::unordered_set<std::pair<int, int>, pair_hash> &allCells) {
     if (vorField[maxValIndex.first][maxValIndex.second] >= Constants::RECURSION_MIN_ReVOR) {
-        
+        if (!allCells.count(maxValIndex)) {
+            allCells.insert(maxValIndex);
+            auto surroundingCells = getSurroundingCells(vorField, maxValIndex);
+            for (auto &i: surroundingCells) {
+                getVortexCells(vorField, i, allCells);
+            }
+        }
     }
 
 }
 
+/// 此函数接受一个点，返回周围的8个点，如果在边缘则排除边缘外的点。
+/// @param[in] vorField 涡度场（2d array）
+/// @param[in] maxValIndex 涡度最大值的格点对应的纬度、经度index
+std::unordered_set<std::pair<int, int>, pair_hash> Processor::getSurroundingCells(float vorField[Constants::latGridNum][Constants::lonGridNum], std::pair<int, int> cellIndex) {
+    std::unordered_set<std::pair<int, int>, pair_hash> surroundingCells{
+        // 左列三个点
+        {cellIndex.first+1, cellIndex.second-1}, {cellIndex.first, cellIndex.second-1}, {cellIndex.first-1, cellIndex.second-1},
+        // 上下两个点
+        {cellIndex.first+1, cellIndex.second}, {cellIndex.first-1, cellIndex.second},
+        // 右列三个点
+        {cellIndex.first+1, cellIndex.second+1}, {cellIndex.first, cellIndex.second+1}, {cellIndex.first-1, cellIndex.second+1}
+    };
+    // 点在左边缘
+    if (cellIndex.second == 0) {
+        std::vector<std::pair<int, int>> excludeCells{{cellIndex.first+1, cellIndex.second-1}, {cellIndex.first, cellIndex.second-1}, {cellIndex.first-1, cellIndex.second-1}};
+        for (auto &i : excludeCells) {
+            surroundingCells.erase(i);
+        }
+    }
+    // 点在右边缘
+    if (cellIndex.second == Constants::lonGridNum - 1) {
+        std::vector<std::pair<int, int>> excludeCells{{cellIndex.first+1, cellIndex.second+1}, {cellIndex.first, cellIndex.second+1}, {cellIndex.first-1, cellIndex.second+1}};
+        for (auto &i : excludeCells) {
+            surroundingCells.erase(i);
+        }
+    }
+    // 点在上边缘
+    if (cellIndex.first == Constants::latGridNum - 1) {
+        std::vector<std::pair<int, int>> excludeCells{{cellIndex.first+1, cellIndex.second-1}, {cellIndex.first+1, cellIndex.second}, {cellIndex.first+1, cellIndex.second+1}};
+        for (auto &i : excludeCells) {
+            surroundingCells.erase(i);
+        }
+    }
+    // 点在下边缘
+    if (cellIndex.first == 0) {
+        std::vector<std::pair<int, int>> excludeCells{{cellIndex.first-1, cellIndex.second-1}, {cellIndex.first-1, cellIndex.second}, {cellIndex.first-1, cellIndex.second+1}};
+        for (auto &i : excludeCells) {
+            surroundingCells.erase(i);
+        }
+    }
+
+    return surroundingCells;
+
+}

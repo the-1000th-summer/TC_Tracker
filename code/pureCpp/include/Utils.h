@@ -35,3 +35,9 @@ namespace UtilFunc {
     void getVorField(netCDF::NcFile *iFile, float *vor);
     std::pair<std::pair<int, int>, float> max_element_2d(float vorField[Constants::latGridNum][Constants::lonGridNum]);
 }
+
+struct pair_hash {
+    inline std::size_t operator()(const std::pair<int,int> & v) const {
+        return v.first*31+v.second;
+    }
+};
