@@ -3,7 +3,9 @@
 #include <ctime>
 #include <string>
 #include <netcdf>
+#include <utility>
 #include <vector>
+#include <unordered_set>
 
 namespace Constants {
     /// 一天中最多会出现的涡旋数量
@@ -25,19 +27,26 @@ namespace Constants {
     constexpr int latGridNum = 41, lonGridNum = 89;
 }
 
+struct pair_hash {
+    inline std::size_t operator()(const std::pair<int,int> & v) const {
+        return v.first*31+v.second;
+    }
+};
+
 namespace UtilFunc {
     bool ifFileExists (const std::string& name);
     std::time_t getEpochTime(const std::string& dateTime, const std::string& dateTimeFormat="%Y-%m-%dT%H:%M:%SZ");
     void getTimeData(netCDF::NcFile &iFile);
     void num2Date(double timeNum, tm &dateTimeTm, std::string timeUnits);
     void num2Date(double timeNum[], std::string timeUnits);
+    void getLatLonData(netCDF::NcFile *iFile, float lat[Constants::latGridNum], float lon[Constants::latGridNum]);
     void getLatLonData(netCDF::NcFile *iFile, std::vector<float> &latVec, std::vector<float> &lonVec);
     void getVorField(netCDF::NcFile *iFile, float *vor);
     std::pair<std::pair<int, int>, float> max_element_2d(float vorField[Constants::latGridNum][Constants::lonGridNum]);
+
+    std::pair<float, float> getVortexCenterLatLon(const std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex, float latArray[Constants::latGridNum], float lonArray[Constants::lonGridNum]);
+    float cellDist(float lat[Constants::latGridNum], float lon[Constants::latGridNum], std::pair<int, int> cell1Index, std::pair<int, int> cell2Index);
+
 }
 
-struct pair_hash {
-    inline std::size_t operator()(const std::pair<int,int> & v) const {
-        return v.first*31+v.second;
-    }
-};
+

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include <ctime>
 #include <iomanip>
 #include <iostream>
@@ -12,6 +13,7 @@
 #include <sys/stat.h>
 #include <utility>
 #include <vector>
+#include <cmath>
 
 
 
@@ -70,6 +72,11 @@ void UtilFunc::getTimeData(netCDF::NcFile &iFile) {
     std::cout << timeUnits << std::endl;
 }
 
+void getLatLonData(netCDF::NcFile *iFile, float latArray[Constants::latGridNum], float lonArray[Constants::latGridNum]) {
+    iFile->getVar("lat").getVar(latArray);
+    iFile->getVar("lon").getVar(lonArray);
+}
+
 void UtilFunc::getLatLonData(netCDF::NcFile *iFile, std::vector<float> &latVec, std::vector<float> &lonVec) {
     float lat[Constants::latGridNum], lon[Constants::lonGridNum];
     iFile->getVar("lat").getVar(lat);
@@ -99,4 +106,34 @@ std::pair<std::pair<int, int>, float> UtilFunc::max_element_2d(float vorField[Co
     auto maxElemIter = std::max_element(maxElements, maxElements + Constants::latGridNum);
     int maxElemLatIndex = std::distance(maxElements, maxElemIter);
     return std::pair<std::pair<int, int>, float> {{maxElemLatIndex, maxElemLonIndexes[maxElemLatIndex]}, *maxElemIter};
+}
+
+/// 此方法计算涡旋包含的点的中心位置
+/// @param[in] vortexCellsIndex 涡旋包含的点的index
+/// @param[in] latArray 纬度array
+/// @param[in] lonArray 经度array
+std::pair<float, float> UtilFunc::getVortexCenterLatLon(const std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex, float latArray[Constants::latGridNum], float lonArray[Constants::lonGridNum]) {
+    float latAvg = 0, lonAvg = 0;
+    for (auto &cellIndex : vortexCellsIndex) {
+        latAvg += latArray[cellIndex.first];
+        lonAvg += lonArray[cellIndex.second]; 
+    }
+    return {latAvg / Constants::latGridNum, lonAvg / Constants::lonGridNum};
+}
+
+/// 此方法利用haversine公式计算两个点的真实距离(km)（大圆距离）
+/// @param[in] latArray 纬度array
+/// @param[in] lonArray 经度array
+/// @param[in] cell1Index 第一个cell
+/// @param[in] cell2Index 第二个cell
+float UtilFunc::cellDist(float latArray[Constants::latGridNum], float lonArray[Constants::latGridNum], std::pair<int, int> cell1Index, std::pair<int, int> cell2Index) {
+    // 两cell的纬度、经度（弧度形式）
+    float lat1 = sin(latArray[cell1Index.first]*M_PI/180.0), lon1 = sin(lonArray[cell1Index.second]*M_PI/180.0);
+    float lat2 = sin(latArray[cell2Index.first]*M_PI/180.0), lon2 = sin(lonArray[cell2Index.second]*M_PI/180.0);
+
+    float dlat = lat2 - lat1, dlon = lon2 - lon1;
+    float a = pow(sin(dlat/2), 2) + cos(lat1) * cos(lat2) * pow(sin(dlon/2), 2);
+    float c = 2 * asin(sqrt(a));
+    constexpr float r = 6371;
+    return c * r;
 }

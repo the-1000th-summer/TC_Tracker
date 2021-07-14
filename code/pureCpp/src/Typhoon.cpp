@@ -2,6 +2,6 @@
 #include <iostream>
 
 
-void Typhoon::sayHello() {
-    std::cout << "sd" << std::endl;
-}
+// void Typhoon::sayHello() {
+//     std::cout << "sd" << std::endl;
+// }
