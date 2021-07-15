@@ -39,13 +39,22 @@ namespace UtilFunc {
     void getTimeData(netCDF::NcFile &iFile);
     void num2Date(double timeNum, tm &dateTimeTm, std::string timeUnits);
     void num2Date(double timeNum[], std::string timeUnits);
-    void getLatLonData(netCDF::NcFile *iFile, float lat[Constants::latGridNum], float lon[Constants::latGridNum]);
+    void getLatLonData(netCDF::NcFile *iFile, float latArray[Constants::latGridNum], float lonArray[Constants::latGridNum]);
     void getLatLonData(netCDF::NcFile *iFile, std::vector<float> &latVec, std::vector<float> &lonVec);
     void getVorField(netCDF::NcFile *iFile, float *vor);
+
     std::pair<std::pair<int, int>, float> max_element_2d(float vorField[Constants::latGridNum][Constants::lonGridNum]);
+    template <int latGridNum, int lonGridNum>
+    std::pair<std::pair<int, int>, float> max_element_2d(float (&vorField)[latGridNum][lonGridNum]);
+    template <int latGridNum, int lonGridNum>
+    std::pair<std::pair<int, int>, float> minn_element_2d(float (&vorField)[latGridNum][lonGridNum]);
+
+    std::pair<std::pair<int, int>, float> min_element_2d(float **vorField, int latGridNum, int lonGridNum);
+
+
 
     std::pair<float, float> getVortexCenterLatLon(const std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex, float latArray[Constants::latGridNum], float lonArray[Constants::lonGridNum]);
-    float cellDist(float lat[Constants::latGridNum], float lon[Constants::latGridNum], std::pair<int, int> cell1Index, std::pair<int, int> cell2Index);
+    float cellDist(float latArray[Constants::latGridNum], float lonArray[Constants::latGridNum], std::pair<int, int> cell1Index, std::pair<int, int> cell2Index);
 
 }
 

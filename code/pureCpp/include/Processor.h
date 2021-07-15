@@ -24,7 +24,8 @@ public:
 private:
     netCDF::NcFile *iiFile;
     /// 记录所有有台风的日期的数组（从基准日期起算的时次数）
-    float lonArr[Constants::lonGridNum], latArr[Constants::latGridNum];
+
+    float latArr[Constants::latGridNum], lonArr[Constants::lonGridNum];
     std::vector<int> hasTC_timeIndex{};
     std::vector<std::vector<TC1Time>> allVortexes{};
 };
