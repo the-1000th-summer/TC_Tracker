@@ -72,13 +72,13 @@ void UtilFunc::getTimeData(netCDF::NcFile &iFile) {
     std::cout << timeUnits << std::endl;
 }
 
-void UtilFunc::getLatLonData(netCDF::NcFile *iFile, float latArray[Constants::latGridNum], float lonArray[Constants::latGridNum]) {
+void UtilFunc::getLatLonData(netCDF::NcFile *iFile, float *latArray, float *lonArray) {
     iFile->getVar("lat").getVar(latArray);
     iFile->getVar("lon").getVar(lonArray);
 }
 
 void UtilFunc::getLatLonData(netCDF::NcFile *iFile, std::vector<float> &latVec, std::vector<float> &lonVec) {
-    float lat[Constants::latGridNum], lon[Constants::lonGridNum];
+    float lat[iFile->getDim("lat").getSize()], lon[iFile->getDim("lon").getSize()];
     iFile->getVar("lat").getVar(lat);
     iFile->getVar("lon").getVar(lon);
     latVec.assign(lat, lat + sizeof(lat) / sizeof(lat[0]) );
@@ -93,88 +93,88 @@ void UtilFunc::getVorField(netCDF::NcFile *iFile, float *vor) {
 /// 找出2d array的最大值和相应的index
 /// @param[in] vorField 涡度场（2d array）
 /// @return index（纬度index、经度index）和最大值
-std::pair<std::pair<int, int>, float> UtilFunc::max_element_2d(float vorField[Constants::latGridNum][Constants::lonGridNum]) {
-    /// 保存每行的最大值
-    float maxElements[Constants::latGridNum];
-    /// 保存每行的最大值对应的index
-    int maxElemLonIndexes[Constants::latGridNum];
-    for (int i = 0; i < Constants::latGridNum; ++i) {
-        auto rowMaxElemIter = std::max_element(vorField[i], vorField[i] + Constants::lonGridNum);
-        maxElements[i] = *rowMaxElemIter;
-        maxElemLonIndexes[i] = std::distance(vorField[i], rowMaxElemIter);
-    }
-    auto maxElemIter = std::max_element(maxElements, maxElements + Constants::latGridNum);
-    int maxElemLatIndex = std::distance(maxElements, maxElemIter);
-    return std::pair<std::pair<int, int>, float> {{maxElemLatIndex, maxElemLonIndexes[maxElemLatIndex]}, *maxElemIter};
-}
+// std::pair<std::pair<int, int>, float> UtilFunc::max_element_2d(float vorField[Constants::latGridNum][Constants::lonGridNum]) {
+//     /// 保存每行的最大值
+//     float maxElements[Constants::latGridNum];
+//     /// 保存每行的最大值对应的index
+//     int maxElemLonIndexes[Constants::latGridNum];
+//     for (int i = 0; i < Constants::latGridNum; ++i) {
+//         auto rowMaxElemIter = std::max_element(vorField[i], vorField[i] + Constants::lonGridNum);
+//         maxElements[i] = *rowMaxElemIter;
+//         maxElemLonIndexes[i] = std::distance(vorField[i], rowMaxElemIter);
+//     }
+//     auto maxElemIter = std::max_element(maxElements, maxElements + Constants::latGridNum);
+//     int maxElemLatIndex = std::distance(maxElements, maxElemIter);
+//     return std::pair<std::pair<int, int>, float> {{maxElemLatIndex, maxElemLonIndexes[maxElemLatIndex]}, *maxElemIter};
+// }
 
 /// 找出2d array的最大值和相应的index
 /// @param[in] vorField 涡度场（2d array）
 /// @return index（纬度index、经度index）和最大值
-template <int latGridNum, int lonGridNum>
-std::pair<std::pair<int, int>, float> UtilFunc::max_element_2d(float (&vorField)[latGridNum][lonGridNum]) {
-    /// 保存每行的最大值
-    float maxElements[latGridNum];
-    /// 保存每行的最大值对应的index
-    int maxElemLonIndexes[latGridNum];
-    for (int i = 0; i < latGridNum; ++i) {
-        auto rowMaxElemIter = std::max_element(vorField[i], vorField[i] + lonGridNum);
-        maxElements[i] = *rowMaxElemIter;
-        maxElemLonIndexes[i] = std::distance(vorField[i], rowMaxElemIter);
-    }
-    auto maxElemIter = std::max_element(maxElements, maxElements + latGridNum);
-    int maxElemLatIndex = std::distance(maxElements, maxElemIter);
-    return std::pair<std::pair<int, int>, float> {{maxElemLatIndex, maxElemLonIndexes[maxElemLatIndex]}, *maxElemIter};
-}
+// template <int latGridNum, int lonGridNum>
+// std::pair<std::pair<int, int>, float> UtilFunc::max_element_2d(float (&vorField)[latGridNum][lonGridNum]) {
+//     /// 保存每行的最大值
+//     float maxElements[latGridNum];
+//     /// 保存每行的最大值对应的index
+//     int maxElemLonIndexes[latGridNum];
+//     for (int i = 0; i < latGridNum; ++i) {
+//         auto rowMaxElemIter = std::max_element(vorField[i], vorField[i] + lonGridNum);
+//         maxElements[i] = *rowMaxElemIter;
+//         maxElemLonIndexes[i] = std::distance(vorField[i], rowMaxElemIter);
+//     }
+//     auto maxElemIter = std::max_element(maxElements, maxElements + latGridNum);
+//     int maxElemLatIndex = std::distance(maxElements, maxElemIter);
+//     return std::pair<std::pair<int, int>, float> {{maxElemLatIndex, maxElemLonIndexes[maxElemLatIndex]}, *maxElemIter};
+// }
 
 
-template <int latGridNum, int lonGridNum>
-std::pair<std::pair<int, int>, float> UtilFunc::minn_element_2d(float (&vorField)[latGridNum][lonGridNum]) {
-    /// 保存每行的最大值
-    float minElements[latGridNum];
-    /// 保存每行的最大值对应的index
-    int minElemLonIndexes[latGridNum];
-    for (int i = 0; i < latGridNum; ++i) {
-        auto rowMinElemIter = std::min_element(vorField[i], vorField[i] + lonGridNum);
-        minElements[i] = *rowMinElemIter;
-        minElemLonIndexes[i] = std::distance(vorField[i], rowMinElemIter);
-    }
-    auto minElemIter = std::min_element(minElements, minElements + latGridNum);
-    int minElemLatIndex = std::distance(minElements, minElemIter);
-    return std::pair<std::pair<int, int>, float> {{minElemLatIndex, minElemLonIndexes[minElemLatIndex]}, *minElemIter};
-}
+// template <int latGridNum, int lonGridNum>
+// std::pair<std::pair<int, int>, float> UtilFunc::minn_element_2d(float (&vorField)[latGridNum][lonGridNum]) {
+//     /// 保存每行的最大值
+//     float minElements[latGridNum];
+//     /// 保存每行的最大值对应的index
+//     int minElemLonIndexes[latGridNum];
+//     for (int i = 0; i < latGridNum; ++i) {
+//         auto rowMinElemIter = std::min_element(vorField[i], vorField[i] + lonGridNum);
+//         minElements[i] = *rowMinElemIter;
+//         minElemLonIndexes[i] = std::distance(vorField[i], rowMinElemIter);
+//     }
+//     auto minElemIter = std::min_element(minElements, minElements + latGridNum);
+//     int minElemLatIndex = std::distance(minElements, minElemIter);
+//     return std::pair<std::pair<int, int>, float> {{minElemLatIndex, minElemLonIndexes[minElemLatIndex]}, *minElemIter};
+// }
 
 /// 找出2d array的最小值和相应的index
 /// @param[in] vorField 涡度场（2d array）
 /// @param[in] latGridNum 行数
 /// @param[in] lonGridNum 列数
 /// @return index（纬度index、经度index）和最大值
-std::pair<std::pair<int, int>, float> UtilFunc::min_element_2d(float **vorField, int latGridNum, int lonGridNum) {
-    /// 保存每行的最大值
-    float minElements[latGridNum];
-    /// 保存每行的最大值对应的index
-    int minElemLonIndexes[latGridNum];
-    for (int i = 0; i < latGridNum; ++i) {
-        auto rowMinElemIter = std::min_element(vorField[i], vorField[i] + lonGridNum);
-        minElements[i] = *rowMinElemIter;
-        minElemLonIndexes[i] = std::distance(vorField[i], rowMinElemIter);
-    }
-    auto minElemIter = std::min_element(minElements, minElements + latGridNum);
-    int minElemLatIndex = std::distance(minElements, minElemIter);
-    return std::pair<std::pair<int, int>, float> {{minElemLatIndex, minElemLonIndexes[minElemLatIndex]}, *minElemIter};
-}
+// std::pair<std::pair<int, int>, float> UtilFunc::min_element_2d(float **vorField, int latGridNum, int lonGridNum) {
+//     /// 保存每行的最大值
+//     float minElements[latGridNum];
+//     /// 保存每行的最大值对应的index
+//     int minElemLonIndexes[latGridNum];
+//     for (int i = 0; i < latGridNum; ++i) {
+//         auto rowMinElemIter = std::min_element(vorField[i], vorField[i] + lonGridNum);
+//         minElements[i] = *rowMinElemIter;
+//         minElemLonIndexes[i] = std::distance(vorField[i], rowMinElemIter);
+//     }
+//     auto minElemIter = std::min_element(minElements, minElements + latGridNum);
+//     int minElemLatIndex = std::distance(minElements, minElemIter);
+//     return std::pair<std::pair<int, int>, float> {{minElemLatIndex, minElemLonIndexes[minElemLatIndex]}, *minElemIter};
+// }
 
 /// 此方法计算涡旋包含的点的中心位置
 /// @param[in] vortexCellsIndex 涡旋包含的点的index
 /// @param[in] latArray 纬度array
 /// @param[in] lonArray 经度array
-std::pair<float, float> UtilFunc::getVortexCenterLatLon(const std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex, float latArray[Constants::latGridNum], float lonArray[Constants::lonGridNum]) {
+std::pair<float, float> UtilFunc::getVortexCenterLatLon(const std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex, float *latArray, float *lonArray) {
     float latAvg = 0, lonAvg = 0;
     for (auto &cellIndex : vortexCellsIndex) {
         latAvg += latArray[cellIndex.first];
         lonAvg += lonArray[cellIndex.second]; 
     }
-    return {latAvg / Constants::latGridNum, lonAvg / Constants::lonGridNum};
+    return {latAvg / vortexCellsIndex.size(), lonAvg / vortexCellsIndex.size()};
 }
 
 /// 此方法利用haversine公式计算两个点的真实距离(km)（大圆距离）
@@ -182,7 +182,7 @@ std::pair<float, float> UtilFunc::getVortexCenterLatLon(const std::unordered_set
 /// @param[in] lonArray 经度array
 /// @param[in] cell1Index 第一个cell
 /// @param[in] cell2Index 第二个cell
-float UtilFunc::cellDist(float latArray[Constants::latGridNum], float lonArray[Constants::latGridNum], std::pair<int, int> cell1Index, std::pair<int, int> cell2Index) {
+float UtilFunc::cellDist(float *latArray, float *lonArray, std::pair<int, int> cell1Index, std::pair<int, int> cell2Index) {
     // 两cell的纬度、经度（弧度形式）
     float lat1 = sin(latArray[cell1Index.first]*M_PI/180.0), lon1 = sin(lonArray[cell1Index.second]*M_PI/180.0);
     float lat2 = sin(latArray[cell2Index.first]*M_PI/180.0), lon2 = sin(lonArray[cell2Index.second]*M_PI/180.0);

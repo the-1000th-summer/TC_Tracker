@@ -12,35 +12,16 @@
 using namespace std;
 
 
-void tryMKTIME() {
-    // tm dt{0, 0, 0, };
-
-}
-
-void vv(float a[1000][Constants::latGridNum][Constants::lonGridNum]) {
-
-}
 
 int main(int, char**) {
     
-    // netCDF::NcFile iFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly_timeIndex19.nc", netCDF::NcFile::read);
-    // float aaa[Constants::latGridNum][Constants::lonGridNum];
-    // auto vorVar = iFile.getVar("Vorticity");
-    // vorVar.getVar(aaa);
-    // iFile.close();
-
-
-    // Processor p(iFile);
-    // p.recognizeTyphoon(aaa);
-
-    std::vector<int> a{ 1,4, 65, 6};
-    vector<int> b{3};
-    b = a;
-    for (const auto &i : b) {
-        cout << i << endl;
-    }
+    netCDF::NcFile iFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read);
     
-
+    
+    Processor p(iFile);
+    p.recognizeTyphoon();
+    
+    
     // time_t timep = 0;
     // auto a = gmtime(&timep);
     // cout << asctime(a) << endl;

@@ -6,3 +6,5 @@
 .vscode
 # data
 /data/
+# pycache
+__pycache__/

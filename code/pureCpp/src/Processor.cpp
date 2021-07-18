@@ -9,20 +9,38 @@
 #include <utility>
 #include <vector>
 #include <unordered_set>
+#include "multiArray.h"
 #include "Processor.h"
 #include "Utils.h"
 #include "Typhoon.h"
 
 Processor::Processor(netCDF::NcFile &iFile) {
     iiFile = &iFile;
-    UtilFunc::getLatLonData(iiFile, latArr, lonArr);
+    getDimLength();
+    latArr = std::make_unique<float[]>(latGridNum);
+    lonArr = std::make_unique<float[]>(lonGridNum);
+    UtilFunc::getLatLonData(iiFile, latArr.get(), lonArr.get());
     // std::cout << a << std::endl;
     // iFile = netCDF::NcFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read)
 }
 
+Processor::~Processor() {
+    iiFile->close();
+    iiFile = nullptr;
+}
+
+
+/// 此方法找出文件的各维度的长度
+void Processor::getDimLength() {
+    auto vorVar = iiFile->getVar("Vorticity");
+    timeLength = vorVar.getDim(0).getSize();
+    latGridNum = vorVar.getDim(1).getSize();
+    lonGridNum = vorVar.getDim(2).getSize();
+}
+
 
 /// 第一步：找出有台风的日期，记录日期与台风信息
-void Processor::recognizeTyphoon(float vorField[Constants::latGridNum][Constants::lonGridNum]) {
+void Processor::recognizeTyphoon() {
     std::cout << "第一步(recognize_typhoon): 导入文件成功，开始识别。" << std::endl;
 
     /// 记录前一个时次的台风数目
@@ -34,14 +52,29 @@ void Processor::recognizeTyphoon(float vorField[Constants::latGridNum][Constants
     /// endYear的12月31日0时时次在文件中的index
     int endIndexInFile = 58436;
 
-    for (int timeIndex = startIndexInFile; timeIndex <= endIndexInFile; ++timeIndex) {
+    auto vorVar = iiFile->getVar("Vorticity");
+    
+    // float vorField[latGridNum][lonGridNum];
+    auto vorField = TwoDArray(latGridNum, lonGridNum);
+
+    // float (*arrayy)[Constants::latGridNum][Constants::lonGridNum] = new float[58440][Constants::latGridNum][Constants::lonGridNum];
+    // vorVar.getVar(arrayy);
+
+    for (unsigned long timeIndex = startIndexInFile; timeIndex <= endIndexInFile; ++timeIndex) {
+        // std::cout << vorVar.getName() << std::endl;
+        if (timeIndex % 1000 == 0)
+            std::cout << timeIndex << std::endl; 
+        vorVar.getVar({timeIndex,0,0}, {1, latGridNum, lonGridNum}, vorField.get());
+
         int tpNum_timei = getVortexNum1Time(vorField, tpNum_prevTime);
         tpNum_prevTime = tpNum_timei;
         if (tpNum_timei >= 1) {
             hasTC_timeIndex.push_back(timeIndex);
         }
+        
     }
-
+    // delete [] arrayy;
+    std::cout << "Done step1" << std::endl;
 }
 
 /// 第二步：跟踪第一步生成的每个时次的气旋，生成真正的气旋对象。
@@ -119,10 +152,12 @@ void Processor::getRealTC() {
                 //     }
                 // }
                 /// 距离矩阵（pointer实现）
-                float **distMatrix;
-                distMatrix = new float *[tempTCsSize];
-                for (int i = 0; i < tempTCsSize; ++i)
-                    distMatrix[i] = new float[currentTVortexesSize];
+                // float **distMatrix;
+                // distMatrix = new float *[tempTCsSize];
+                // for (int i = 0; i < tempTCsSize; ++i)
+                //     distMatrix[i] = new float[currentTVortexesSize];
+                // float **distMatrix = new float[tempTCsSize][currentTVortexesSize];
+                auto distMatrix = TwoDArray(tempTCsSize, currentTVortexesSize);
 
                 while (!tempTCS_ForD.empty()) {
                     if (currentTVortexes_copy.empty()) {
@@ -132,12 +167,13 @@ void Processor::getRealTC() {
                         real_TCs.push_back(willBeRMTC);
                         // tempTCsIndex.erase(std::remove(tempTCsIndex.begin(), tempTCsIndex.end(), willBeRMTCIndex), tempTCsIndex.end());
                         // tempTCsIndexForD.erase(std::remove(tempTCsIndexForD.begin(), tempTCsIndexForD.end(), willBeRMTCIndex), tempTCsIndexForD.end());
-                        tempTCS_copy.erase(std::remove(tempTCS_copy.begin(), tempTCS_copy.end(), willBeRMTC));
-                        tempTCS_ForD.erase(std::remove(tempTCS_ForD.begin(), tempTCS_ForD.end(), willBeRMTC));
+                        // tempTCS_copy.erase(std::remove(tempTCS_copy.begin(), tempTCS_copy.end(), willBeRMTC));
+                        // tempTCS_ForD.erase(std::remove(tempTCS_ForD.begin(), tempTCS_ForD.end(), willBeRMTC));
                         continue;
                     }
                     // 寻找两个靠的最近的昨日台风与今日台风
-                    auto minDist = UtilFunc::min_element_2d(distMatrix, tempTCsSize, currentTVortexesSize);
+                    // auto minDist = UtilFunc::min_element_2d(distMatrix, tempTCsSize, currentTVortexesSize);
+                    auto minDist = distMatrix.min();
                     auto minDistIndex = minDist.first;
                     auto minD_tempTC = tempTCs[minDistIndex.first];
                     auto minD_currentTTC = currentTimeVortexes[minDistIndex.second];
@@ -147,18 +183,18 @@ void Processor::getRealTC() {
                         // 从临时数组中移去已消亡的台风
                         // tempTCsIndex.erase(std::remove(tempTCsIndex.begin(), tempTCsIndex.end(), minDistIndex.first), tempTCsIndex.end());
                         // tempTCsIndexForD.erase(std::remove(tempTCsIndexForD.begin(), tempTCsIndexForD.end(), minDistIndex.first), tempTCsIndexForD.end());
-                        tempTCS_copy.erase(std::remove(tempTCS_copy.begin(), tempTCS_copy.end(), minD_tempTC));
-                        tempTCS_ForD.erase(std::remove(tempTCS_ForD.begin(), tempTCS_ForD.end(), minD_tempTC));
+                        // tempTCS_copy.erase(std::remove(tempTCS_copy.begin(), tempTCS_copy.end(), minD_tempTC));
+                        // tempTCS_ForD.erase(std::remove(tempTCS_ForD.begin(), tempTCS_ForD.end(), minD_tempTC));
 
                         // 处理完后将距离设为一个较大的值
                         // 不可设置distMatrix[:][minDistIndex.second] = 1e5！！！！
                         for (int i = 0; i < currentTVortexesSize; ++i) {
-                            distMatrix[minDistIndex.first][i] = 1e5;
+                            distMatrix(minDistIndex.first, i) = 1e5;
                         }
                     } else {                              // 对应成功，移除今天对应的台风
-                        auto theIndex = std::find(tempTCS_copy.begin(), tempTCS_copy.end(), minD_tempTC);
+                        // auto theIndex = std::find(tempTCS_copy.begin(), tempTCS_copy.end(), minD_tempTC);
                         // 更新台风移动到的位置
-                        theIndex->maxVorCells.push_back(minD_currentTTC.maxVorCellIndex);
+                        // theIndex->maxVorCells.push_back(minD_currentTTC.maxVorCellIndex);
                         // 更新最大风速
                         //
                         // 更新台风长轴中心移动到的位置
@@ -168,14 +204,14 @@ void Processor::getRealTC() {
                         // 更新台风几何中心移动到的位置
                         //
 
-                        tempTCS_ForD.erase(std::remove(tempTCS_ForD.begin(), tempTCS_ForD.end(), minD_tempTC));
+                        // tempTCS_ForD.erase(std::remove(tempTCS_ForD.begin(), tempTCS_ForD.end(), minD_tempTC));
                         // 移除对应成功的当前时次的涡旋
-                        currentTVortexes_copy.erase(std::remove(currentTVortexes_copy.begin(), currentTVortexes_copy.end(), minD_currentTTC));
+                        // currentTVortexes_copy.erase(std::remove(currentTVortexes_copy.begin(), currentTVortexes_copy.end(), minD_currentTTC));
 
                         for (int i = 0; i < currentTVortexesSize; ++i)
-                            distMatrix[minDistIndex.first][i] = 1e5;
+                            distMatrix(minDistIndex.first, i) = 1e5;
                         for (int i = 0; i < tempTCsSize; ++i)
-                            distMatrix[i][minDistIndex.second] = 1e5;
+                            distMatrix(i, minDistIndex.second) = 1e5;
                     }
 
                     tempTCs = tempTCS_copy;
@@ -203,13 +239,14 @@ void Processor::getRealTC() {
 /// 此方法识别某个时次是否有台风以及台风的个数
 /// @param[in] vorField 涡度场（2d array）
 /// @return 当前时次的涡旋数量
-int Processor::getVortexNum1Time(float vorField[Constants::latGridNum][Constants::lonGridNum], int tpNum_prevTime) {
+int Processor::getVortexNum1Time(TwoDArray &vorField, int tpNum_prevTime) {
     /// 当前时次的涡旋的个数
     int tpNum = 0;
     std::vector<TC1Time> vortexesThisTime{};
 
     for (int i = 0; i < Constants::TODAY_MAX_TP_NUM; ++i) {
-        auto maxVorCell = UtilFunc::max_element_2d(vorField);
+        // auto maxVorCell = UtilFunc::max_element_2d(vorField);
+        auto maxVorCell = vorField.max();
         std::unordered_set<std::pair<int, int>, pair_hash> allCellsIndex;
         getVortexCellsIndex(vorField, maxVorCell.first, allCellsIndex);
         // auto a = allCells.begin();
@@ -226,7 +263,7 @@ int Processor::getVortexNum1Time(float vorField[Constants::latGridNum][Constants
         float e;
 
         ++tpNum;
-        auto vortexCenterLatLon = UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr, lonArr);
+        auto vortexCenterLatLon = UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr.get(), lonArr.get());
         vortexesThisTime.push_back(TC1Time{maxVorCell.first});
         removeVortex(vorField, allCellsIndex);
     }
@@ -238,8 +275,8 @@ int Processor::getVortexNum1Time(float vorField[Constants::latGridNum][Constants
 /// 此函数接受一个点，递归返回所有在台风内的点（阈值采用相对涡度）
 /// @param[in] vorField 涡度场（2d array）
 /// @param[in] maxValIndex 涡度最大值的格点对应的纬度、经度index
-void Processor::getVortexCellsIndex(float vorField[Constants::latGridNum][Constants::lonGridNum], std::pair<int, int> maxValIndex, std::unordered_set<std::pair<int, int>, pair_hash> &allCellsIndex) {
-    if (vorField[maxValIndex.first][maxValIndex.second] >= Constants::RECURSION_MIN_ReVOR) {
+void Processor::getVortexCellsIndex(TwoDArray &vorField, std::pair<int, int> maxValIndex, std::unordered_set<std::pair<int, int>, pair_hash> &allCellsIndex) {
+    if (vorField(maxValIndex.first, maxValIndex.second) >= Constants::RECURSION_MIN_ReVOR) {
         if (!allCellsIndex.count(maxValIndex)) {
             allCellsIndex.insert(maxValIndex);
             auto surroundingCellsIndex = getSurroundingCellsIndex(vorField, maxValIndex);
@@ -255,7 +292,7 @@ void Processor::getVortexCellsIndex(float vorField[Constants::latGridNum][Consta
 /// @param[in] vorField 涡度场（2d array）
 /// @param[in] maxValIndex 涡度最大值的格点对应的纬度、经度index
 /// @return 周围的点的index
-std::unordered_set<std::pair<int, int>, pair_hash> Processor::getSurroundingCellsIndex(float vorField[Constants::latGridNum][Constants::lonGridNum], std::pair<int, int> cellIndex) {
+std::unordered_set<std::pair<int, int>, pair_hash> Processor::getSurroundingCellsIndex(TwoDArray &vorField, std::pair<int, int> cellIndex) {
     std::unordered_set<std::pair<int, int>, pair_hash> surroundingCells{
         // 左列三个点
         {cellIndex.first+1, cellIndex.second-1}, {cellIndex.first, cellIndex.second-1}, {cellIndex.first-1, cellIndex.second-1},
@@ -270,14 +307,14 @@ std::unordered_set<std::pair<int, int>, pair_hash> Processor::getSurroundingCell
         for (auto &i : excludeCells) {
             surroundingCells.erase(i);
         }
-    } else if (cellIndex.second == Constants::lonGridNum - 1) {      // 点在右边缘
+    } else if (cellIndex.second == lonGridNum - 1) {      // 点在右边缘
         std::vector<std::pair<int, int>> excludeCells{{cellIndex.first+1, cellIndex.second+1}, {cellIndex.first, cellIndex.second+1}, {cellIndex.first-1, cellIndex.second+1}};
         for (auto &i : excludeCells) {
             surroundingCells.erase(i);
         }
     }
     // 点在上边缘
-    if (cellIndex.first == Constants::latGridNum - 1) {
+    if (cellIndex.first == latGridNum - 1) {
         std::vector<std::pair<int, int>> excludeCells{{cellIndex.first+1, cellIndex.second-1}, {cellIndex.first+1, cellIndex.second}, {cellIndex.first+1, cellIndex.second+1}};
         for (auto &i : excludeCells) {
             surroundingCells.erase(i);
@@ -291,11 +328,15 @@ std::unordered_set<std::pair<int, int>, pair_hash> Processor::getSurroundingCell
     return surroundingCells;
 }
 
+void get_e() {
+
+}
+
 /// 此函数消除相对涡度大值中心，为识别多个台风服务，替换为1e-6
 /// @param[inout] vorField 涡度场（2d array）
 /// @param[vortexCellsIndex] 涡旋包含的点的index
-void Processor::removeVortex(float vorField[Constants::latGridNum][Constants::lonGridNum], std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex) {
+inline void Processor::removeVortex(TwoDArray &vorField, std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex) {
     for (auto &i : vortexCellsIndex) {
-        vorField[i.first][i.second] = 1e-6;
+        vorField(i.first, i.second) = 1e-6;
     }
 }
