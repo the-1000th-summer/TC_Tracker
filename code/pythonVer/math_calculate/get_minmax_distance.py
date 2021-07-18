@@ -14,7 +14,7 @@ def get_max_distance(lon, lat, points):  ### points非地球坐标
     """ 此程序输出代表台风的点中两点间的最大距离及相应的点 """
 
     lonlats = pts_to_lonlats(lon, lat, points)   ### 实际地球坐标
-
+    # lonlats = points
     # dists = np.array([point_dist(lon,lat,pt1,pt2) for (pt1,pt2) in itertools.product(points, points)]).reshape(len(points), len(points))
     dists = distance.cdist(lonlats, lonlats, 'euclidean')     ### 距离矩阵
     max_points_index = unravel_index( argmax(dists), dists.shape )   ### 距离矩阵中最大值在矩阵中的坐标

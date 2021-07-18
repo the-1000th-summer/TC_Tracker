@@ -52,11 +52,18 @@ namespace UtilFunc {
     // std::pair<std::pair<int, int>, float> min_element_2d(float **vorField, int latGridNum, int lonGridNum);
 
 
-
     std::pair<float, float> getVortexCenterLatLon(const std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex, float *latArray, float *lonArray);
 
     float cellDist(float *latArray, float *lonArray, std::pair<int, int> cell1Index, std::pair<int, int> cell2Index);
 
+    std::pair<std::pair<int, int>, float> getMaxDistance(std::vector<std::pair<int, int>> &cellsIndex);
+    
+
+    inline float euclideanDist2(const std::pair<float, float> &cell1Index, const std::pair<float, float> &cell2Index);
+    inline float getSlope(const std::pair<float, float> &cell1Index, const std::pair<float, float> &cell2Index);
+    
+    
+    std::pair<float, float> getCellsCenterLatLon(const std::pair<int, int> &cell1Index, const std::pair<int, int> &cell2Index, const float *latArray, const float *lonArray);
 }
 
 

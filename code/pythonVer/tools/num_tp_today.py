@@ -7,7 +7,7 @@ from math_calculate.get_e import get_e
 from math_calculate.constants import WIND_10M_FP, WIND_ALLLEVS_FP
 from tp_class.Tp_Day import Tp_Day
 
-def fffnum_tp_today(lon, lat, VField, tp_num_Y, date, now_date_i, TMTN_inF, HTMR_inF, TMP_inF, TME_inF, RMR_inF, get_max_wnd_10, get_max_wnd_all):
+def num_tp_today(lon, lat, VField, tp_num_Y, date, now_date_i, TMTN_inF, HTMR_inF, TMP_inF, TME_inF, RMR_inF, get_max_wnd_10, get_max_wnd_all):
     """ 此函数识别某天是否有台风以及台风的个数，
     返回当天台风的个数和当天台风组成的列表（台风的类为Tp_Day）。
 

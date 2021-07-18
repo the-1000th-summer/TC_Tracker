@@ -1,4 +1,5 @@
 
+#include <cmath>
 #include <cstdio>
 #include <iostream>
 #include <iterator>
@@ -44,7 +45,7 @@ void Processor::recognizeTyphoon() {
     std::cout << "第一步(recognize_typhoon): 导入文件成功，开始识别。" << std::endl;
 
     /// 记录前一个时次的台风数目
-    int tpNum_prevTime = 0;
+    int TCNum_prevTime = 0;
     constexpr int startYear = 1979, endYear = 2018;
 
     /// startYear的1月1日0时时次在文件中的index
@@ -66,8 +67,8 @@ void Processor::recognizeTyphoon() {
             std::cout << timeIndex << std::endl; 
         vorVar.getVar({timeIndex,0,0}, {1, latGridNum, lonGridNum}, vorField.get());
 
-        int tpNum_timei = getVortexNum1Time(vorField, tpNum_prevTime);
-        tpNum_prevTime = tpNum_timei;
+        int tpNum_timei = getVortexNum1Time(vorField, TCNum_prevTime);
+        TCNum_prevTime = tpNum_timei;
         if (tpNum_timei >= 1) {
             hasTC_timeIndex.push_back(timeIndex);
         }
@@ -239,7 +240,7 @@ void Processor::getRealTC() {
 /// 此方法识别某个时次是否有台风以及台风的个数
 /// @param[in] vorField 涡度场（2d array）
 /// @return 当前时次的涡旋数量
-int Processor::getVortexNum1Time(TwoDArray &vorField, int tpNum_prevTime) {
+int Processor::getVortexNum1Time(TwoDArray &vorField, int TCNum_prevTime) {
     /// 当前时次的涡旋的个数
     int tpNum = 0;
     std::vector<TC1Time> vortexesThisTime{};
@@ -256,11 +257,13 @@ int Processor::getVortexNum1Time(TwoDArray &vorField, int tpNum_prevTime) {
         // }
         if (allCellsIndex.empty())
             break;
-        if ((allCellsIndex.size() <= Constants::TP_MIN_PTS) && (tpNum_prevTime == 0) )
+        if ((allCellsIndex.size() <= Constants::TP_MIN_PTS) && (TCNum_prevTime == 0) )
             break;
 
         /// @todo 偏心率的计算逻辑
-        float e;
+        float e = get_e(allCellsIndex);
+        if ((e > Constants::TP_MIN_E) && (TCNum_prevTime == 0))
+            break;
 
         ++tpNum;
         auto vortexCenterLatLon = UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr.get(), lonArr.get());
@@ -328,8 +331,51 @@ std::unordered_set<std::pair<int, int>, pair_hash> Processor::getSurroundingCell
     return surroundingCells;
 }
 
-void get_e() {
+float Processor::get_e(std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex, const float *latArray, const float *lonArray) {
+    std::vector<std::pair<int, int>> vortexCellsIndex_v(vortexCellsIndex.begin(), vortexCellsIndex.end());
+    auto distMax = UtilFunc::getMaxDistance(vortexCellsIndex_v);
+    
+    /// 半长轴长度（单位：度）
+    float A = distMax.second * (latArray[1] - latArray[0]) / 2.0;
+    /// 长轴斜率
+    float majorAxisK = UtilFunc::getSlope(vortexCellsIndex_v[distMax.first.first], vortexCellsIndex_v[distMax.first.second]);
+    /// 短轴斜率
+    float minorAxisK = (majorAxisK == 0) ? std::numeric_limits<float>::infinity() : (-1 / majorAxisK);
+    /// 椭圆中点纬度、经度
+    auto centerLatLon = UtilFunc::getCellsCenterLatLon(vortexCellsIndex_v[distMax.first.first], vortexCellsIndex_v[distMax.first.second], latArray, lonArray);
 
+    getMinorAxisLen(vortexCellsIndex_v, minorAxisK);
+}
+
+/// 此方法计算短轴长度
+float Processor::getMinorAxisLen(const std::vector<std::pair<int, int>> &cellsIndex, const std::pair<float, float> &centerLatLon, float minorAxisK) {
+    std::pair<float, float> cellsLatLon[cellsIndex.size()];
+    std::transform(cellsIndex.begin(), cellsIndex.end(), cellsLatLon, [this](const std::pair<int, int> &cellIndex) -> std::pair<float, float> {
+        return {latArr[cellIndex.first], lonArr[cellIndex.second]};
+    });
+    std::vector<std::pair<int, int>> validCellsIndex;
+    /// 短轴轴线对应的弧度
+    float minorAxisRad = std::atan(minorAxisK);
+    for (int i = 0; i < cellsIndex.size(); ++i) {
+        auto cellRad = std::atan(UtilFunc::getSlope(centerLatLon, cellsLatLon[i]));
+        if (std::abs(minorAxisRad - cellRad) <= M_PI / 4)
+            validCellsIndex.push_back(cellsIndex[i]);
+    }
+    if (validCellsIndex.size() <= 1)
+        return 0.0;
+
+    /// 取这些点中两个距离最远的点
+    auto a = UtilFunc::getMaxDistance(validCellsIndex);
+    /// 两个距离最远的点连线的弧度
+    float appro_min_rad = std::atan(UtilFunc::getSlope(validCellsIndex[a.first.first], validCellsIndex[a.first.second]));
+    /// 估计线与真实线夹角余弦
+    float cosAlpha = std::cos(std::abs(appro_min_rad - minorAxisRad));
+    if (cosAlpha < 0)               // 条带太窄导致两个点都在一边，
+        return 0.0;                 // 可能使计算出的斜率严重出错（即与长轴有相同趋势）
+
+    auto min_dists = a.second
+
+    
 }
 
 /// 此函数消除相对涡度大值中心，为识别多个台风服务，替换为1e-6

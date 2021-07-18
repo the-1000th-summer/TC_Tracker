@@ -18,11 +18,14 @@ public:
     void recognizeTyphoon();
     void getRealTC();
     void removeNoise();
-    int getVortexNum1Time(TwoDArray &vorField, int tpNum_prevTime);
+    int getVortexNum1Time(TwoDArray &vorField, int TCNum_prevTime);
     void getVortexCellsIndex(TwoDArray &vorField, std::pair<int, int> maxValIndex, std::unordered_set<std::pair<int, int>, pair_hash> &allCells);
     std::unordered_set<std::pair<int, int>, pair_hash> getSurroundingCellsIndex(TwoDArray &vorField, std::pair<int, int> cellIndex);
-    void get_e();
+    float get_e(std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex, const float *latArray, const float *lonArray);
+    float getMinorAxisLen(const std::vector<std::pair<int, int>> &cellsIndex, const std::pair<float, float> &centerLatLon, float minorAxisK);
+
     inline void removeVortex(TwoDArray &vorField, std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex);
+    
     
 private:
     netCDF::NcFile *iiFile;

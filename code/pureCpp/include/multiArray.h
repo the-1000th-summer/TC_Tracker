@@ -23,16 +23,17 @@ public:
     inline float *get() {
         return data.get();
     }
-    std::pair<std::pair<int, int>, float> max() {
+    std::pair<std::pair<int, int>, float> max() const {
         auto maxElemIter = std::max_element(data.get(), data.get() + _rows*_columns);
         auto maxElemIndex = std::distance(data.get(), maxElemIter);
         return {{maxElemIndex/_columns, maxElemIndex%_columns}, *maxElemIter};
     }
-    std::pair<std::pair<int, int>, float> min() {
+    std::pair<std::pair<int, int>, float> min() const {
         auto minElemIter = std::min_element(data.get(), data.get() + _rows*_columns);
         auto minElemIndex = std::distance(data.get(), minElemIter);
         return {{minElemIndex/_columns, minElemIndex%_columns}, *minElemIter};
     }
+    
 
     // void printData() {
     //     for (int i = 0; i < 2; i++) {
