@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <ctime>
 #include <string>
 #include <netcdf>
@@ -64,6 +65,15 @@ namespace UtilFunc {
     
     
     std::pair<float, float> getCellsCenterLatLon(const std::pair<int, int> &cell1Index, const std::pair<int, int> &cell2Index, const float *latArray, const float *lonArray);
+
 }
 
+/// 计算两点欧氏距离
+inline float UtilFunc::euclideanDist2(const std::pair<float, float> &cell1Index, const std::pair<float, float> &cell2Index) {
+    return std::pow(cell1Index.first-cell2Index.first, 2) + std::pow(cell1Index.second-cell2Index.second, 2);
+}
 
+/// 计算两点斜率
+inline float UtilFunc::getSlope(const std::pair<float, float> &cell1Index, const std::pair<float, float> &cell2Index) {
+    return (cell2Index.first == cell1Index.first) ? std::numeric_limits<float>::infinity() : (cell2Index.second - cell1Index.second) / (cell2Index.first - cell1Index.first);
+}

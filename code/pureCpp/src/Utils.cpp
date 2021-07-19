@@ -210,18 +210,6 @@ std::pair<std::pair<int, int>, float> UtilFunc::getMaxDistance(std::vector<std::
 }
 
 
-
-
-/// 计算两点欧氏距离
-inline float UtilFunc::euclideanDist2(const std::pair<float, float> &cell1Index, const std::pair<float, float> &cell2Index) {
-    return std::pow(cell1Index.first-cell2Index.first, 2) + std::pow(cell1Index.second-cell2Index.second, 2);
-}
-
-/// 计算两点斜率
-inline float UtilFunc::getSlope(const std::pair<float, float> &cell1Index, const std::pair<float, float> &cell2Index) {
-    return (cell2Index.first == cell1Index.first) ? std::numeric_limits<float>::infinity() : (cell2Index.second - cell1Index.second) / (cell2Index.first - cell1Index.first);
-}
-
 std::pair<float, float> UtilFunc::getCellsCenterLatLon(const std::pair<int, int> &cell1Index, const std::pair<int, int> &cell2Index, const float *latArray, const float *lonArray) {
     return {(latArray[cell1Index.first]+latArray[cell2Index.first])/2.0, (lonArray[cell1Index.second]+lonArray[cell2Index.second])/2.0};
 }

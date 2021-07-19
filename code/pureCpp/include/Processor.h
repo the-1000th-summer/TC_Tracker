@@ -18,13 +18,13 @@ public:
     void recognizeTyphoon();
     void getRealTC();
     void removeNoise();
-    int getVortexNum1Time(TwoDArray &vorField, int TCNum_prevTime);
-    void getVortexCellsIndex(TwoDArray &vorField, std::pair<int, int> maxValIndex, std::unordered_set<std::pair<int, int>, pair_hash> &allCells);
-    std::unordered_set<std::pair<int, int>, pair_hash> getSurroundingCellsIndex(TwoDArray &vorField, std::pair<int, int> cellIndex);
-    float get_e(std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex, const float *latArray, const float *lonArray);
-    float getMinorAxisLen(const std::vector<std::pair<int, int>> &cellsIndex, const std::pair<float, float> &centerLatLon, float minorAxisK);
+    int getVortexNum1Time(ThreeDArray &vorField, int timeIndex, int TCNum_prevTime);
+    void getVortexCellsIndex(ThreeDArray &vorField, int timeIndex, std::pair<int, int> maxValIndex, std::unordered_set<std::pair<int, int>, pair_hash> &allCells);
+    std::unordered_set<std::pair<int, int>, pair_hash> getSurroundingCellsIndex(std::pair<int, int> cellIndex);
+    float get_e(std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex);
+    std::pair<float, float> getMinorAxisLen(const std::vector<std::pair<int, int>> &cellsIndex, const std::pair<float, float> &centerLatLon, float minorAxisK, const float gridRatio, const float A);
 
-    inline void removeVortex(TwoDArray &vorField, std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex);
+    inline void removeVortex(ThreeDArray &vorField, int timeIndex, std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex);
     
     
 private:
