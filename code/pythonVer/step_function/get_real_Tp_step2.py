@@ -81,8 +81,8 @@ def get_real_Tp(i_binFileName, o_binFileName, LTMD):
 
                 ################################
 
-                temp_tps_max_pt = [temp_tp.max_pts[-1] for temp_tp in temp_tps_copy]
-                today_tps_max_pt = [today_tp.max_pt for today_tp in today_tps_copy]
+                temp_tps_max_pt = [temp_tp.max_pts[-1] for temp_tp in temp_tps]
+                today_tps_max_pt = [today_tp.max_pt for today_tp in today_tps]
                 temp_today_dists = np.array([point_dist(lon,lat,pt1,pt2) for (pt1,pt2) in itertools.product(temp_tps_max_pt, today_tps_max_pt)]).reshape(len(temp_tps_max_pt), len(today_tps_max_pt))
                 # print(temp_today_dists)
                 while temp_tps_cForD:               ### 当昨日台风仍未全部对应完时
@@ -130,72 +130,10 @@ def get_real_Tp(i_binFileName, o_binFileName, LTMD):
                 ### 昨天所有的台风对应完，today_tps_copy剩下新生成的、未被跟踪的台风
                 if today_tps_copy:    ### 判断 today_tps_copy 是否为空
                     for i, tp_No_i in enumerate(range(tp_No, tp_No+len(today_tps_copy))):
-                        temp_tps.append(Typhoon(tp_No_i, [today_tps_copy[i].max_pt], [today_tps_copy[i].mws_10m], [today_tps_copy[i].mws_allLs], [today_tps_copy[i].twoPCenterLL], [today_tps_copy[i].fourPCenterLL], [today_tps_copy[i].allPCenterLL], today_tps_copy[i].date, today_tps_copy[i].date))
+                        today_tp_copy = today_tps_copy[i]
+                        temp_tps.append(Typhoon(tp_No_i, [today_tp_copy.max_pt], [today_tp_copy.mws_10m], [today_tp_copy.mws_allLs], [today_tp_copy.twoPCenterLL], [today_tp_copy.fourPCenterLL], [today_tp_copy.allPCenterLL], today_tp_copy.date, today_tp_copy.date))
 
                     tp_No += len(today_tps_copy)  ### 更新台风编号，注意更新后的编号所代表的台风仍未出现
-
-                # if today_tp_num >= len(temp_tps):   ### 如果今天台风个数大于等于正在跟踪的台风，对正在跟踪的台风进行迭代！！
-                # if True:
-                #     for tp_i, temp_tp in enumerate(temp_tps):  ### 注意迭代时不能改变被迭代的对象！
-
-                #         if not today_tps_copy:
-                #         ### 如果进入了这个条件，就说明今天的台风比昨天的少，今天的台风都对应成功
-                #             real_tps.append(temp_tp)        ### 该台风昨天就消亡了
-                #             temp_tps_copy.remove(temp_tp)    ### 从临时数组中移去已消亡的台风
-                #             continue
-                #         ### 找到最近的台风以及它们之间的距离
-                #         nearest_tp, nearest_dist = find_nearest_tp(lon, lat, temp_tps[tp_i], today_tps_copy)
-                #         if nearest_dist > LINK_TP_MAX_DIST:
-                #             # temp_tps[tp_i].end_date = num2date(date_iter-1, time.units, time.calendar)       ### 该台风昨天就消亡了
-                #             real_tps.append(temp_tps[tp_i])
-                #             temp_tps_copy.remove(temp_tps[tp_i])   ### 从临时数组中移去已消亡的台风
-
-                #         else:    ### 对应成功，移除今天对应的台风
-                #             temp_tps_copy[temp_tps_copy.index(temp_tp)].max_pts.append(nearest_tp.max_pt)     ### 更新台风移动到的位置
-                #             temp_tps_copy[temp_tps_copy.index(temp_tp)].centerLonlats.append(nearest_tp.centerLonlat) ### 更新台风中心移动到的位置
-                #             temp_tps_copy[temp_tps_copy.index(temp_tp)].allPCenterLLs.append(nearest_tp.allPCenterLL)  ### 更新台风几何中心移动到的位置
-
-                #             # temp_tps_copy[temp_tps_copy.index(temp_tp)].end_date = num2date(date_iter, time_units, time_calendar)       ### 更新台风消亡日期
-                #             temp_tps_copy[temp_tps_copy.index(temp_tp)].end_date = time[date_iter]
-                #             today_tps_copy.remove(nearest_tp)  ### 移除对应成功的今天的台风
-
-                #     temp_tps = temp_tps_copy.copy()
-
-                #     ### 昨天所有的台风对应完，today_tps_copy剩下新生成的、未被跟踪的台风
-                #     if today_tps_copy:    ### 判断 today_tps_copy 是否为空
-                #         for i, tp_No_i in enumerate(range(tp_No, tp_No+len(today_tps_copy))):
-                #             temp_tps.append(Typhoon(tp_No_i, [today_tps_copy[i].max_pt], [today_tps_copy[i].centerLonlat], [today_tps_copy[i].allPCenterLL], today_tps_copy[i].date, today_tps_copy[i].date))
-
-                #         tp_No += len(today_tps_copy)  ### 更新台风编号，注意更新后的编号所代表的台风仍未出现
-
-                # else:    ### 如果今天台风个数小于正在跟踪的台风，对“今天台风”进行迭代！！
-                #     ### else里的语句永远不被执行
-                #     # new_temp_tps = []     ### 今天所生成的真正的台风(Typhoon)
-                #     for tp_i, today_tp in enumerate(today_tps):
-                #         if not temp_tps_copy:
-                #             ### 如果进入了这个条件，就说明今天的台风比temp的多，且剩下的都对应成功
-                #             temp_tps.append(Typhoon(tp_No, [today_tp.max_pt], [today_tp.centerLonlat], [today_tp.allPCenterLL], today_tp.date, today_tp.date))
-                #             tp_No += 1
-
-                #         ### nearest_tp：指temp_tp中最近的一个
-                #         nearest_tp, nearest_dist = find_nearest_real_tp(lon, lat, temp_tps_copy, today_tp)
-                #         if nearest_dist > 700.0:     ### 离已有的台风都很远，这是新生成的台风
-                #             temp_tps.append(Typhoon(tp_No, [today_tp.max_pt], [today_tp.centerLonlat], [today_tp.allPCenterLL], today_tp.date, today_tp.date))
-                #             tp_No += 1
-                #         else:
-                #             ### 更新台风移动到的位置
-                #             temp_tps[temp_tps_copy.index(nearest_tp)].max_pts.append(today_tp.max_pt)
-                #             temp_tps[temp_tps_copy.index(nearest_tp)].centerLonlats.append(today_tp.centerLonlat)
-                #             temp_tps[temp_tps_copy.index(nearest_tp)].allPCenterLLs.append(today_tp.allPCenterLL)
-                #             ### 更新台风消亡日期
-                #             # temp_tps[temp_tps_copy.index(nearest_tp)].end_date = num2date(date_iter, time_units, time_calendar)
-                #             temp_tps[temp_tps_copy.index(nearest_tp)].end_date = time[date_iter]
-                #             temp_tps_copy.remove(nearest_tp)
-
-                #     ### “今天台风”全部对应成功，剩下未对应的temp台风要结束掉
-                #     for left_temp_tp in temp_tps_copy:
-                #         real_tps.append(left_temp_tp)
-                #         temp_tps.remove(left_temp_tp)
 
         is_tp_date_yest = is_tp_date_today     ### 到第二天之前更新第二天的昨天有无台风
         date_iter += 1
