@@ -20,6 +20,7 @@ int main(int, char**) {
     
     Processor p(iFile);
     p.recognizeTyphoon();
+    p.getRealTC();
     
     
     // time_t timep = 0;

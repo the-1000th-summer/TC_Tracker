@@ -1,0 +1,28 @@
+﻿<Window x:Class="TC_Tracker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TC_Tracker"
+        mc:Ignorable="d"
+        Title="TC Tracker" Height="450" Width="800"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        
+        <Menu>
+            <MenuItem Header="文件(_F)">
+                <MenuItem x:Name="menu_selDir" Header="选择文件(_O)" Click="browseButton_Click" />
+                <MenuItem Header="退出(_X)" Click="exit_OnClick" />
+            </MenuItem>
+            <MenuItem Header="偏好设置(_P)">
+
+            </MenuItem>
+        </Menu>
+
+    </Grid>
+</Window>

@@ -66,6 +66,9 @@ namespace UtilFunc {
     
     std::pair<float, float> getCellsCenterLatLon(const std::pair<int, int> &cell1Index, const std::pair<int, int> &cell2Index, const float *latArray, const float *lonArray);
 
+    bool alwaysMoveEast(const std::vector<std::pair<int, int>> &cells);
+    float cellsLatOrLonAvg(const float *latOrLonArray, const std::vector<std::pair<int, int>> &cells);
+
 }
 
 /// 计算两点欧氏距离

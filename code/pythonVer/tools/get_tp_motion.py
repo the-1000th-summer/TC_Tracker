@@ -3,9 +3,7 @@ from netCDF4 import Dataset
 
 def always_move_east(points):
     """ 此程序判断“台风”是否一直向东移动 """
-    xArr = []
-    for point in points:
-        xArr.append(point[0])
+    xArr = [ point[0] for point in points ]
     # xBefore = xArr[0]
     for i in range(1,len(xArr)):
         # print(xArr[i] - xArr[i-1])

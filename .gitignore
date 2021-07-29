@@ -1,3 +1,5 @@
+# .gitignore
+/.gitignore
 # build
 /code/pureCpp/build
 # cache
@@ -8,3 +10,10 @@
 /data/
 # pycache
 __pycache__/
+# visual studio auto-generated files
+/code/projects/TC_Tracker/.vs/
+/code/projects/TC_Tracker/Debug/
+/code/projects/TC_Tracker/TC_Tracker/bin/
+/code/projects/TC_Tracker/TC_Tracker/obj/
+/code/projects/TC_Tracker/TTCore/Debug/
+/code/projects/TC_Tracker/TTWrapper/Debug/

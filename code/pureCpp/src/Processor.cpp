@@ -7,6 +7,7 @@
 #include <numeric>
 #include <netcdf>
 #include <ostream>
+#include <set>
 #include <utility>
 #include <vector>
 #include <unordered_set>
@@ -92,19 +93,21 @@ void Processor::getRealTC() {
     int timeIndex = 0;
     ///
     int hasVortex_notHandledYetIndex;
-    /// 最后有气旋的时次的index
-    int hasTCLastTimeIndex = hasTC_timeIndex.back();
+    /// 最后有气旋的时次的index+1
+    int hasTCLastTimeIndex = hasTC_timeIndex.back() + 1;
     /// 跟踪时仍未确定消亡日期的气旋；跟踪完成的气旋
-    std::vector<Typhoon> tempTCs{}, real_TCs{};
+    std::vector<Typhoon> tempTCs{};
 
-    while (timeIndex <= hasTCLastTimeIndex) {
+    for (; timeIndex < hasTCLastTimeIndex; ++timeIndex) {
+        if (timeIndex % 1000 == 0)
+            std::cout << timeIndex << std::endl;
         /// 当前时次是否有气旋？
         hasTCCurrentTime = (std::find(hasTC_timeIndex.begin(), hasTC_timeIndex.end(), timeIndex) != hasTC_timeIndex.end()) ? true : false;
         if (!hasTCCurrentTime) {
             if (hasTCPrevTime) {  // 当前时次无气旋，前一时次有气旋，确定气旋消亡日期
                 for (auto &tempTC : tempTCs)
                     tempTC.endTimeIndex = timeIndex - 1;
-                real_TCs.insert(real_TCs.end(), tempTCs.begin(), tempTCs.end());
+                realTCs.insert(realTCs.end(), tempTCs.begin(), tempTCs.end());
                 tempTCs.clear();
             }
 
@@ -125,28 +128,33 @@ void Processor::getRealTC() {
                 // 更新气旋编号，注意更新后的编号所代表的气旋仍未出现
                 TC_No += currentTimeTCNum;
             } else {             // 当前时次和前一时次都有气旋
+                int tempTCsSize = tempTCs.size();
+                int currentTVortexesSize = currentTimeVortexes.size();
+
                 /// 当前时次的涡旋index
                 // std::vector<TC1Time> currentTVortexes_copy(currentTimeVortexes);
                 std::set<int> currentT_VorsRMIndex;
                 // std::iota(currentT_VorsIndex.begin(), currentT_VorsIndex.end(), 0);
 
                 /// 正在跟踪的气旋index
-                std::vector<Typhoon> tempTCS_copy(tempTCs);
-                // std::vector<int> tempTCsIndex(tempTCs.size());
-                // std::iota(tempTCsIndex.begin(), tempTCsIndex.end(), 0);
+                // std::vector<Typhoon> tempTCS_copy(tempTCs);
+                std::set<int> tempTCsRMIndex;
 
                 /// 正在跟踪的气旋index，用于判断每个台风是否被处理
-                std::vector<Typhoon> tempTCS_ForD(tempTCs);
-                // std::vector<int> tempTCsIndexForD(tempTCs.size());
-                // std::iota(tempTCsIndexForD.begin(), tempTCsIndexForD.end(), 0);
+                // std::vector<Typhoon> tempTCS_ForD(tempTCs);
+                std::set<int> tempTCsIndexForD;
+                for (int i = 0; i < tempTCsSize; ++i) {
+                    // tempTCsIndex.insert(tempTCsIndex.end(), i);
+                    tempTCsIndexForD.insert(tempTCsIndexForD.end(), i);
+                }
+                    
 
 
                 std::vector<std::pair<int, int>> temp_TCs_max_pt, currentT_TCs_maxVorCellIndex;
                 std::transform(tempTCs.begin(), tempTCs.end(), std::back_inserter(temp_TCs_max_pt), [](const Typhoon &temp_TC) {return temp_TC.maxVorCells.back();});
                 std::transform(currentTimeVortexes.begin(), currentTimeVortexes.end(), std::back_inserter(currentT_TCs_maxVorCellIndex), [](const TC1Time &currentTimeVortex) {return currentTimeVortex.maxVorCellIndex;});
 
-                int tempTCsSize = tempTCs.size();
-                int currentTVortexesSize = currentTimeVortexes.size();
+                
 
                 /// 距离矩阵（多维数组实现）
                 // float distMatrix[tempTCsSize][currentTVortexesSize];
@@ -168,16 +176,18 @@ void Processor::getRealTC() {
                     }
                 }
 
-                while (!tempTCS_ForD.empty()) {
+                while (!tempTCsIndexForD.empty()) {
                     if (currentT_VorsRMIndex.size() == currentTVortexesSize) {
                         // 如果进入了这个条件，就说明当前时次的气旋比昨天的少，当前时次的气旋都已经对应成功
                         // 现在处理的是上一个时次的没有对应的气旋
-                        auto willBeRMTC = tempTCS_ForD[0];
-                        real_TCs.push_back(willBeRMTC);
-                        // tempTCsIndex.erase(std::remove(tempTCsIndex.begin(), tempTCsIndex.end(), willBeRMTCIndex), tempTCsIndex.end());
-                        // tempTCsIndexForD.erase(std::remove(tempTCsIndexForD.begin(), tempTCsIndexForD.end(), willBeRMTCIndex), tempTCsIndexForD.end());
-                        tempTCS_copy.erase(std::remove(tempTCS_copy.begin(), tempTCS_copy.end(), willBeRMTC));
-                        tempTCS_ForD.erase(std::remove(tempTCS_ForD.begin(), tempTCS_ForD.end(), willBeRMTC));
+
+                        /// 需要被删除的气旋在index中的iterator（删除第一个）
+                        auto willBeRMTCIter = tempTCsIndexForD.begin();
+                        realTCs.push_back(tempTCs[*willBeRMTCIter]);
+                        // 这里必须加星号
+                        tempTCsRMIndex.insert(*willBeRMTCIter);
+                        // 注意这里是删除第一个元素，至于加不加星号都是删除第一个元素，加星号意味着根据值删除
+                        tempTCsIndexForD.erase(willBeRMTCIter);
                         continue;
                     }
                     // 寻找两个靠的最近的昨日台风与今日台风
@@ -188,13 +198,13 @@ void Processor::getRealTC() {
                     auto minD_currentTTC = currentTimeVortexes[minDistIndex.second];
 
                     if (minDist.second > Constants::LINK_TP_MAX_DIST) {  // 该台风昨天就消亡了
-                        real_TCs.push_back(minD_tempTC);
+                        realTCs.push_back(minD_tempTC);
 
                         // 从临时数组中移去已消亡的台风
-                        // tempTCsIndex.erase(std::remove(tempTCsIndex.begin(), tempTCsIndex.end(), minDistIndex.first), tempTCsIndex.end());
-                        // tempTCsIndexForD.erase(std::remove(tempTCsIndexForD.begin(), tempTCsIndexForD.end(), minDistIndex.first), tempTCsIndexForD.end());
-                        tempTCS_copy.erase(std::remove(tempTCS_copy.begin(), tempTCS_copy.end(), minD_tempTC));
-                        tempTCS_ForD.erase(std::remove(tempTCS_ForD.begin(), tempTCS_ForD.end(), minD_tempTC));
+                        tempTCsRMIndex.insert(minDistIndex.first);
+                        tempTCsIndexForD.erase(minDistIndex.first);
+                        // tempTCS_copy.erase(std::remove(tempTCS_copy.begin(), tempTCS_copy.end(), minD_tempTC));
+                        // tempTCS_ForD.erase(std::remove(tempTCS_ForD.begin(), tempTCS_ForD.end(), minD_tempTC));
 
                         // 处理完后将距离设为一个较大的值
                         // 不可设置distMatrix[:][minDistIndex.second] = 1e5！！！！
@@ -205,6 +215,7 @@ void Processor::getRealTC() {
                         // auto theIndex = std::find(tempTCS_copy.begin(), tempTCS_copy.end(), minD_tempTC);
                         // 更新台风移动到的位置
                         // theIndex->maxVorCells.push_back(minD_currentTTC.maxVorCellIndex);
+                        tempTCs[minDistIndex.first].maxVorCells.push_back(minD_currentTTC.maxVorCellIndex);
                         // 更新最大风速
                         //
                         // 更新台风长轴中心移动到的位置
@@ -214,7 +225,7 @@ void Processor::getRealTC() {
                         // 更新台风几何中心移动到的位置
                         //
 
-                        tempTCS_ForD.erase(std::remove(tempTCS_ForD.begin(), tempTCS_ForD.end(), minD_tempTC));
+                        tempTCsIndexForD.erase(minDistIndex.first);
                         // 移除对应成功的当前时次的涡旋
                         // currentTVortexes_copy.erase(std::remove(currentTVortexes_copy.begin(), currentTVortexes_copy.end(), minD_currentTTC));
                         currentT_VorsRMIndex.insert(minDistIndex.second);
@@ -225,10 +236,13 @@ void Processor::getRealTC() {
                             distMatrix(i, minDistIndex.second) = 1e5;
                     }
                 }
-                tempTCs = tempTCS_copy;
+                // 根据index删除相应的消亡的气旋
+                for (auto rIter = tempTCsRMIndex.crbegin(); rIter != tempTCsRMIndex.crend(); ++rIter)
+                    tempTCs.erase(tempTCs.cbegin() + *rIter);
 
                 // 前一时次的所有的气旋对应完，today_tps_copy剩下新生成的、未被跟踪的气旋
                 if (currentT_VorsRMIndex.size() < currentTVortexesSize) {
+                    // 根据index删除相应的处理完的当前时次的涡旋
                     for (auto rIter = currentT_VorsRMIndex.crbegin(); rIter != currentT_VorsRMIndex.crend(); ++rIter) {
                         currentTimeVortexes.erase(currentTimeVortexes.cbegin() + *rIter);
                     }
@@ -244,9 +258,49 @@ void Processor::getRealTC() {
             }
         }
         hasTCPrevTime = hasTCCurrentTime;
-        ++timeIndex;
+    }
+}
+
+void Processor::removeNoise() {
+    int realTCsNum = realTCs.size();
+    std::set<int> tcRMIndex;
+    int i = 0;
+    auto addRMIndex = [&tcRMIndex, i]() { tcRMIndex.insert(i); };
+
+    for (; i < realTCsNum; ++i) {
+        auto realTC = realTCs[i];
+        int tcStartLat = realTC.maxVorCells.front().first, tcStartLon = realTC.maxVorCells.front().second;
+        int tcEndLat = realTC.maxVorCells.back().first, tcEndLon = realTC.maxVorCells.back().second;
+
+        // 去除不动的点（即包括单个点）
+        if ((tcStartLon == tcEndLon) && (tcStartLat == tcEndLat)) {
+            addRMIndex();
+        // 去除小于3个点的轨迹
+        } else if (realTC.maxVorCells.size() < 3) {
+            addRMIndex();
+        // 去除一直在东边的轨迹
+        } else if ((tcStartLon >= 170) && (tcEndLon >= 170)) {
+            addRMIndex();
+        // 排除非热带生成的气旋
+        } else if ((tcStartLat >= 33) || (tcStartLat < 0)) {
+            addRMIndex();
+        // 去除温带低压
+        } else if (UtilFunc::alwaysMoveEast(realTC.maxVorCells)) {
+            addRMIndex();
+        // 第一个点在陆地上
+        } else if () {
+            addRMIndex();
+        // 排除纬度太低的气旋
+        } else if ((tcEndLat < 5) && UtilFunc::cellsLatOrLonAvg(latArr.get(), realTC.maxVorCells)) {
+            addRMIndex();
+        // 排除印度洋的台风
+        } else if (UtilFunc::cellsLatOrLonAvg(lonArr.get(), realTC.maxVorCells)) {
+            addRMIndex();
+        }
     }
 
+    for (auto rIter = tcRMIndex.crbegin(); rIter != tcRMIndex.crend(); ++rIter)
+        realTCs.erase(realTCs.cbegin() + *rIter);
 }
 
 /// 此方法识别某个时次是否有台风以及台风的个数

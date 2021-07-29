@@ -213,3 +213,18 @@ std::pair<std::pair<int, int>, float> UtilFunc::getMaxDistance(std::vector<std::
 std::pair<float, float> UtilFunc::getCellsCenterLatLon(const std::pair<int, int> &cell1Index, const std::pair<int, int> &cell2Index, const float *latArray, const float *lonArray) {
     return {(latArray[cell1Index.first]+latArray[cell2Index.first])/2.0, (lonArray[cell1Index.second]+lonArray[cell2Index.second])/2.0};
 }
+
+/// 判断气旋是否一直向东移动
+bool UtilFunc::alwaysMoveEast(const std::vector<std::pair<int, int>> &cells) {
+    int cellsLon[cells.size()];
+    std::transform(cells.cbegin(), cells.cend(), cellsLon, [](const std::pair<int, int> &cell) {return cell.second;});
+    return std::is_sorted(cellsLon, cellsLon+cells.size());
+}
+
+// 返回一组cell的平均纬度
+float UtilFunc::cellsLatOrLonAvg(const float *latOrLonArray, const std::vector<std::pair<int, int>> &cells) {
+    float avg = 0.0;
+    for (const auto &cell : cells)
+        avg += latOrLonArray[cell.first];
+    return avg / cells.size();
+}

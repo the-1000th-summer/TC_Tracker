@@ -3,6 +3,7 @@
 #include <netcdf>
 #include <string>
 #include <utility>
+#include "Typhoon.h"
 #include "Utils.h"
 #include <unordered_set>
 #include <vector>
@@ -36,6 +37,7 @@ private:
     std::unique_ptr<float[]> latArr, lonArr;
     std::vector<int> hasTC_timeIndex{};
     std::vector<std::vector<TC1Time>> allVortexes{};
+    std::vector<Typhoon> realTCs{};
 };
 
 

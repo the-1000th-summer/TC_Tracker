@@ -38,7 +38,7 @@ def remove_noise(i_binFileName, o_binFileName, remove=True):
             if tp_start_lon == tp_end_lon and tp_start_lat == tp_end_lat:
                 real_tps_copy.remove(real_tp)
                 continue
-            if len(real_tp.max_pts) <= 2:#13: ### 去除小于等于2个点的轨迹
+            if len(real_tp.max_pts) <= 2:#13: ### 
                 real_tps_copy.remove(real_tp)
                 continue
             ### 去除一直在东边的轨迹
