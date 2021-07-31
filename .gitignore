@@ -10,10 +10,13 @@
 /data/
 # pycache
 __pycache__/
-# visual studio auto-generated files
+# visual studio generated files
 /code/projects/TC_Tracker/.vs/
 /code/projects/TC_Tracker/Debug/
 /code/projects/TC_Tracker/TC_Tracker/bin/
 /code/projects/TC_Tracker/TC_Tracker/obj/
 /code/projects/TC_Tracker/TTCore/Debug/
+/code/projects/TC_Tracker/TTCore/x64/
 /code/projects/TC_Tracker/TTWrapper/Debug/
+/code/projects/TC_Tracker/TTWrapper/x64/
+/code/projects/TC_Tracker/x64/

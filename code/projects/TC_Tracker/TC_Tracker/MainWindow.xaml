@@ -19,7 +19,7 @@
                 <MenuItem x:Name="menu_selDir" Header="选择文件(_O)" Click="browseButton_Click" />
                 <MenuItem Header="退出(_X)" Click="exit_OnClick" />
             </MenuItem>
-            <MenuItem Header="偏好设置(_P)">
+            <MenuItem Header="偏好设置(_P)" Click="MenuItem_Click">
 
             </MenuItem>
         </Menu>

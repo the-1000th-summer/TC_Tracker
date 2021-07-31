@@ -6,7 +6,7 @@ using namespace System;
 namespace myCLI {
     public ref class Entity : public ManagedObject<TTCore::Entity> {
     public:
-        // dsfsdf
+        
         Entity(String^ name, float xPos, float yPos);
         void Move(float deltaX, float deltaY);
         property float XPosition {

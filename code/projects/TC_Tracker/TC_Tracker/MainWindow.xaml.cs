@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 using myCLI;
 
@@ -20,6 +22,11 @@ namespace TC_Tracker {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
+
+        private string cSelDir {
+            get => Properties.Settings.Default.selectDir;
+        }
+
         public MainWindow() {
             InitializeComponent();
 
@@ -30,6 +37,39 @@ namespace TC_Tracker {
             //Console.WriteLine(e.XPosition + " " + e.YPosition);
             //Console.Read();
 
+        }
+
+        private void browseButton_Click(object sender, RoutedEventArgs e) {
+            var dialog = new CommonOpenFileDialog();
+
+            var savedSDir = cSelDir;
+            dialog.InitialDirectory = savedSDir == "" ? "C:\\Users" : savedSDir;
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+                var selectDir = dialog.FileName;
+                Debug.WriteLine(selectDir);
+                saveSelectDir(selectDir);
+                //dirTextBox.Text = selectDir;
+                //changeUIAccV(validateDir(dirTextBox.Text));
+            }
+        }
+
+        private void exit_OnClick(object sender, RoutedEventArgs e) {
+
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e) {
+            //Debug
+            Trace.WriteLine("ssdfsdf");
+        }
+
+        /// <summary>
+        /// 保存工作文件夹字符串到settings中
+        /// </summary>
+        /// <param name="text"></param>
+        private void saveSelectDir(string text) {
+            Properties.Settings.Default.selectDir = text;
+            Properties.Settings.Default.Save();
         }
     }
 }

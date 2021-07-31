@@ -17,5 +17,6 @@ namespace TTCore {
 class aa {
     int tryFunc() {
         int rr = 4 + 3;
+        std::cout << "sdf" << std::endl;
     }
 };
