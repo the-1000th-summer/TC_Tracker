@@ -9,6 +9,9 @@ namespace myCLI {
         
         Entity(String^ name, float xPos, float yPos);
         void Move(float deltaX, float deltaY);
+        /// <summary>
+        ///  
+        /// </summary>
         property float XPosition {
         public:
             float get() {

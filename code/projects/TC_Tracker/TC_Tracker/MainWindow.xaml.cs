@@ -55,7 +55,7 @@ namespace TC_Tracker {
         }
 
         private void exit_OnClick(object sender, RoutedEventArgs e) {
-
+            Debug.WriteLine(sender.ToString());
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e) {
@@ -65,7 +65,7 @@ namespace TC_Tracker {
 
         /// <summary>
         /// 保存工作文件夹字符串到settings中
-        /// </summary>
+        /// </summary>·
         /// <param name="text"></param>
         private void saveSelectDir(string text) {
             Properties.Settings.Default.selectDir = text;

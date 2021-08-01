@@ -72,15 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Release;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Release;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -100,8 +108,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_USE_MATH_DEFINES</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -114,7 +124,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -128,7 +138,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_USE_MATH_DEFINES;%(PreprocessorDefinitions);_USE_MATH_DEFINES</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -141,9 +151,19 @@
   <ItemGroup>
     <ClInclude Include="Core.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="include\date.h" />
+    <ClInclude Include="include\multiArray.h" />
+    <ClInclude Include="include\Processor.h" />
+    <ClInclude Include="include\TC1Time.h" />
+    <ClInclude Include="include\Typhoon.h" />
+    <ClInclude Include="include\Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="src\Processor.cpp" />
+    <ClCompile Include="src\TC1Time.cpp" />
+    <ClCompile Include="src\Typhoon.cpp" />
+    <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

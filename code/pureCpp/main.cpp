@@ -5,6 +5,7 @@
 #include <netcdf>
 #include <vector>
 // #include "Typhoon.h"
+#include <iomanip>
 #include "Processor.h"
 #include "Utils.h"
 #include <algorithm>
@@ -15,17 +16,34 @@ using namespace std;
 
 int main(int, char**) {
     
-    netCDF::NcFile iFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read);
+    // netCDF::NcFile iFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read);
     
     
-    Processor p(iFile);
-    p.recognizeTyphoon();
-    p.getRealTC();
-    
+    // Processor p(iFile);
+    // p.recognizeTyphoon();
+    // p.getRealTC();
+    string dateTimea = "1970-01-01T04:00:00Z";
+    std::stringstream ss{ dateTimea };
+    std::tm dt{0};
+    ss >> std::get_time(&dt, "%Y-%m-%dT%H:%M:%SZ");
+
+    //cout << ss.fail() << endl;
+
+    auto b = std::mktime(&dt);
+    cout << b << endl;
+
+    // string dateTimea = "1970-02-01T00:00:00Z";
+    // std::stringstream ss{ dateTimea };
+    // std::tm dt{};
+    // ss >> std::get_time(&dt, "1970-01-01T00:00:00Z");
+    // cout << ss.fail() << endl;
     
     // time_t timep = 0;
     // auto a = gmtime(&timep);
     // cout << asctime(a) << endl;
+
+    // tm info;
+    
     // Typhoon a;
     // a.sayHello();
     // tryReadNCFile();

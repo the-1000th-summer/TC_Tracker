@@ -1,4 +1,4 @@
-
+﻿
 #include <cmath>
 #include <cstdio>
 #include <iostream>
@@ -55,7 +55,7 @@ void Processor::recognizeTyphoon() {
     int endIndexInFile = 58436;
 
     auto vorVar = iiFile->getVar("Vorticity");
-    
+
     // float vorField[latGridNum][lonGridNum];
     // auto vorField = TwoDArray(latGridNum, lonGridNum);
     auto vorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
@@ -288,8 +288,8 @@ void Processor::removeNoise() {
         } else if (UtilFunc::alwaysMoveEast(realTC.maxVorCells)) {
             addRMIndex();
         // 第一个点在陆地上
-        // } else if () {
-        //     addRMIndex();
+        //} else if () {
+            //addRMIndex();
         // 排除纬度太低的气旋
         } else if ((tcEndLat < 5) && UtilFunc::cellsLatOrLonAvg(latArr.get(), realTC.maxVorCells)) {
             addRMIndex();
