@@ -1,5 +1,6 @@
 #include <vector>
 #include "NCFileInfo.h"
+#include <netcdf>
 
 using namespace System::Collections::Generic;
 
@@ -29,5 +30,10 @@ namespace myCLI {
             sd->Add(gcnew String(f.c_str()));
         }
         return sd;
+    }
+
+    void NCFileInfo::startTracking() {
+        
+
     }
 }

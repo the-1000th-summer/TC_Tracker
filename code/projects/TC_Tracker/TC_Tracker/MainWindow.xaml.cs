@@ -66,6 +66,9 @@ namespace TC_Tracker {
                 if (!fileInfo.isFileValid) {
                     MessageBox.Show($"File\n{selectDir}\n is not valid:\n {fileInfo.fileValidInfo}");
                     selVarButton.IsEnabled = false;
+                    latNameLabel.Content = "未指定";
+                    lonNameLabel.Content = "未指定";
+                    vorNameLabel.Content = "未指定";
                     return;
                 }
                 selVarButton.IsEnabled = true;
@@ -110,6 +113,19 @@ namespace TC_Tracker {
             latVarStr = (string)varSelView.comboBox_lat.SelectedValue;
             lonVarStr = (string)varSelView.comboBox_lon.SelectedValue;
             vorVarStr = (string)varSelView.comboBox_vor.SelectedValue;
+            latNameLabel.Content = latVarStr;
+            lonNameLabel.Content = lonVarStr;
+            vorNameLabel.Content = vorVarStr;
+        }
+
+        /// <summary>
+        /// 点击了开始识别按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void startTrackButton_Click(object sender, RoutedEventArgs e) {
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir);
+            fileInfo.startTracking();
         }
     }
 }

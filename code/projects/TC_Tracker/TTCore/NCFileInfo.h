@@ -18,6 +18,7 @@ namespace TTCore {
         void checkFileValid();
         //void openFile();
         void getVarsName(std::vector<std::string>& varsName);
+        void startTracking();
     //private:
     //    netCDF::NcFile *iiFile = nullptr;
     };

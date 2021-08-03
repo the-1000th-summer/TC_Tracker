@@ -1,8 +1,10 @@
-#include "NCFileInfo.h"
 #include <iostream>
 #include <vector>
 #include <netcdf>
 #include <algorithm>
+
+#include "NCFileInfo.h"
+#include "Processor.h"
 
 namespace TTCore {
     NCFileInfo::NCFileInfo(const char *filePath) : ncFilePath(filePath) {
@@ -42,5 +44,13 @@ namespace TTCore {
         }
         f.close();
         //std::transform(tt.cbegin(), tt.end(), std::back_inserter(varsName), []( std::pair<std::string, netCDF::NcVar> &a) {return a.first;} );
+    }
+
+    void NCFileInfo::startTracking() {
+        netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+        Processor p(f);
+        p.recognizeTyphoon();
+        p.getRealTC();
+        //p.removeNoise();
     }
 }

@@ -14,6 +14,7 @@ namespace myCLI {
         void checkFileValid();
         //void openFile();
         List<String^>^ getVarsName();
+        void startTracking();
 
 
         property bool isFileValid {
