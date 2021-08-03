@@ -92,7 +92,7 @@ void Processor::getRealTC() {
     /// 当前时次的index
     int timeIndex = 0;
     ///
-    int hasVortex_notHandledYetIndex;
+    int hasVortex_notHandledYetIndex = 0;
     /// 最后有气旋的时次的index+1
     int hasTCLastTimeIndex = hasTC_timeIndex.back() + 1;
     /// 跟踪时仍未确定消亡日期的气旋；跟踪完成的气旋
@@ -428,8 +428,10 @@ float Processor::get_e(std::unordered_set<std::pair<int, int>, pair_hash> &vorte
 
 /// 此方法计算短轴长度
 std::pair<float, float> Processor::getMinorAxisLen(const std::vector<std::pair<int, int>> &cellsIndex, const std::pair<float, float> &centerLatLon, float minorAxisK, const float gridRatio, const float A) {
-    std::pair<float, float> cellsLatLon[cellsIndex.size()];
-    std::transform(cellsIndex.begin(), cellsIndex.end(), cellsLatLon, [this](const std::pair<int, int> &cellIndex) -> std::pair<float, float> {
+    /// 涡旋cell的纬度经度array
+    //std::pair<float, float> cellsLatLon[cellsIndex.size()];
+    auto cellsLatLon = std::make_unique<std::pair<float,float>[]>(cellsIndex.size());
+    std::transform(cellsIndex.begin(), cellsIndex.end(), cellsLatLon.get(), [this](const std::pair<int, int> &cellIndex) -> std::pair<float, float> {
         return {latArr[cellIndex.first], lonArr[cellIndex.second]};
     });
     std::vector<std::pair<int, int>> validCellsIndex;

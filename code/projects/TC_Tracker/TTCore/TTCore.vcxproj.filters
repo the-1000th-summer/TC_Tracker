@@ -45,6 +45,9 @@
     <ClInclude Include="include\date.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="NCFileInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp">
@@ -61,6 +64,9 @@
     </ClCompile>
     <ClCompile Include="src\Utils.cpp">
       <Filter>源文件\Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="NCFileInfo.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -73,7 +73,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -121,12 +132,14 @@
   <ItemGroup>
     <ClInclude Include="Entity.h" />
     <ClInclude Include="ManagedObject.h" />
+    <ClInclude Include="NCFileInfo.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="TTWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="NCFileInfo.cpp" />
     <ClCompile Include="TTWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>

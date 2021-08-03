@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TC_Tracker": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

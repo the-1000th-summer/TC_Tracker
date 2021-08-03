@@ -26,9 +26,17 @@ namespace TC_Tracker {
         private string cSelDir {
             get => Properties.Settings.Default.selectDir;
         }
+        private string latVarStr;
+        private string lonVarStr;
+        private string vorVarStr;
 
         public MainWindow() {
             InitializeComponent();
+
+            ncFileTextBox.Text = cSelDir;
+
+            Properties.Settings.Default.isRunning = false;
+            Properties.Settings.Default.Save();
 
             Entity e = new Entity("The Wallman", 20, 35);
             e.Move(5, -10);
@@ -44,18 +52,34 @@ namespace TC_Tracker {
 
             var savedSDir = cSelDir;
             dialog.InitialDirectory = savedSDir == "" ? "C:\\Users" : savedSDir;
-            dialog.IsFolderPicker = true;
+            //dialog.is
+            //dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
                 var selectDir = dialog.FileName;
                 Debug.WriteLine(selectDir);
                 saveSelectDir(selectDir);
-                //dirTextBox.Text = selectDir;
+                ncFileTextBox.Text = selectDir;
                 //changeUIAccV(validateDir(dirTextBox.Text));
+                NCFileInfo fileInfo = new NCFileInfo(selectDir);
+                fileInfo.checkFileValid();
+                Debug.WriteLine(fileInfo.fileValidInfo, " from cs.");
+                if (!fileInfo.isFileValid) {
+                    MessageBox.Show($"File\n{selectDir}\n is not valid:\n {fileInfo.fileValidInfo}");
+                    selVarButton.IsEnabled = false;
+                    return;
+                }
+                selVarButton.IsEnabled = true;
             }
         }
 
         private void exit_OnClick(object sender, RoutedEventArgs e) {
-            Debug.WriteLine(sender.ToString());
+            if (Properties.Settings.Default.isRunning) {
+                if (MessageBox.Show("退出程序吗？任务仍在执行。", "退出程序吗？", MessageBoxButton.YesNo, MessageBoxImage.Question) ==
+                    MessageBoxResult.No) {
+                    return;
+                }
+            }
+            Application.Current.Shutdown();
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e) {
@@ -65,11 +89,27 @@ namespace TC_Tracker {
 
         /// <summary>
         /// 保存工作文件夹字符串到settings中
-        /// </summary>·
+        /// </summary>
         /// <param name="text"></param>
         private void saveSelectDir(string text) {
             Properties.Settings.Default.selectDir = text;
             Properties.Settings.Default.Save();
+        }
+
+        /// <summary>
+        /// 点击选择变量按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void varSelClicked(object sender, RoutedEventArgs e) {
+            var varSelView = new VarSelector();
+            varSelView.Owner = this;
+            varSelView.ShowDialog();
+            if (!varSelView.selectOK) { return; }
+
+            latVarStr = (string)varSelView.comboBox_lat.SelectedValue;
+            lonVarStr = (string)varSelView.comboBox_lon.SelectedValue;
+            vorVarStr = (string)varSelView.comboBox_vor.SelectedValue;
         }
     }
 }
