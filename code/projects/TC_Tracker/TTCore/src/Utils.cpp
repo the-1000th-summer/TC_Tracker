@@ -78,22 +78,22 @@ namespace TTCore {
         std::cout << timeUnits << std::endl;
     }
 
-    void UtilFunc::getLatLonData(netCDF::NcFile *iFile, float *latArray, float *lonArray) {
-        iFile->getVar("lat").getVar(latArray);
-        iFile->getVar("lon").getVar(lonArray);
+    void UtilFunc::getLatLonData(netCDF::NcFile *iFile, const std::string& latVarName, const std::string& lonVarName, float *latArray, float *lonArray) {
+        iFile->getVar(latVarName).getVar(latArray);
+        iFile->getVar(lonVarName).getVar(lonArray);
     }
 
-    void UtilFunc::getLatLonData(netCDF::NcFile *iFile, std::vector<float> &latVec, std::vector<float> &lonVec) {
+    void UtilFunc::getLatLonData(netCDF::NcFile *iFile, const std::string& latVarName, const std::string& lonVarName, std::vector<float> &latVec, std::vector<float> &lonVec) {
         // MSVC 无法使用变长数组(VLA)
         // float lat[iFile->getDim("lat").getSize()], lon[iFile->getDim("lon").getSize()];
-        auto latSize = iFile->getDim("lat").getSize();
-        auto lonSize = iFile->getDim("lon").getSize();
+        auto latSize = iFile->getDim(latVarName).getSize();
+        auto lonSize = iFile->getDim(lonVarName).getSize();
         auto lat = std::make_unique<float[]>(latSize);
         auto lon = std::make_unique<float[]>(lonSize);
         auto latGet = lat.get(), lonGet = lon.get();
     
-        iFile->getVar("lat").getVar(latGet);
-        iFile->getVar("lon").getVar(lonGet);
+        iFile->getVar(latVarName).getVar(latGet);
+        iFile->getVar(lonVarName).getVar(lonGet);
         latVec.assign(latGet, latGet + latSize);
         lonVec.assign(lonGet, lonGet + lonSize);
     }

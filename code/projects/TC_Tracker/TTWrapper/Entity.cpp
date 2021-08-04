@@ -1,7 +1,7 @@
 #include "Entity.h"
 
 namespace myCLI {
-    Entity::Entity(String^ name, float xPos, float yPos) : ManagedObject(new TTCore::Entity(string_to_char_array(name), xPos, yPos)) {
+    Entity::Entity(String^ name, float xPos, float yPos) : ManagedObject(new TTCore::Entity(string2Char(name), xPos, yPos)) {
         Console::WriteLine("Creating a new Entity-wrapper object!");
     }
 

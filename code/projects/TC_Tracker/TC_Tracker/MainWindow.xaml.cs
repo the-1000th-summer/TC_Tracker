@@ -16,6 +16,7 @@ using System.Diagnostics;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 using myCLI;
+using System.Runtime.InteropServices;
 
 namespace TC_Tracker {
     /// <summary>
@@ -47,7 +48,12 @@ namespace TC_Tracker {
 
         }
 
+
+
         private void browseButton_Click(object sender, RoutedEventArgs e) {
+            //ConsoleManager.Show();
+            Console.WriteLine("browse button clicked!");
+
             var dialog = new CommonOpenFileDialog();
 
             var savedSDir = cSelDir;
@@ -60,7 +66,7 @@ namespace TC_Tracker {
                 saveSelectDir(selectDir);
                 ncFileTextBox.Text = selectDir;
                 //changeUIAccV(validateDir(dirTextBox.Text));
-                NCFileInfo fileInfo = new NCFileInfo(selectDir);
+                NCFileInfo fileInfo = new NCFileInfo(selectDir,"","","");
                 fileInfo.checkFileValid();
                 Debug.WriteLine(fileInfo.fileValidInfo, " from cs.");
                 if (!fileInfo.isFileValid) {
@@ -124,7 +130,7 @@ namespace TC_Tracker {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void startTrackButton_Click(object sender, RoutedEventArgs e) {
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir);
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr);
             fileInfo.startTracking();
         }
     }

@@ -10,7 +10,8 @@ using namespace System::Collections::Generic;
 namespace myCLI {
     public ref class NCFileInfo: public ManagedObject<TTCore::NCFileInfo> {
     public:
-        NCFileInfo(String ^filePath);
+        // 无法在managed class的方法里使用optional paramater
+        NCFileInfo(String ^filePath, String ^latVarName, String ^lonVarName, String ^vorVarName);
         void checkFileValid();
         //void openFile();
         List<String^>^ getVarsName();

@@ -8,13 +8,13 @@ namespace TTCore {
     public:
         std::string ncFilePath;
         //const char* ncFilePath;
-        //std::string vorVarName;
-        //std::string latVarName;
-        //std::string lonVarName;
+        std::string latVarName;
+        std::string lonVarName;
+        std::string vorVarName;
         bool isFileValid = false;
         std::string fileValidInfo;
 
-        NCFileInfo(const char *filePath);
+        NCFileInfo(const char *filePath, const char *latVName, const char *lonVName, const char *vorVName);
         void checkFileValid();
         //void openFile();
         void getVarsName(std::vector<std::string>& varsName);

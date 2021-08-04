@@ -5,7 +5,7 @@
 using namespace System::Collections::Generic;
 
 namespace myCLI {
-    NCFileInfo::NCFileInfo(String ^filePath) : ManagedObject(new TTCore::NCFileInfo(string_to_char_array(filePath))) {
+    NCFileInfo::NCFileInfo(String ^filePath, String^ latVarName, String^ lonVarName, String^ vorVarName) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName))) {
         
     }
 
@@ -33,7 +33,8 @@ namespace myCLI {
     }
 
     void NCFileInfo::startTracking() {
-        
+        //Debug::WriteLine("sdf");
+        m_Instance->startTracking();
 
     }
 }

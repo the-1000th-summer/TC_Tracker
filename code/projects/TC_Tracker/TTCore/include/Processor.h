@@ -14,7 +14,7 @@ namespace TTCore {
 
     class Processor {
     public:
-        Processor(netCDF::NcFile &iFile);
+        Processor(netCDF::NcFile &iFile, const std::string &latVName, const std::string &lonVName, const std::string &varVName);
         ~Processor();
         void getDimLength();
         void recognizeTyphoon();
@@ -31,6 +31,9 @@ namespace TTCore {
     
     private:
         netCDF::NcFile *iiFile;
+        std::string latVarName;
+        std::string lonVarName;
+        std::string vorVarName;
         unsigned long timeLength = 0;
         unsigned long latGridNum = 0;
         unsigned long lonGridNum = 0;

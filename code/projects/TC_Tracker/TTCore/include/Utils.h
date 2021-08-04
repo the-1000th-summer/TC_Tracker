@@ -42,8 +42,8 @@ namespace TTCore {
         void getTimeData(netCDF::NcFile &iFile);
         void num2Date(double timeNum, tm &dateTimeTm, std::string timeUnits);
         void num2Date(double timeNum[], std::string timeUnits);
-        void getLatLonData(netCDF::NcFile *iFile, float *latArray, float *lonArray);
-        void getLatLonData(netCDF::NcFile *iFile, std::vector<float> &latVec, std::vector<float> &lonVec);
+        void getLatLonData(netCDF::NcFile *iFile, const std::string& latVarName, const std::string& lonVarName, float *latArray, float *lonArray);
+        void getLatLonData(netCDF::NcFile *iFile, const std::string& latVarName, const std::string& lonVarName, std::vector<float> &latVec, std::vector<float> &lonVec);
         void getVorField(netCDF::NcFile *iFile, float *vor);
 
         // std::pair<std::pair<int, int>, float> max_element_2d(float vorField[Constants::latGridNum][Constants::lonGridNum]);

@@ -28,7 +28,7 @@ namespace TC_Tracker {
 
         public VarSelector() {
             InitializeComponent();
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir);
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir,"","","");
             //fileInfo.openFile();
             var aa = fileInfo.getVarsName();
             //aa.Clear();

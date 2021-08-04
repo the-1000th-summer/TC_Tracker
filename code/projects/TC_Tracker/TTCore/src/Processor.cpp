@@ -18,12 +18,12 @@
 
 namespace TTCore {
 
-    Processor::Processor(netCDF::NcFile &iFile) {
+    Processor::Processor(netCDF::NcFile &iFile, const std::string& latVName, const std::string& lonVName, const std::string& varVName) : latVarName(latVName), lonVarName(lonVName), vorVarName(varVName){
         iiFile = &iFile;
         getDimLength();
         latArr = std::make_unique<float[]>(latGridNum);
         lonArr = std::make_unique<float[]>(lonGridNum);
-        UtilFunc::getLatLonData(iiFile, latArr.get(), lonArr.get());
+        UtilFunc::getLatLonData(iiFile, latVarName, lonVarName, latArr.get(), lonArr.get());
         // std::cout << a << std::endl;
         // iFile = netCDF::NcFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read)
     }
@@ -36,7 +36,7 @@ namespace TTCore {
 
     /// 此方法找出文件的各维度的长度
     void Processor::getDimLength() {
-        auto vorVar = iiFile->getVar("Vorticity");
+        auto vorVar = iiFile->getVar(vorVarName);
         timeLength = vorVar.getDim(0).getSize();
         latGridNum = vorVar.getDim(1).getSize();
         lonGridNum = vorVar.getDim(2).getSize();
@@ -56,7 +56,7 @@ namespace TTCore {
         /// endYear的12月31日0时时次在文件中的index
         int endIndexInFile = 58436;
 
-        auto vorVar = iiFile->getVar("Vorticity");
+        auto vorVar = iiFile->getVar(vorVarName);
 
         // float vorField[latGridNum][lonGridNum];
         // auto vorField = TwoDArray(latGridNum, lonGridNum);
