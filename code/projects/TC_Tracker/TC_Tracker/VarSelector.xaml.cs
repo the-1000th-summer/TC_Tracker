@@ -53,5 +53,9 @@ namespace TC_Tracker {
             selectOK = true;
             this.Close();
         }
+
+        private void Cancelbutton_Click(object sender, RoutedEventArgs e) {
+            this.Close();
+        }
     }
 }

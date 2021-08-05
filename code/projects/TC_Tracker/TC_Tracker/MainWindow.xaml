@@ -3,11 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
         xmlns:local="clr-namespace:TC_Tracker"
         mc:Ignorable="d"
+        x:Name="mainWin"
         Title="TC Tracker" Height="450" Width="800"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanMinimize">
+    <Window.Resources>
+        <cm:BackgroundWorker x:Key="backgroundWorker" WorkerReportsProgress="True" WorkerSupportsCancellation="True" DoWork="bgWorker_DoWork" ProgressChanged="bgWorker_progressChanged" RunWorkerCompleted="bgWorker_runCompleted">
+        </cm:BackgroundWorker>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -33,7 +39,8 @@
         <Label x:Name="latNameLabel" Content="未指定" HorizontalAlignment="Left" Margin="364,88,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Label x:Name="lonNameLabel" Content="未指定" HorizontalAlignment="Left" Margin="364,124,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Label x:Name="vorNameLabel" Content="未指定" HorizontalAlignment="Left" Margin="364,161,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <Button x:Name="startTrackButton" Content="开始识别" HorizontalAlignment="Left" Margin="346,282,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="89" Click="startTrackButton_Click"/>
+        <Button x:Name="startTrackButton" Content="开始识别" HorizontalAlignment="Left" Margin="346,282,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="89" Click="startTrackButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=IsNotTracking, Mode=TwoWay}"/>
+        <Button x:Name="stopButton" Content="中止" HorizontalAlignment="Left" Margin="610,282,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-0.256,0.391" Height="23" Width="55" Click="stopButtonClicked" IsEnabled="{Binding ElementName=mainWin, Path=IsTracking, Mode=TwoWay}" />
 
     </Grid>
 </Window>

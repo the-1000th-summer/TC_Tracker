@@ -16,7 +16,7 @@
         <ComboBox x:Name="comboBox_lon" HorizontalAlignment="Center" Margin="0,119,0,0" VerticalAlignment="Top" Width="120"/>
         <ComboBox x:Name="comboBox_vor" HorizontalAlignment="Center" Margin="0,161,0,0" VerticalAlignment="Top" Width="120"/>
         <Button x:Name="button_OK" Content="确定" HorizontalAlignment="Left" Margin="340,244,0,0" VerticalAlignment="Top" Click="OKButton_Click" Width="55"/>
-        <Button x:Name="button_Cancel" Content="取消" HorizontalAlignment="Left" Margin="413,244,0,0" VerticalAlignment="Top" Width="50"/>
+        <Button x:Name="button_Cancel" Content="取消" HorizontalAlignment="Left" Margin="413,244,0,0" VerticalAlignment="Top" Width="50" Click="Cancelbutton_Click"/>
 
     </Grid>
 </Window>

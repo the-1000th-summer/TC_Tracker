@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
@@ -30,12 +31,22 @@ namespace TC_Tracker {
         private string latVarStr;
         private string lonVarStr;
         private string vorVarStr;
+        private bool isTracking;
+        //private bool town;
+        public bool IsTracking {
+            get { return isTracking; }
+            set { isTracking = value; }
+        }
+        public bool IsNotTracking {
+            get { return !isTracking; }
+            set { isTracking = !value; }
+        }
+        private BackgroundWorker bgWorker;
 
         public MainWindow() {
             InitializeComponent();
 
             ncFileTextBox.Text = cSelDir;
-
             Properties.Settings.Default.isRunning = false;
             Properties.Settings.Default.Save();
 
@@ -45,6 +56,7 @@ namespace TC_Tracker {
             //label.Content = e.XPosition + " " + e.YPosition;
             //Console.WriteLine(e.XPosition + " " + e.YPosition);
             //Console.Read();
+            bgWorker = (BackgroundWorker)this.FindResource("backgroundWorker");
 
         }
 
@@ -66,7 +78,7 @@ namespace TC_Tracker {
                 saveSelectDir(selectDir);
                 ncFileTextBox.Text = selectDir;
                 //changeUIAccV(validateDir(dirTextBox.Text));
-                NCFileInfo fileInfo = new NCFileInfo(selectDir,"","","");
+                NCFileInfo fileInfo = new NCFileInfo(selectDir, "", "", "");
                 fileInfo.checkFileValid();
                 Debug.WriteLine(fileInfo.fileValidInfo, " from cs.");
                 if (!fileInfo.isFileValid) {
@@ -130,8 +142,46 @@ namespace TC_Tracker {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void startTrackButton_Click(object sender, RoutedEventArgs e) {
+            //startTrackButton.IsEnabled = false;
+            Console.WriteLine("sdffff");
+            IsTracking = true;
+
+            //bgWorker.RunWorkerAsync();
+
+        }
+
+        private void stopButtonClicked(object sender, RoutedEventArgs e) {
+            Console.WriteLine("stop button clicked!");
+            IsTracking = false;
+        }
+
+        /// <summary>
+        /// 分配到后台线程，从执行此方法开始
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void bgWorker_DoWork(object sender, DoWorkEventArgs e) {
             NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr);
             fileInfo.startTracking();
         }
-    }
+
+        /// <summary>
+        /// 进度条值改变，执行此方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void bgWorker_progressChanged(object sender, ProgressChangedEventArgs e) {
+
+        }
+
+        /// <summary>
+        /// 后台线程执行完毕，执行此方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void bgWorker_runCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            Console.WriteLine("run completed!");
+        }
+    };
+
 }
