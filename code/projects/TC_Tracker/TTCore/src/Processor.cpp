@@ -12,12 +12,15 @@
 #include <utility>
 #include <vector>
 #include <unordered_set>
+#include <iomanip>
 #include "json.hpp"
 #include "multiArray.h"
 #include "Processor.h"
 #include "Utils.h"
 #include "Typhoon.h"
-#include <iomanip>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
 
 namespace TTCore {
 
@@ -487,11 +490,15 @@ namespace TTCore {
     }
 
     void Processor::dumpStep1() {
-        nlohmann::json j(allVortexes);
-        std::string jsonArray = j.dump();
+        //nlohmann::json j(allVortexes);
+        //std::string jsonArray = j.dump();
         std::string dumpDir = "E:\\University\\TC_Tracker\\data\\stepFile\\";
-        std::ofstream o(dumpDir+"pretty.json");
-        o << std::setw(4) << j << std::endl;
+        //std::ofstream o(dumpDir+"pretty.json");
+        //o << std::setw(4) << j << std::endl;
+        std::ofstream ofs(dumpDir+"filename.dat", std::ios::binary);
+        boost::archive::binary_oarchive oa(ofs);
+        // write class instance to archive
+        oa << allVortexes;
     }
 
 }

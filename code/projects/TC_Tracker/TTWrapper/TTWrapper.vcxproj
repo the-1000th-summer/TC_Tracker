@@ -75,15 +75,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

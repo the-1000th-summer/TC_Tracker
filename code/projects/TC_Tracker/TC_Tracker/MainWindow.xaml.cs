@@ -202,5 +202,19 @@ namespace TC_Tracker {
             settingsView.Owner = this;
             settingsView.ShowDialog();
         }
+
+        private void about_OnClick(object sender, RoutedEventArgs e) {
+            bool isWindowOpen = false;
+            foreach (Window w in Application.Current.Windows) {
+                if (w is AboutWindow) {
+                    isWindowOpen = true;
+                    w.Activate();
+                }
+            }
+            if (!isWindowOpen) {
+                var newwindow = new AboutWindow();
+                newwindow.Show();
+            }
+        }
     }
 }

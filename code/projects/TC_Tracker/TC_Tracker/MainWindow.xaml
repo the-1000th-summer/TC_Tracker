@@ -27,6 +27,7 @@
             </MenuItem>
             <MenuItem Header="偏好设置(_P)" Click="MenuItem_Click">
                 <MenuItem x:Name="settings" Header="设置..." Click="settingsClicked"></MenuItem>
+                <MenuItem Header="关于..." Click="about_OnClick"></MenuItem>
             </MenuItem>
         </Menu>
         <Label x:Name="label" Content="工作文件" HorizontalAlignment="Left" Margin="28,26,0,0" Grid.Row="1" VerticalAlignment="Top"/>

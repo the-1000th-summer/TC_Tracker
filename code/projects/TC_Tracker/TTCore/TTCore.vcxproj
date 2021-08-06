@@ -72,23 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\VisualStudio\cxxLib\boost_1_76_0;$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Release;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\VisualStudio\cxxLib\boost_1_76_0;$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Release;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\VisualStudio\cxxLib\boost_1_76_0;$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Release;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\VisualStudio\cxxLib\boost_1_76_0;$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Release;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
