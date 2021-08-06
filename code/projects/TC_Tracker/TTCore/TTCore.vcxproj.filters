@@ -48,6 +48,9 @@
     <ClInclude Include="NCFileInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\json.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp">

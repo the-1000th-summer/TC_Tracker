@@ -22,16 +22,16 @@
 
         <Menu>
             <MenuItem Header="文件(_F)">
-                <MenuItem x:Name="menu_selDir" Header="选择文件(_O)" Click="browseButton_Click" />
+                <MenuItem x:Name="menu_selDir" Header="选择文件(_O)" Click="browseButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isTracking, Converter={StaticResource InverseBooleanConverter}}" />
                 <MenuItem Header="退出(_X)" Click="exit_OnClick" />
             </MenuItem>
             <MenuItem Header="偏好设置(_P)" Click="MenuItem_Click">
-
+                <MenuItem x:Name="settings" Header="设置..." Click="settingsClicked"></MenuItem>
             </MenuItem>
         </Menu>
         <Label x:Name="label" Content="工作文件" HorizontalAlignment="Left" Margin="28,26,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="111,30,0,0" Grid.Row="1" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="507" Height="21"/>
-        <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="660,28,0,0" Grid.Row="1" VerticalAlignment="Top" Height="25" Width="74" Click="browseButton_Click"/>
+        <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="660,28,0,0" Grid.Row="1" VerticalAlignment="Top" Height="25" Width="74" Click="browseButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isTracking, Converter={StaticResource InverseBooleanConverter}}"/>
         <Button x:Name="selVarButton" Content="选择变量..." HorizontalAlignment="Left" Margin="111,110,0,0" Grid.Row="1" VerticalAlignment="Top" Height="27" Width="97" Click="varSelClicked" IsEnabled="False"/>
         <Label x:Name="label1" Content="纬度变量名：" HorizontalAlignment="Left" Margin="276,88,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Label x:Name="label2" Content="经度变量名：" HorizontalAlignment="Left" Margin="276,124,0,0" Grid.Row="1" VerticalAlignment="Top"/>
@@ -39,8 +39,8 @@
         <Label x:Name="latNameLabel" Content="未指定" HorizontalAlignment="Left" Margin="364,88,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Label x:Name="lonNameLabel" Content="未指定" HorizontalAlignment="Left" Margin="364,124,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Label x:Name="vorNameLabel" Content="未指定" HorizontalAlignment="Left" Margin="364,161,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <Button x:Name="startTrackButton" Content="开始识别" HorizontalAlignment="Left" Margin="346,282,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="89" Click="startTrackButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=IsNotTracking, Mode=TwoWay}"/>
-        <Button x:Name="stopButton" Content="中止" HorizontalAlignment="Left" Margin="610,282,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-0.256,0.391" Height="23" Width="55" Click="stopButtonClicked" IsEnabled="{Binding ElementName=mainWin, Path=IsTracking, Mode=TwoWay}" />
+        <Button x:Name="startTrackButton" Content="开始识别" HorizontalAlignment="Left" Margin="346,282,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="89" Click="startTrackButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isTracking, Converter={StaticResource InverseBooleanConverter}}"/>
+        <Button x:Name="stopButton" Content="中止" HorizontalAlignment="Left" Margin="610,282,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-0.256,0.391" Height="23" Width="55" Click="stopButtonClicked" IsEnabled="{Binding ElementName=mainWin, Path=isTracking}" />
 
     </Grid>
 </Window>

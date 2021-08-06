@@ -9,6 +9,7 @@
 #include <vector>
 #include "multiArray.h"
 #include "TC1Time.h"
+#include "json.hpp"
 
 namespace TTCore {
 
@@ -27,6 +28,8 @@ namespace TTCore {
         std::pair<float, float> getMinorAxisLen(const std::vector<std::pair<int, int>> &cellsIndex, const std::pair<float, float> &centerLatLon, float minorAxisK, const float gridRatio, const float A);
 
         inline void removeVortex(ThreeDArray &vorField, int timeIndex, std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex);
+
+        void dumpStep1();
     
     
     private:
@@ -43,5 +46,7 @@ namespace TTCore {
         std::vector<std::vector<TC1Time>> allVortexes{};
         std::vector<Typhoon> realTCs{};
     };
+
+    //void to_json(json& j, const TC1Time& r);
 
 }

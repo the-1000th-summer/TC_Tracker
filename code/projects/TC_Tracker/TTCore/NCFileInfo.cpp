@@ -50,7 +50,9 @@ namespace TTCore {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
         Processor p(f, latVarName, lonVarName, vorVarName);
         p.recognizeTyphoon();
-        p.getRealTC();
+        //p.
+        p.dumpStep1();
+        //p.getRealTC();
         //p.removeNoise();
     }
 }

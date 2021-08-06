@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdio>
 #include <iostream>
+#include <fstream>
 #include <iterator>
 #include <algorithm>
 #include <numeric>
@@ -11,10 +12,12 @@
 #include <utility>
 #include <vector>
 #include <unordered_set>
+#include "json.hpp"
 #include "multiArray.h"
 #include "Processor.h"
 #include "Utils.h"
 #include "Typhoon.h"
+#include <iomanip>
 
 namespace TTCore {
 
@@ -473,4 +476,23 @@ namespace TTCore {
         }
     }
 
+    void to_json(nlohmann::json& j, const TC1Time& tc) {
+        j = nlohmann::json{
+            {"maxVorCellIndex", tc.maxVorCellIndex}
+        };
+    }
+
+    void from_json(const nlohmann::json& j, TC1Time& tc) {
+        tc.maxVorCellIndex = j.at("maxVorCellIndex").get<std::pair<int,int>>();
+    }
+
+    void Processor::dumpStep1() {
+        nlohmann::json j(allVortexes);
+        std::string jsonArray = j.dump();
+        std::string dumpDir = "E:\\University\\TC_Tracker\\data\\stepFile\\";
+        std::ofstream o(dumpDir+"pretty.json");
+        o << std::setw(4) << j << std::endl;
+    }
+
 }
+

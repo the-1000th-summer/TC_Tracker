@@ -163,6 +163,7 @@
   <ItemGroup>
     <ClInclude Include="Core.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="include\json.hpp" />
     <ClInclude Include="NCFileInfo.h" />
     <ClInclude Include="include\date.h" />
     <ClInclude Include="include\multiArray.h" />

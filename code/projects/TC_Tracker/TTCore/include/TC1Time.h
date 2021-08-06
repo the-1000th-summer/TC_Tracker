@@ -2,7 +2,7 @@
 
 #include <utility>
 
-namespace {
+namespace TTCore {
     class TC1Time {
     public:
         // TC1Time();

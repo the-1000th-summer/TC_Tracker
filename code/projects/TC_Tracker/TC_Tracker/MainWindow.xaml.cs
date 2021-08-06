@@ -23,7 +23,7 @@ namespace TC_Tracker {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window {
+    public partial class MainWindow : Window, INotifyPropertyChanged {
 
         private string cSelDir {
             get => Properties.Settings.Default.selectDir;
@@ -31,17 +31,25 @@ namespace TC_Tracker {
         private string latVarStr;
         private string lonVarStr;
         private string vorVarStr;
-        private bool isTracking;
-        //private bool town;
-        public bool IsTracking {
-            get { return isTracking; }
-            set { isTracking = value; }
+
+        private bool _isTracking = false;
+        public bool isTracking {
+            get { return _isTracking; }
+            set { 
+                _isTracking = value;
+                RaisePropertyChanged("isTracking");
+            }
         }
-        public bool IsNotTracking {
-            get { return !isTracking; }
-            set { isTracking = !value; }
+
+        private void RaisePropertyChanged(string propertyName) {
+            if (PropertyChanged != null) {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
+
         private BackgroundWorker bgWorker;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public MainWindow() {
             InitializeComponent();
@@ -94,7 +102,8 @@ namespace TC_Tracker {
         }
 
         private void exit_OnClick(object sender, RoutedEventArgs e) {
-            if (Properties.Settings.Default.isRunning) {
+            //if (Properties.Settings.Default.isRunning) {
+            if (isTracking) {
                 if (MessageBox.Show("退出程序吗？任务仍在执行。", "退出程序吗？", MessageBoxButton.YesNo, MessageBoxImage.Question) ==
                     MessageBoxResult.No) {
                     return;
@@ -144,15 +153,15 @@ namespace TC_Tracker {
         private void startTrackButton_Click(object sender, RoutedEventArgs e) {
             //startTrackButton.IsEnabled = false;
             Console.WriteLine("sdffff");
-            IsTracking = true;
+            isTracking = true;
 
-            //bgWorker.RunWorkerAsync();
+            bgWorker.RunWorkerAsync();
 
         }
 
         private void stopButtonClicked(object sender, RoutedEventArgs e) {
             Console.WriteLine("stop button clicked!");
-            IsTracking = false;
+            isTracking = false;
         }
 
         /// <summary>
@@ -182,6 +191,16 @@ namespace TC_Tracker {
         private void bgWorker_runCompleted(object sender, RunWorkerCompletedEventArgs e) {
             Console.WriteLine("run completed!");
         }
-    };
 
+        /// <summary>
+        /// 点击了设置按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void settingsClicked(object sender, RoutedEventArgs e) {
+            var settingsView = new SettingsWindow();
+            settingsView.Owner = this;
+            settingsView.ShowDialog();
+        }
+    }
 }

@@ -46,5 +46,17 @@ namespace TC_Tracker.Properties {
                 this["isRunning"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string tempFileDir {
+            get {
+                return ((string)(this["tempFileDir"]));
+            }
+            set {
+                this["tempFileDir"] = value;
+            }
+        }
     }
 }
