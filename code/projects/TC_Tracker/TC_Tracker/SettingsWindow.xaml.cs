@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,7 +71,7 @@ namespace TC_Tracker {
         private void OKbutton_Click(object sender, RoutedEventArgs e) {
             var dirIsValid = checkDirIsValid();
             if (!dirIsValid) {
-                MessageBox.Show("临时文件夹不合法！");
+                //MessageBox.Show("临时文件夹不合法！\n");
                 return;
             }
             //saveSelectDir(tempFDirTextBox.Text);
@@ -83,9 +84,22 @@ namespace TC_Tracker {
         }
 
         private bool checkDirIsValid() {
+            if (!Directory.Exists(tempFDirTextBox.Text)) {
+                MessageBox.Show("文件夹不存在！");
+                return false;
+            }
+            string[] stepsFolderName = { "step1", "step2", "step3" };
+            foreach (string folderName in stepsFolderName) {
+                //Console.WriteLine(i);
+                var folderPath = System.IO.Path.Combine(s_TempFileDir, folderName);
+                if (File.Exists(folderPath)) {
+                    Console.WriteLine("Invalid file exists!\nInvalid file name: {0}\n", folderPath);
+                    MessageBox.Show("文件夹不合法。\n文件夹内不能有名字为\n\"step1\",\"step2\"或\"step3\"的文件。");
+                    return false;
+                }
+            }
             return true;
         }
-
 
         /// <summary>
         /// 保存工作文件夹字符串到settings中

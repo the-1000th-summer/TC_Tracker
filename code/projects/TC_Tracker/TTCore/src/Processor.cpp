@@ -13,18 +13,20 @@
 #include <vector>
 #include <unordered_set>
 #include <iomanip>
+#include <filesystem>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
 #include "json.hpp"
 #include "multiArray.h"
 #include "Processor.h"
 #include "Utils.h"
 #include "Typhoon.h"
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/serialization/vector.hpp>
+
 
 namespace TTCore {
 
-    Processor::Processor(netCDF::NcFile &iFile, const std::string& latVName, const std::string& lonVName, const std::string& varVName) : latVarName(latVName), lonVarName(lonVName), vorVarName(varVName){
+    Processor::Processor(netCDF::NcFile &iFile, const std::string& latVName, const std::string& lonVName, const std::string& varVName, const std::string& dumpDirectory) : latVarName(latVName), lonVarName(lonVName), vorVarName(varVName), dumpDir(dumpDirectory) {
         iiFile = &iFile;
         getDimLength();
         latArr = std::make_unique<float[]>(latGridNum);
@@ -489,13 +491,34 @@ namespace TTCore {
         tc.maxVorCellIndex = j.at("maxVorCellIndex").get<std::pair<int,int>>();
     }
 
+
+    /// 此方法检查一个文件夹名字对应的路径是否为路径
+    void Processor::checkDirAndCreate(const std::string& folderName) {
+        //std::filesystem::path dumpDir("E:\\University\\TC_Tracker\\data\\stepFile\\");
+        std::filesystem::path dumpDir(dumpDir);
+        std::filesystem::path folderPath = dumpDir / folderName;
+        //std::cout << folderPath << std::endl;
+        // 文件或文件夹不存在，创建文件夹
+        if (!std::filesystem::exists(folderPath)) {
+            std::filesystem::create_directories(folderPath);
+            return;
+        }
+        // 存在文件夹，直接返回
+        if (std::filesystem::is_directory(folderPath)) { return; }
+        // 存在文件，重命名原有文件，并创建新文件夹
+        std::filesystem::rename(folderPath, dumpDir / (folderName+".original"));
+        std::filesystem::create_directories(folderPath);
+
+    }
+
     void Processor::dumpStep1() {
+        checkDirAndCreate("step1");
         //nlohmann::json j(allVortexes);
         //std::string jsonArray = j.dump();
-        std::string dumpDir = "E:\\University\\TC_Tracker\\data\\stepFile\\";
         //std::ofstream o(dumpDir+"pretty.json");
         //o << std::setw(4) << j << std::endl;
-        std::ofstream ofs(dumpDir+"filename.dat", std::ios::binary);
+        std::filesystem::path stepDumpDir(dumpDir);
+        std::ofstream ofs(stepDumpDir / "step1\\step1.dat", std::ios::binary);
         boost::archive::binary_oarchive oa(ofs);
         // write class instance to archive
         oa << allVortexes;

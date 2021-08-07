@@ -9,14 +9,13 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include "Utils.h"
-#include "multiArray.h"
 #include <netcdf>
 #include <sys/stat.h>
 #include <utility>
 #include <vector>
 #include <cmath>
-
+#include "Utils.h"
+#include "multiArray.h"
 
 namespace TTCore {
 
@@ -235,7 +234,7 @@ namespace TTCore {
         return std::is_sorted(cellsLonGet, cellsLonGet+cells.size());
     }
 
-    // 返回一组cell的平均纬度
+    /// 返回一组cell的平均纬度
     float UtilFunc::cellsLatOrLonAvg(const float *latOrLonArray, const std::vector<std::pair<int, int>> &cells) {
         float avg = 0.0;
         for (const auto &cell : cells)

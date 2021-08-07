@@ -10,7 +10,7 @@
         ResizeMode="CanMinimize">
     <Grid>
         <Label x:Name="label1" Content="中间文件存储文件夹" HorizontalAlignment="Left" Margin="37,24,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="tempFDirTextBox" HorizontalAlignment="Left" Margin="42,54,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="336" Height="19" KeyDown="DirTextBox_OnKeyDown" LostFocus="DirTextBox_OnLostFocus"/>
+        <TextBox x:Name="tempFDirTextBox" HorizontalAlignment="Left" Margin="44,54,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="336" Height="19" KeyDown="DirTextBox_OnKeyDown" LostFocus="DirTextBox_OnLostFocus"/>
         <Button x:Name="okButton" Content="确定" HorizontalAlignment="Left" Margin="294,232,0,0" VerticalAlignment="Top" Height="26" Width="57" Click="OKbutton_Click"/>
         <Button x:Name="cancelButton" Content="取消" HorizontalAlignment="Left" Margin="380,232,0,0" VerticalAlignment="Top" Height="26" Width="55" Click="cancelButton_Click"/>
         <Button x:Name="button" Content="选择文件夹..." HorizontalAlignment="Left" Margin="408,54,0,0" VerticalAlignment="Top" Click="browsebutton_Click"/>

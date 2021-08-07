@@ -15,7 +15,7 @@ namespace TTCore {
 
     class Processor {
     public:
-        Processor(netCDF::NcFile &iFile, const std::string &latVName, const std::string &lonVName, const std::string &varVName);
+        Processor(netCDF::NcFile &iFile, const std::string &latVName, const std::string &lonVName, const std::string &varVName, const std::string &dumpDirectory);
         ~Processor();
         void getDimLength();
         void recognizeTyphoon();
@@ -31,12 +31,12 @@ namespace TTCore {
 
         void dumpStep1();
     
-    
     private:
         netCDF::NcFile *iiFile;
         std::string latVarName;
         std::string lonVarName;
         std::string vorVarName;
+        std::string dumpDir;
         unsigned long timeLength = 0;
         unsigned long latGridNum = 0;
         unsigned long lonGridNum = 0;
@@ -45,6 +45,8 @@ namespace TTCore {
         std::vector<int> hasTC_timeIndex{};
         std::vector<std::vector<TC1Time>> allVortexes{};
         std::vector<Typhoon> realTCs{};
+
+        void checkDirAndCreate(const std::string &folderName);
     };
 
     //void to_json(json& j, const TC1Time& r);
