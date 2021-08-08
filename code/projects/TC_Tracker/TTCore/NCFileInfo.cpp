@@ -7,7 +7,7 @@
 #include "Processor.h"
 
 namespace TTCore {
-    NCFileInfo::NCFileInfo(const char *filePath, const char* latVName, const char* lonVName, const char* vorVName) : ncFilePath(filePath), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName) {
+    NCFileInfo::NCFileInfo(const char *filePath, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
         //checkFileValid();
     }
 
@@ -48,10 +48,11 @@ namespace TTCore {
 
     void NCFileInfo::startTracking() {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-        Processor p(f, latVarName, lonVarName, vorVarName);
+        Processor p(f, latVarName, lonVarName, vorVarName, dumpDir);
         //p.recognizeTyphoon();
         //p.
-        p.dumpStep1();
+        //p.dumpStep1();
+        p.dumpStep2();
         //p.getRealTC();
         //p.removeNoise();
     }

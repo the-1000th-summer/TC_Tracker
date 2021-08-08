@@ -27,7 +27,19 @@ namespace TC_Tracker {
 
         private string cSelDir {
             get => Properties.Settings.Default.selectDir;
+            set {
+                Properties.Settings.Default.selectDir = value;
+                Properties.Settings.Default.Save();
+            }
         }
+        private string s_TempFileDir {
+            get => Properties.Settings.Default.tempFileDir;
+            set {
+                Properties.Settings.Default.tempFileDir = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+
         private string latVarStr;
         private string lonVarStr;
         private string vorVarStr;
@@ -86,7 +98,7 @@ namespace TC_Tracker {
                 saveSelectDir(selectDir);
                 ncFileTextBox.Text = selectDir;
                 //changeUIAccV(validateDir(dirTextBox.Text));
-                NCFileInfo fileInfo = new NCFileInfo(selectDir, "", "", "");
+                NCFileInfo fileInfo = new NCFileInfo(selectDir, "", "", "", "");
                 fileInfo.checkFileValid();
                 Debug.WriteLine(fileInfo.fileValidInfo, " from cs.");
                 if (!fileInfo.isFileValid) {
@@ -170,7 +182,7 @@ namespace TC_Tracker {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void bgWorker_DoWork(object sender, DoWorkEventArgs e) {
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr);
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
             fileInfo.startTracking();
         }
 

@@ -17,6 +17,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/dll/runtime_symbol_info.hpp>
 #include "json.hpp"
 #include "multiArray.h"
 #include "Processor.h"
@@ -304,7 +305,7 @@ namespace TTCore {
             } else if ((tcEndLat < 5) && UtilFunc::cellsLatOrLonAvg(latArr.get(), realTC.maxVorCells)) {
                 addRMIndex();
             // 排除印度洋的台风
-            } else if (UtilFunc::cellsLatOrLonAvg(lonArr.get(), realTC.maxVorCells)) {
+            } else if (UtilFunc::cellsLatOrLonAvg(lonArr.get(), realTC.maxVorCells) < 103) {
                 addRMIndex();
             }
         }
@@ -495,6 +496,10 @@ namespace TTCore {
     /// 此方法检查一个文件夹名字对应的路径是否为路径
     void Processor::checkDirAndCreate(const std::string& folderName) {
         //std::filesystem::path dumpDir("E:\\University\\TC_Tracker\\data\\stepFile\\");
+        if (dumpDir.empty()) {
+            std::cout << "未设定中间文件的储存位置，将中间文件储存在exe文件的位置下" << std::endl;
+            dumpDir = boost::dll::program_location().parent_path().string();
+        }
         std::filesystem::path dumpDir(dumpDir);
         std::filesystem::path folderPath = dumpDir / folderName;
         //std::cout << folderPath << std::endl;
@@ -522,6 +527,26 @@ namespace TTCore {
         boost::archive::binary_oarchive oa(ofs);
         // write class instance to archive
         oa << allVortexes;
+    }
+
+    void Processor::dumpStep2() {
+        checkDirAndCreate("step2");
+        std::filesystem::path stepDumpDir(dumpDir);
+        std::ofstream ofs(stepDumpDir / "step2\\step2.dat", std::ios::binary);
+        boost::archive::binary_oarchive oa(ofs);
+        oa << realTCs;
+    }
+
+
+    /// 检查点是否在多边形里
+    bool pnpoly(int nvert, float* vertx, float* verty, float testx, float testy) {
+        bool isInPolygon = false;
+        int i, j;
+        for (i = 0, j = nvert - 1; i < nvert; j = i++) {
+            if (((verty[i] > testy) != (verty[j] > testy)) && (testx < (vertx[j] - vertx[i]) * (testy - verty[i]) / (verty[j] - verty[i]) + vertx[i]))
+                isInPolygon = !isInPolygon;
+        }
+        return isInPolygon;
     }
 
 }

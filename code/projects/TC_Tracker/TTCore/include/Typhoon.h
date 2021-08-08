@@ -2,6 +2,9 @@
 
 #include <utility>
 #include <vector>
+#include <utility>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 
 namespace TTCore {
     class Typhoon {
@@ -12,7 +15,14 @@ namespace TTCore {
         int startTimeIndex;
         int endTimeIndex;
     private:
-
+        friend class boost::serialization::access;
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int version) {
+            ar & serialNo;
+            ar & maxVorCells;
+            ar & startTimeIndex;
+            ar & endTimeIndex;
+        }
     };
 }
 

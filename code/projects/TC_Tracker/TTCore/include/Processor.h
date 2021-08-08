@@ -30,6 +30,7 @@ namespace TTCore {
         inline void removeVortex(ThreeDArray &vorField, int timeIndex, std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex);
 
         void dumpStep1();
+        void dumpStep2();
     
     private:
         netCDF::NcFile *iiFile;
@@ -47,6 +48,7 @@ namespace TTCore {
         std::vector<Typhoon> realTCs{};
 
         void checkDirAndCreate(const std::string &folderName);
+
     };
 
     //void to_json(json& j, const TC1Time& r);

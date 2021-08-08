@@ -11,7 +11,7 @@ namespace myCLI {
     public ref class NCFileInfo: public ManagedObject<TTCore::NCFileInfo> {
     public:
         // 无法在managed class的方法里使用optional paramater
-        NCFileInfo(String ^filePath, String ^latVarName, String ^lonVarName, String ^vorVarName);
+        NCFileInfo(String ^filePath, String ^latVarName, String ^lonVarName, String ^vorVarName, String ^dumpDirectory);
         void checkFileValid();
         //void openFile();
         List<String^>^ getVarsName();

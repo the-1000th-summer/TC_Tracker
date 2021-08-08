@@ -5,7 +5,7 @@
 using namespace System::Collections::Generic;
 
 namespace myCLI {
-    NCFileInfo::NCFileInfo(String ^filePath, String^ latVarName, String^ lonVarName, String^ vorVarName) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName))) {
+    NCFileInfo::NCFileInfo(String ^filePath, String^ latVarName, String^ lonVarName, String^ vorVarName, String^ dumpDirectory) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName), string2Char(dumpDirectory))) {
         
     }
 
