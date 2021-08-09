@@ -46,9 +46,12 @@ namespace TTCore {
         std::vector<int> hasTC_timeIndex{};
         std::vector<std::vector<TC1Time>> allVortexes{};
         std::vector<Typhoon> realTCs{};
+        std::vector<std::vector<std::pair<float, float>>> landPolygons;
 
         void checkDirAndCreate(const std::string &folderName);
-
+        void getLandPolygons();
+        bool pnpoly(const std::vector<std::pair<float, float>>& polygon, float testLat, float testLon);
+        bool pnpolys(float testLat, float testLon);
     };
 
     //void to_json(json& j, const TC1Time& r);

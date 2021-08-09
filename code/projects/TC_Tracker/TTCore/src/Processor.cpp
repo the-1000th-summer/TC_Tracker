@@ -274,9 +274,14 @@ namespace TTCore {
 
     void Processor::removeNoise() {
         int realTCsNum = realTCs.size();
+        /// 需移除的气旋的index的set（会自动按升序排列）
         std::set<int> tcRMIndex;
         int i = 0;
         auto addRMIndex = [&tcRMIndex, i]() { tcRMIndex.insert(i); };
+
+        // 获取陆地信息
+        //std::vector<std::vector<std::pair<float, float>>> landPolygons;
+        getLandPolygons();
 
         for (; i < realTCsNum; ++i) {
             auto realTC = realTCs[i];
@@ -299,8 +304,8 @@ namespace TTCore {
             } else if (UtilFunc::alwaysMoveEast(realTC.maxVorCells)) {
                 addRMIndex();
             // 第一个点在陆地上
-            //} else if () {
-                //addRMIndex();
+            } else if (pnpolys(tcStartLat, tcStartLon)) {
+                addRMIndex();
             // 排除纬度太低的气旋
             } else if ((tcEndLat < 5) && UtilFunc::cellsLatOrLonAvg(latArr.get(), realTC.maxVorCells)) {
                 addRMIndex();
@@ -309,7 +314,7 @@ namespace TTCore {
                 addRMIndex();
             }
         }
-
+        // 按index降序逐个删除需删除的气旋
         for (auto rIter = tcRMIndex.crbegin(); rIter != tcRMIndex.crend(); ++rIter)
             realTCs.erase(realTCs.cbegin() + *rIter);
     }
@@ -493,7 +498,8 @@ namespace TTCore {
     }
 
 
-    /// 此方法检查一个文件夹名字对应的路径是否为路径
+    /// @brief 此方法检查一个文件夹名字对应的路径是否为路径
+    /// @param folderName 文件夹名称
     void Processor::checkDirAndCreate(const std::string& folderName) {
         //std::filesystem::path dumpDir("E:\\University\\TC_Tracker\\data\\stepFile\\");
         if (dumpDir.empty()) {
@@ -535,18 +541,53 @@ namespace TTCore {
         std::ofstream ofs(stepDumpDir / "step2\\step2.dat", std::ios::binary);
         boost::archive::binary_oarchive oa(ofs);
         oa << realTCs;
+
+        //getLandPolygons();
+        //std::cout << "test" << std::endl;
+        //std::cout << pnpolys(24.764169, 112.762106) << std::endl;  // true
+        //std::cout << pnpolys(23.628600, 120.898879) << std::endl;  // true
+        //std::cout << pnpolys(19.745883, 115.252048) << std::endl;  // false
+        //std::cout << pnpolys(7.034187, 109.994884) << std::endl;  // false
+        //std::cout << pnpolys(16.830964, 121.199621) << std::endl;  // true
+        //std::cout << pnpolys(7.871843, 124.967880) << std::endl;  // true
+        //std::cout << pnpolys(20.260121, 107.827437) << std::endl;  // false
+    }
+
+    void Processor::getLandPolygons() {
+        auto exeDirStr = boost::dll::program_location().parent_path().string();
+        std::filesystem::path exeDir(exeDirStr);
+        std::ifstream ifs(exeDir / "data\\myMap.dat", std::ios::binary);
+        boost::archive::binary_iarchive ia(ifs);
+        ia >> landPolygons;
     }
 
 
-    /// 检查点是否在多边形里
-    bool pnpoly(int nvert, float* vertx, float* verty, float testx, float testy) {
+    /// @brief 检查点是否在多边形里
+    /// @param[in] polygon 多边形
+    /// @param[in] testLat 点的纬度
+    /// @param[in] testLon 点的经度
+    /// @return 点是否在多边形内
+    bool Processor::pnpoly(const std::vector<std::pair<float,float>> &polygon, float testLat, float testLon) {
         bool isInPolygon = false;
         int i, j;
+        /// 多边形的顶点个数
+        int nvert = polygon.size();
         for (i = 0, j = nvert - 1; i < nvert; j = i++) {
-            if (((verty[i] > testy) != (verty[j] > testy)) && (testx < (vertx[j] - vertx[i]) * (testy - verty[i]) / (verty[j] - verty[i]) + vertx[i]))
+            if (((polygon[i].first > testLat) != (polygon[j].first > testLat)) && (testLon < (polygon[j].second - polygon[i].second) * (testLat - polygon[i].first) / (polygon[j].first - polygon[i].first) + polygon[i].second))
                 isInPolygon = !isInPolygon;
         }
         return isInPolygon;
+    }
+
+    /// @brief 检查点是否在任一个多边形
+    /// @param[in] testLat 点的纬度
+    /// @param[in] testLon 点的经度
+    /// @return 点是否在任一个多边形
+    bool Processor::pnpolys(float testLat, float testLon) {
+        for (const auto& landPolygon : landPolygons) {
+            if (pnpoly(landPolygon, testLat, testLon)) { return true; }
+        }
+        return false;
     }
 
 }
