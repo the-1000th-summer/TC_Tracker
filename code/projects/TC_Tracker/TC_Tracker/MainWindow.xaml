@@ -14,7 +14,7 @@
         <cm:BackgroundWorker x:Key="backgroundWorker" WorkerReportsProgress="True" WorkerSupportsCancellation="True" DoWork="bgWorker_DoWork" ProgressChanged="bgWorker_progressChanged" RunWorkerCompleted="bgWorker_runCompleted">
         </cm:BackgroundWorker>
     </Window.Resources>
-    <Grid>
+    <Grid Background="Transparent" Drop="filePathDrop" AllowDrop="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />

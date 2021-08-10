@@ -32,9 +32,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="my.html" />
-    <EmbeddedResource Include="myyy.html">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="path.html" />
   </ItemGroup>
 

@@ -47,7 +47,7 @@ namespace TC_Tracker {
         private bool _isTracking = false;
         public bool isTracking {
             get { return _isTracking; }
-            set { 
+            set {
                 _isTracking = value;
                 RaisePropertyChanged("isTracking");
             }
@@ -95,22 +95,32 @@ namespace TC_Tracker {
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
                 var selectDir = dialog.FileName;
                 Debug.WriteLine(selectDir);
-                saveSelectDir(selectDir);
+
                 ncFileTextBox.Text = selectDir;
                 //changeUIAccV(validateDir(dirTextBox.Text));
-                NCFileInfo fileInfo = new NCFileInfo(selectDir, "", "", "", "");
-                fileInfo.checkFileValid();
-                Debug.WriteLine(fileInfo.fileValidInfo, " from cs.");
-                if (!fileInfo.isFileValid) {
-                    MessageBox.Show($"File\n{selectDir}\n is not valid:\n {fileInfo.fileValidInfo}");
-                    selVarButton.IsEnabled = false;
-                    latNameLabel.Content = "未指定";
-                    lonNameLabel.Content = "未指定";
-                    vorNameLabel.Content = "未指定";
-                    return;
-                }
+                if (!checkFileValidAndUpdateUI(selectDir)) { return; }
+                cSelDir = selectDir;
                 selVarButton.IsEnabled = true;
             }
+        }
+
+        private bool checkFileValidAndUpdateUI(string selectDir) {
+            NCFileInfo fileInfo = new NCFileInfo(selectDir, "", "", "", "");
+            fileInfo.checkFileValid();
+            Debug.WriteLine(fileInfo.fileValidInfo, " from cs.");
+            if (!fileInfo.isFileValid) {
+                MessageBox.Show($"File\n{selectDir}\n is not valid:\n {fileInfo.fileValidInfo}");
+                notValidUI();
+                return false;
+            }
+            return true;
+        }
+
+        private void notValidUI() {
+            selVarButton.IsEnabled = false;
+            latNameLabel.Content = "未指定";
+            lonNameLabel.Content = "未指定";
+            vorNameLabel.Content = "未指定";
         }
 
         private void exit_OnClick(object sender, RoutedEventArgs e) {
@@ -133,10 +143,10 @@ namespace TC_Tracker {
         /// 保存工作文件夹字符串到settings中
         /// </summary>
         /// <param name="text"></param>
-        private void saveSelectDir(string text) {
-            Properties.Settings.Default.selectDir = text;
-            Properties.Settings.Default.Save();
-        }
+        //private void saveSelectDir(string text) {
+        //    Properties.Settings.Default.selectDir = text;
+        //    Properties.Settings.Default.Save();
+        //}
 
         /// <summary>
         /// 点击选择变量按钮
@@ -233,6 +243,27 @@ namespace TC_Tracker {
             var resultView = new ResultWindow();
             resultView.Owner = this;
             resultView.ShowDialog();
+        }
+
+        /// <summary>
+        /// Drag and drop放手时执行的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void filePathDrop(object sender, DragEventArgs e) {
+            // 可能drop多个文件
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files.Length != 1) {
+                MessageBox.Show("选择的文件多于一个，请重新选择。");
+                notValidUI();
+                return;
+            }
+            string fileStr = files[0];
+            Console.WriteLine(fileStr);
+            ncFileTextBox.Text = fileStr;
+            if (!checkFileValidAndUpdateUI(fileStr)) { return; }
+            cSelDir = fileStr;
+            selVarButton.IsEnabled = true;
         }
     }
 }
