@@ -228,5 +228,11 @@ namespace TC_Tracker {
                 newwindow.Show();
             }
         }
+
+        private void showWebButton_Click(object sender, RoutedEventArgs e) {
+            var resultView = new ResultWindow();
+            resultView.Owner = this;
+            resultView.ShowDialog();
+        }
     }
 }

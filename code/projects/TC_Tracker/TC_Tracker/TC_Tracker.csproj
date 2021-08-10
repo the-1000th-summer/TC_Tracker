@@ -25,6 +25,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="my.html" />
+    <None Remove="myyy.html" />
+    <None Remove="path.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="my.html" />
+    <EmbeddedResource Include="myyy.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="path.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="WindowsAPICodePack-Core" Version="1.1.2" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
   </ItemGroup>
