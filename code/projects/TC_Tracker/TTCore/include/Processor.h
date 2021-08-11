@@ -31,7 +31,9 @@ namespace TTCore {
 
         void dumpStep1();
         void dumpStep2();
+        void dumpStep3();
         void getStep1DataFromFile(const std::string &filePath);
+        void getStep2DataFromFile(const std::string &filePath);
         void copyRealTCs(std::vector<Typhoon> &tcs);
     
     private:

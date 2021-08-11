@@ -40,15 +40,39 @@ namespace myCLI {
         ttt(unManagedTC, realTCs);
     }
 
-    void NCFileInfo::startFromStep2() {
-        m_Instance->startFromStep2();
+    void NCFileInfo::startFromStep2(List<Typhoon^>^ outTC) {
+        std::vector<TTCore::Typhoon> unManagedTC;
+        m_Instance->startFromStep2(unManagedTC);
+        Console::WriteLine("step2: unmanagedTC number : {0}", unManagedTC.size());
+        ttt(unManagedTC, outTC);
+    }
+
+    void NCFileInfo::startFromStep3(List<Typhoon^>^ outTC) {
+        std::vector<TTCore::Typhoon> unManagedTC;
+        m_Instance->startFromStep3(unManagedTC);
+        Console::WriteLine("step3: unmanagedTC number: {0}", unManagedTC.size());
+        ttt(unManagedTC, outTC);
+    }
+
+    void NCFileInfo::getLatLonData(std::vector<float>& latData, std::vector<float>& lonData) {
+        m_Instance->getLatLonData(latData, lonData);
     }
 
     void NCFileInfo::ttt(std::vector<TTCore::Typhoon>& inTC, List<Typhoon^>^ outTC) {
+        std::vector<float> latData{}, lonData{};
+        getLatLonData(latData, lonData);
+
         int n = inTC.size();
         for (int i = 0; i < n; ++i) {
-            //Typhoon ^newTC = gcnew Typhoon(inTC[i].ser)
-            //outTC.
+            Typhoon ^newTC = gcnew Typhoon();
+            newTC->serialNo = inTC[i].serialNo;
+            newTC->startTimeIndex = inTC[i].startTimeIndex;
+            newTC->endTimeIndex = inTC[i].endTimeIndex;
+            for (const auto& df : inTC[i].maxVorCells) {
+                newTC->maxVorCells->Add(gcnew Tuple<float,float>{latData[df.first], lonData[df.second]});
+            }
+            
+            outTC->Add(newTC);
         }
     }
 

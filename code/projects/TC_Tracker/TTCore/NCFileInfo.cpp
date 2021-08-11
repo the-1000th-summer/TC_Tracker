@@ -35,6 +35,11 @@ namespace TTCore {
     //    std::cout << "sdf" << std::endl;
     //}
 
+    void NCFileInfo::getLatLonData(std::vector<float>& latData, std::vector<float>& lonData) {
+        netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+        UtilFunc::getLatLonData(&f, latVarName, lonVarName, latData, lonData);
+    }
+
     void NCFileInfo::getVarsName(std::vector<std::string> &varsName) {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
         auto tt = f.getVars();
@@ -60,14 +65,26 @@ namespace TTCore {
         p.copyRealTCs(tcs);
     }
 
-    void NCFileInfo::startFromStep2() {
+    void NCFileInfo::startFromStep2(std::vector<Typhoon>& tcs) {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
         Processor p(f, latVarName, lonVarName, vorVarName, dumpDir);
         std::string step1FilePath = "E:\\University\\TC_Tracker\\data\\stepFile\\step1\\step1.dat";
         p.getStep1DataFromFile(step1FilePath);
         p.getRealTC();
         p.removeNoise();
+        p.dumpStep3();
+        p.copyRealTCs(tcs);
         
+    }
+
+    void NCFileInfo::startFromStep3(std::vector<Typhoon>& tcs) {
+        netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+        Processor p(f, latVarName, lonVarName, vorVarName, dumpDir);
+        std::string step1FilePath = "E:\\University\\TC_Tracker\\data\\stepFile\\step2\\step2.dat";
+        p.getStep2DataFromFile(step1FilePath);
+        p.removeNoise();
+        p.dumpStep3();
+        p.copyRealTCs(tcs);
     }
 
      

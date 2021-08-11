@@ -563,12 +563,28 @@ namespace TTCore {
         //std::cout << pnpolys(20.260121, 107.827437) << std::endl;  // false
     }
 
+    void Processor::dumpStep3() {
+        checkDirAndCreate("step3");
+        std::filesystem::path stepDumpDir(dumpDir);
+        std::ofstream ofs(stepDumpDir / "step3\\step3.dat", std::ios::binary);
+        boost::archive::binary_oarchive oa(ofs);
+        oa << realTCs;
+    }
+
     void Processor::getStep1DataFromFile(const std::string& filePath) {
         std::ifstream ifs(filePath, std::ios::binary);
         boost::archive::binary_iarchive ia(ifs);
 
         allVortexes.clear();
         ia >> hasTC_timeIndex >> allVortexes;
+    }
+
+    void Processor::getStep2DataFromFile(const std::string& filePath) {
+        std::ifstream ifs(filePath, std::ios::binary);
+        boost::archive::binary_iarchive ia(ifs);
+
+        realTCs.clear();
+        ia >> realTCs;
     }
 
     void Processor::copyRealTCs(std::vector<Typhoon>& tcs) {

@@ -8,7 +8,7 @@
         Title="ResultWindow" Height="450" Width="800">
     <Grid>
 
-        <WebBrowser x:Name="webBrowser" Margin="0,0,135,0" LoadCompleted="aaa"/>
+        <WebBrowser x:Name="webBrowser" Margin="0,0,135,0" LoadCompleted="loadCompletedHandler"/>
         <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="670,360,0,0" VerticalAlignment="Top" Click="button_Click"/>
 
     </Grid>

@@ -19,9 +19,12 @@ namespace TTCore {
         NCFileInfo(const char *filePath, const char *latVName, const char *lonVName, const char *vorVName, const char *dumpDirectory);
         void checkFileValid();
         //void openFile();
+        void getLatLonData(std::vector<float> &latData, std::vector<float>& lonData);
+
         void getVarsName(std::vector<std::string>& varsName);
         void startTracking(std::vector<Typhoon>& tcs);
-        void startFromStep2();
+        void startFromStep2(std::vector<Typhoon>& tcs);
+        void startFromStep3(std::vector<Typhoon>& tcs);
     //private:
     //    netCDF::NcFile *iiFile = nullptr;
     };

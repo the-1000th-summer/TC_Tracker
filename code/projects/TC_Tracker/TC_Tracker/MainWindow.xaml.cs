@@ -60,7 +60,7 @@ namespace TC_Tracker {
         }
 
         private BackgroundWorker bgWorker;
-        List<Typhoon> realTCs;
+        private List<Typhoon> realTCs = new List<Typhoon>();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -242,6 +242,7 @@ namespace TC_Tracker {
 
         private void showWebButton_Click(object sender, RoutedEventArgs e) {
             var resultView = new ResultWindow();
+            resultView.tcData = realTCs[0];
             resultView.Owner = this;
             resultView.ShowDialog();
         }
@@ -268,8 +269,17 @@ namespace TC_Tracker {
         }
 
         private void step2Button_Click(object sender, RoutedEventArgs e) {
+            realTCs.Clear();
             NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
-            fileInfo.startFromStep2();
+            fileInfo.startFromStep2(realTCs);
+            Console.WriteLine("msg from step2ButtonClick, realTCs number: {0}", realTCs.Count);
+        }
+
+        private void step3Button_Click(object sender, RoutedEventArgs e) {
+            realTCs.Clear();
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            fileInfo.startFromStep3(realTCs);
+            Console.WriteLine("msg from step3ButtonClick, realTCs number: {0}", realTCs.Count);
         }
     }
 }

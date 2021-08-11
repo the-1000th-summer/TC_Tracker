@@ -43,7 +43,8 @@
         <Button x:Name="startTrackButton" Content="开始识别" HorizontalAlignment="Left" Margin="346,282,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="89" Click="startTrackButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isTracking, Converter={StaticResource InverseBooleanConverter}}"/>
         <Button x:Name="stopButton" Content="中止" HorizontalAlignment="Left" Margin="610,282,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-0.256,0.391" Height="23" Width="55" Click="stopButtonClicked" IsEnabled="{Binding ElementName=mainWin, Path=isTracking}" />
         <Button x:Name="showWebButton" Content="Web" HorizontalAlignment="Left" Margin="495,355,0,0" Grid.Row="1" VerticalAlignment="Top" Click="showWebButton_Click"/>
-        <Button x:Name="step2Button" Content="startFromStep2" HorizontalAlignment="Left" Margin="160,325,0,0" Grid.Row="1" VerticalAlignment="Top" Height="40" Width="107" Click="step2Button_Click"/>
+        <Button x:Name="step2Button" Content="startFromStep2" HorizontalAlignment="Left" Margin="81,325,0,0" Grid.Row="1" VerticalAlignment="Top" Height="40" Width="107" Click="step2Button_Click"/>
+        <Button x:Name="step3Button" Content="startFromStep3" HorizontalAlignment="Left" Margin="215,328,0,0" Grid.Row="1" VerticalAlignment="Top" Height="34" Width="102" Click="step3Button_Click"/>
 
     </Grid>
 </Window>
