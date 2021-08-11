@@ -1,4 +1,5 @@
 #pragma once
+#include "include/Typhoon.h"
 #include <string>
 #include <vector>
 //#include <netcdf>
@@ -19,7 +20,8 @@ namespace TTCore {
         void checkFileValid();
         //void openFile();
         void getVarsName(std::vector<std::string>& varsName);
-        void startTracking();
+        void startTracking(std::vector<Typhoon>& tcs);
+        void startFromStep2();
     //private:
     //    netCDF::NcFile *iiFile = nullptr;
     };

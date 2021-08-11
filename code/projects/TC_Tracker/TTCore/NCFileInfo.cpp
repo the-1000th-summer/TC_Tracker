@@ -46,14 +46,29 @@ namespace TTCore {
         //std::transform(tt.cbegin(), tt.end(), std::back_inserter(varsName), []( std::pair<std::string, netCDF::NcVar> &a) {return a.first;} );
     }
 
-    void NCFileInfo::startTracking() {
+    void NCFileInfo::startTracking(std::vector<Typhoon> &tcs) {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
         Processor p(f, latVarName, lonVarName, vorVarName, dumpDir);
-        //p.recognizeTyphoon();
+        p.recognizeTyphoon();
         //p.
-        //p.dumpStep1();
+        p.dumpStep1();
+        std::cout << "finish dump step1." << std::endl;
+        p.getRealTC();
         p.dumpStep2();
-        //p.getRealTC();
-        //p.removeNoise();
+
+        p.removeNoise();
+        p.copyRealTCs(tcs);
     }
+
+    void NCFileInfo::startFromStep2() {
+        netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+        Processor p(f, latVarName, lonVarName, vorVarName, dumpDir);
+        std::string step1FilePath = "E:\\University\\TC_Tracker\\data\\stepFile\\step1\\step1.dat";
+        p.getStep1DataFromFile(step1FilePath);
+        p.getRealTC();
+        p.removeNoise();
+        
+    }
+
+     
 }

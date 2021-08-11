@@ -31,6 +31,8 @@ namespace TTCore {
 
         void dumpStep1();
         void dumpStep2();
+        void getStep1DataFromFile(const std::string &filePath);
+        void copyRealTCs(std::vector<Typhoon> &tcs);
     
     private:
         netCDF::NcFile *iiFile;

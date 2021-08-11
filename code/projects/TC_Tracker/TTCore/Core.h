@@ -2,3 +2,4 @@
 #pragma once
 #include "NCFileInfo.h"
 #include "Entity.h"
+#include "include/Typhoon.h"

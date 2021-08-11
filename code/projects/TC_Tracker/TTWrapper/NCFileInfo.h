@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "ManagedObject.h"
 #include "../TTCore/Core.h"
 //#include <netcdf>
@@ -8,6 +9,15 @@ using namespace System::Diagnostics;
 using namespace System::Collections::Generic;
 
 namespace myCLI {
+    
+    public ref class Typhoon {
+    public:
+        // Typhoon();
+        int serialNo;
+        List<Tuple<int, int>^>^ maxVorCells = gcnew List<Tuple<int, int>^>();
+        int startTimeIndex;
+        int endTimeIndex;
+    };
     public ref class NCFileInfo: public ManagedObject<TTCore::NCFileInfo> {
     public:
         // 无法在managed class的方法里使用optional paramater
@@ -15,8 +25,9 @@ namespace myCLI {
         void checkFileValid();
         //void openFile();
         List<String^>^ getVarsName();
-        void startTracking();
-
+        void ttt(std::vector<TTCore::Typhoon> &inTC, List<Typhoon^> ^outTC);
+        void startTracking(List<Typhoon^>^ realTCs);
+        void startFromStep2();
 
         property bool isFileValid {
         public:

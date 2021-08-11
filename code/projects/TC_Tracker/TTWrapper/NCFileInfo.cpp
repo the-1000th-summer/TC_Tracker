@@ -32,9 +32,24 @@ namespace myCLI {
         return sd;
     }
 
-    void NCFileInfo::startTracking() {
+    void NCFileInfo::startTracking(List<Typhoon ^> ^realTCs) {
         //Debug::WriteLine("sdf");
-        m_Instance->startTracking();
-
+        std::vector<TTCore::Typhoon> unManagedTC;
+        m_Instance->startTracking(unManagedTC);
+        Console::WriteLine("unmanagedTC number: {0}",unManagedTC.size());
+        ttt(unManagedTC, realTCs);
     }
+
+    void NCFileInfo::startFromStep2() {
+        m_Instance->startFromStep2();
+    }
+
+    void NCFileInfo::ttt(std::vector<TTCore::Typhoon>& inTC, List<Typhoon^>^ outTC) {
+        int n = inTC.size();
+        for (int i = 0; i < n; ++i) {
+            //Typhoon ^newTC = gcnew Typhoon(inTC[i].ser)
+            //outTC.
+        }
+    }
+
 }

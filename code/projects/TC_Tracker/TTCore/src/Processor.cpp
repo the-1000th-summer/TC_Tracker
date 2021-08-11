@@ -101,15 +101,15 @@ namespace TTCore {
         /// 气旋编号，从1开始
         int TC_No = 1;
         /// 当前时次的index
-        int timeIndex = 0;
+        //int timeIndex = 0;
         ///
-        int hasVortex_notHandledYetIndex = 0;
+        //int hasVortex_notHandledYetIndex = 0;
         /// 最后有气旋的时次的index+1
         int hasTCLastTimeIndex = hasTC_timeIndex.back() + 1;
         /// 跟踪时仍未确定消亡日期的气旋；跟踪完成的气旋
         std::vector<Typhoon> tempTCs{};
 
-        for (; timeIndex < hasTCLastTimeIndex; ++timeIndex) {
+        for (int timeIndex = 0; timeIndex < hasTCLastTimeIndex; ++timeIndex) {
             if (timeIndex % 1000 == 0)
                 std::cout << timeIndex << std::endl;
             /// 当前时次是否有气旋？
@@ -124,10 +124,11 @@ namespace TTCore {
 
             } else {             // 当前时次有气旋
                 /// 当前时次的涡旋vector
-                auto currentTimeVortexes = allVortexes[hasVortex_notHandledYetIndex];
+                //auto currentTimeVortexes = allVortexes[hasVortex_notHandledYetIndex];
+                auto currentTimeVortexes = allVortexes[timeIndex];
                 /// 当前时次的涡旋个数
                 int currentTimeTCNum = currentTimeVortexes.size();
-                ++hasVortex_notHandledYetIndex;
+                //++hasVortex_notHandledYetIndex;
 
                 if (!hasTCPrevTime) {  // 当前时次有气旋，但前一时次无气旋，创建新的气旋对象
                 
@@ -235,6 +236,7 @@ namespace TTCore {
                             //
                             // 更新台风几何中心移动到的位置
                             //
+                            tempTCs[minDistIndex.first].endTimeIndex = timeIndex;
 
                             tempTCsIndexForD.erase(minDistIndex.first);
                             // 移除对应成功的当前时次的涡旋
@@ -270,53 +272,60 @@ namespace TTCore {
             }
             hasTCPrevTime = hasTCCurrentTime;
         }
+        
+        std::cout << "msg from getRealTC, realTC number" << realTCs.size() << std::endl;
     }
 
     void Processor::removeNoise() {
         int realTCsNum = realTCs.size();
         /// 需移除的气旋的index的set（会自动按升序排列）
         std::set<int> tcRMIndex;
-        int i = 0;
-        auto addRMIndex = [&tcRMIndex, i]() { tcRMIndex.insert(i); };
+        
+        auto addRMIndex = [&tcRMIndex](int i) {
+            tcRMIndex.insert(i);
+        };
 
         // 获取陆地信息
         //std::vector<std::vector<std::pair<float, float>>> landPolygons;
         getLandPolygons();
 
-        for (; i < realTCsNum; ++i) {
+        for (int i = 0; i < realTCsNum; ++i) {
             auto realTC = realTCs[i];
-            int tcStartLat = realTC.maxVorCells.front().first, tcStartLon = realTC.maxVorCells.front().second;
-            int tcEndLat = realTC.maxVorCells.back().first, tcEndLon = realTC.maxVorCells.back().second;
+            int tcStartLat = latArr[realTC.maxVorCells.front().first], tcStartLon = lonArr[realTC.maxVorCells.front().second];
+            int tcEndLat = latArr[realTC.maxVorCells.back().first], tcEndLon = lonArr[realTC.maxVorCells.back().second];
 
             // 去除不动的点（即包括单个点）
             if ((tcStartLon == tcEndLon) && (tcStartLat == tcEndLat)) {
-                addRMIndex();
+                addRMIndex(i);
             // 去除小于3个点的轨迹
             } else if (realTC.maxVorCells.size() < 3) {
-                addRMIndex();
+                addRMIndex(i);
             // 去除一直在东边的轨迹
             } else if ((tcStartLon >= 170) && (tcEndLon >= 170)) {
-                addRMIndex();
+                addRMIndex(i);
             // 排除非热带生成的气旋
             } else if ((tcStartLat >= 33) || (tcStartLat < 0)) {
-                addRMIndex();
+                addRMIndex(i);
             // 去除温带低压
             } else if (UtilFunc::alwaysMoveEast(realTC.maxVorCells)) {
-                addRMIndex();
+                addRMIndex(i);
             // 第一个点在陆地上
             } else if (pnpolys(tcStartLat, tcStartLon)) {
-                addRMIndex();
+                addRMIndex(i);
             // 排除纬度太低的气旋
             } else if ((tcEndLat < 5) && UtilFunc::cellsLatOrLonAvg(latArr.get(), realTC.maxVorCells)) {
-                addRMIndex();
+                addRMIndex(i);
             // 排除印度洋的台风
             } else if (UtilFunc::cellsLatOrLonAvg(lonArr.get(), realTC.maxVorCells) < 103) {
-                addRMIndex();
+                addRMIndex(i);
             }
         }
         // 按index降序逐个删除需删除的气旋
         for (auto rIter = tcRMIndex.crbegin(); rIter != tcRMIndex.crend(); ++rIter)
             realTCs.erase(realTCs.cbegin() + *rIter);
+
+        std::cout << "remove noise completed" << std::endl;
+        std::cout << "msg from removeNoise, realTC number: " << realTCs.size() << std::endl;
     }
 
     /// 此方法识别某个时次是否有台风以及台风的个数
@@ -532,7 +541,8 @@ namespace TTCore {
         std::ofstream ofs(stepDumpDir / "step1\\step1.dat", std::ios::binary);
         boost::archive::binary_oarchive oa(ofs);
         // write class instance to archive
-        oa << allVortexes;
+        std::cout << "msg from dump step1, vortex number: " << allVortexes.size() << std::endl;
+        oa << hasTC_timeIndex << allVortexes;
     }
 
     void Processor::dumpStep2() {
@@ -551,6 +561,20 @@ namespace TTCore {
         //std::cout << pnpolys(16.830964, 121.199621) << std::endl;  // true
         //std::cout << pnpolys(7.871843, 124.967880) << std::endl;  // true
         //std::cout << pnpolys(20.260121, 107.827437) << std::endl;  // false
+    }
+
+    void Processor::getStep1DataFromFile(const std::string& filePath) {
+        std::ifstream ifs(filePath, std::ios::binary);
+        boost::archive::binary_iarchive ia(ifs);
+
+        allVortexes.clear();
+        ia >> hasTC_timeIndex >> allVortexes;
+    }
+
+    void Processor::copyRealTCs(std::vector<Typhoon>& tcs) {
+        tcs = realTCs;
+        std::cout << "msg from copy, realTCs number: " << tcs.size() << std::endl;
+        std::cout << "copy tcs completed." << std::endl;
     }
 
     void Processor::getLandPolygons() {

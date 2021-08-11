@@ -60,6 +60,7 @@ namespace TC_Tracker {
         }
 
         private BackgroundWorker bgWorker;
+        List<Typhoon> realTCs;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -193,7 +194,7 @@ namespace TC_Tracker {
         /// <param name="e"></param>
         private void bgWorker_DoWork(object sender, DoWorkEventArgs e) {
             NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
-            fileInfo.startTracking();
+            fileInfo.startTracking(realTCs);
         }
 
         /// <summary>
@@ -264,6 +265,11 @@ namespace TC_Tracker {
             if (!checkFileValidAndUpdateUI(fileStr)) { return; }
             cSelDir = fileStr;
             selVarButton.IsEnabled = true;
+        }
+
+        private void step2Button_Click(object sender, RoutedEventArgs e) {
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            fileInfo.startFromStep2();
         }
     }
 }
