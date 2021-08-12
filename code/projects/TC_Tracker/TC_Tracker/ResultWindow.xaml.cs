@@ -21,7 +21,7 @@ namespace TC_Tracker {
     /// Interaction logic for ResultWindow.xaml
     /// </summary>
     public partial class ResultWindow : Window {
-        public Typhoon tcData;
+        public List<Typhoon> tcsData;
 
         public ResultWindow() {
             InitializeComponent();
@@ -44,27 +44,24 @@ namespace TC_Tracker {
         }
         private void vd() {
 
-            List<Dictionary<string, float>> myData = new List<Dictionary<string, float>>();
-            foreach (var i in tcData.maxVorCells) {
-                var tempDict = new Dictionary<string, float>();
-                tempDict.Add("lat", i.Item1);
-                tempDict.Add("lon", i.Item2);
-                myData.Add(tempDict);
+            var tcsDataForJS = new List<List<Dictionary<string, float>>>();
+
+            foreach (var tcData in tcsData) {
+                var tcDataForJS = new List<Dictionary<string, float>>();
+                foreach (var i in tcData.maxVorCells) {
+                    var tempDict = new Dictionary<string, float>();
+                    tempDict.Add("lat", i.Item1);
+                    tempDict.Add("lon", i.Item2);
+                    tcDataForJS.Add(tempDict);
+                }
+                tcsDataForJS.Add(tcDataForJS);
             }
-            //var bb = new {
-            //    Lat = new List<int> { 10, 20, 30 },
-            //    Long = new List<int> { 110, 120, 130 }
-            //};
 
             try {
 
-                //webBrowser.InvokeScript("aad", JsonConvert.SerializeObject(new {
-                //    Lat = new List<int> { 10, 20, 30 },
-                //    Long = new List<int> { 110, 120, 130 }
-                //}));
-                var bbba = JsonConvert.SerializeObject(myData);
+                var bbba = JsonConvert.SerializeObject(tcsDataForJS);
                 Console.WriteLine(bbba);
-                webBrowser.InvokeScript("aad", bbba);
+                webBrowser.InvokeScript("drawPath", bbba);
             } catch (Exception ex) {
                 string msg = "Could not call script: " + ex.Message + "\n\nPlease click the 'Load HTML Document with Script' button to load.";
                 MessageBox.Show(msg);
