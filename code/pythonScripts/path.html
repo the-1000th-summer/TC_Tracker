@@ -28,26 +28,32 @@
             visibility: visible;
             fill: #f44;
             r: 5;
-            z-index: 10;
+            position: relative;
+            z-index: -999;
         }
         .points:hover {
             visibility: visible;
             fill: #f44;
             r: 8;
-            z-index: 10;
+            position: relative;
+            z-index: -999;
         }
         .myPoint {
-            z-index: 10;
+            position: relative;
+            z-index: -999;
         }
         .texts {
+            position: relative;
             visibility: hidden;
             z-index: 9999;
         }
         .texts:hover {
+            position: relative;
             visibility: visible;
             z-index: 9999;
         }
         .myText {
+            position: relative;
             z-index: 9999;
         }
     </style>
@@ -172,11 +178,7 @@
             var elemEnter = elem.enter()
             // var elemEnter = outerEnter
                 .append("g")
-                .attr("transform", function(d){return "translate("+projection([d.lon, d.lat])[0]+"," + projection([d.lon, d.lat])[1] + ")"})
-                
-                
-                // .attr('class', 'texts')
-                // .style('pointer-events', 'all')
+                .attr("transform", function(d){return "translate("+projection([d.lon, d.lat])[0]+"," + projection([d.lon, d.lat])[1] + ")";})
 
             /*Create the circle for each block */
             var circle = elemEnter.append("circle")
@@ -184,15 +186,33 @@
                 .attr("r", 5)
                 .attr("stroke","red")
                 .attr("fill", "red")
-                .on("mouseover",function(){
+                .on("mouseover",function(d){      // 参数d为经纬度数据！
                     d3.select(this.nextSibling)
-                        // .attr("opacity", "1")
-                        .attr("visibility", "visible")
+                        .attr("visibility", "visible");
+                    var myDiv = document.getElementsByClassName("myToolTipDiv")[0];
+                    // console.log(d);
+                    // var myDivd3 = d3.select("body").select("div").select("text")
+                    var myDivd3 = d3.select(myDiv)
+                        .datum(d)
+                        .attr("transform", function(d){
+                            console.log(d);
+                            // console.log(track[ii]);
+                            return "translate("+projection([d.lon, d.lat])[0]+"," + projection([d.lon, d.lat])[1] + ")"
+                        })
+                        .attr("dx", function(d){return -50})
+                        .attr("dy", function(d){return -20})
+                        .text(function(d){return d.lon+"°E, "+d.lat+"°N"});
+                    // console.log(myDiv);
+
+                    // var content = document.createTextNode("<YOUR_CONTENT>");
+                    // myDiv.appendChild(content);
                 })
+
                 .on("mouseout",function(){
                     d3.select(this.nextSibling)
-                        // .attr("opacity", "0")
-                        .attr("visibility", "hidden")
+                        .attr("visibility", "hidden");
+                    var myDiv = document.getElementsByClassName("myToolTipDiv")[0];
+                    myDiv.textContent = ''
                 })
                 .attr('class', 'points')
                 .attr('z-index', 10)
@@ -200,117 +220,19 @@
             //     .style('pointer-events', 'all')
 
             /* Create the text for each block */
-            elemEnter.append("text")
-                .attr("dx", function(d){return -50})
-                .attr("dy", function(d){return -20})
-                .attr("opacity", "1")
-                .attr("visibility", "hidden")
-                // .text(function(d){return d.label})
-                .attr('class', 'myText')
-                .text(function(d){return d.lon+"°E, "+d.lat+"°N"})
-                .attr('z-index', 9999)
+            // elemEnter.append("text")
+            //     .attr("dx", function(d){return -50})
+            //     .attr("dy", function(d){return -20})
+            //     .attr("opacity", "1")
+            //     .attr("visibility", "hidden")
+            //     .attr('class', 'myText')
+            //     .text(function(d){return d.lon+"°E, "+d.lat+"°N"})
 
             }
 
-            //    ------------------------
-            // outer2 = svg.append("g")
-            //     .attr("opacity", "0.5")
-            //     .on("mouseover",function(){
-            //         // console.log(this.nextSibling)
-            //         d3.select(this)
-            //             .attr("opacity", "1")
-            //     })
-            //     .on("mouseout",function(){
-            //         d3.select(this)
-            //             .attr("opacity", "0.5")
-            //     });
-
-            // var elem2 = outer2.selectAll("g")
-            //     .data(track[1]);
-
-            // /*Create and place the "blocks" containing the circle and the text */  
-            // var elemEnter2 = elem2.enter()
-            // // var elemEnter = outerEnter
-            //     .append("g")
-            //     .attr("transform", function(d){return "translate("+projection([d.lon, d.lat])[0]+"," + projection([d.lon, d.lat])[1] + ")"})
-            //     // .attr("opacity", "0.5")
-            //     // .attr('class', 'texts')
-            //     // .style('pointer-events', 'all')
-
-            // /*Create the circle for each block */
-            // var circle2 = elemEnter2.append("circle")
-            //     // .attr("r", function(d){return d.r} )
-            //     .attr("r", 5)
-            //     .attr("stroke","red")
-            //     .attr("fill", "red")
-            //     .on("mouseover",function(){
-            //         d3.select(this.nextSibling)
-            //             .attr("opacity", "1")
-            //     })
-            //     .on("mouseout",function(){
-            //         d3.select(this.nextSibling)
-            //             .attr("opacity", "0")
-            //     })
-            //     .attr('class', 'points');
-            // //     .style('pointer-events', 'all')
-
-            // /* Create the text for each block */
-            // elemEnter2.append("text")
-            //     .attr("dx", function(d){return -50})
-            //     .attr("dy", function(d){return -20})
-            //     .attr("opacity", "0")
-            //     // .text(function(d){return d.label})
-            //     .text(function(d){return d.lon+"°E, "+d.lat+"°N"})
-            
-            // //    ------------------------
-            // outer3 = svg.append("g")
-            //     .attr("opacity", "0.5")
-            //     .on("mouseover",function(){
-            //         // console.log(this.nextSibling)
-            //         d3.select(this)
-            //             .attr("opacity", "1")
-            //     })
-            //     .on("mouseout",function(){
-            //         d3.select(this)
-            //             .attr("opacity", "0.5")
-            //     });
-
-            // var elem3 = outer3.selectAll("g")
-            //     .data(track[2]);
-
-            // /*Create and place the "blocks" containing the circle and the text */  
-            // var elemEnter3 = elem3.enter()
-            // // var elemEnter = outerEnter
-            //     .append("g")
-            //     .attr("transform", function(d){return "translate("+projection([d.lon, d.lat])[0]+"," + projection([d.lon, d.lat])[1] + ")"})
-            //     // .attr("opacity", "0.5")
-            //     // .attr('class', 'texts')
-            //     // .style('pointer-events', 'all')
-
-            // /*Create the circle for each block */
-            // var circle3 = elemEnter3.append("circle")
-            //     // .attr("r", function(d){return d.r} )
-            //     .attr("r", 5)
-            //     .attr("stroke","red")
-            //     .attr("fill", "red")
-            //     .on("mouseover",function(){
-            //         d3.select(this.nextSibling)
-            //             .attr("opacity", "1")
-            //     })
-            //     .on("mouseout",function(){
-            //         d3.select(this.nextSibling)
-            //             .attr("opacity", "0")
-            //     })
-            //     .attr('class', 'points');
-            // //     .style('pointer-events', 'all')
-
-            // /* Create the text for each block */
-            // elemEnter3.append("text")
-            //     .attr("dx", function(d){return -50})
-            //     .attr("dy", function(d){return -20})
-            //     .attr("opacity", "0")
-            //     // .text(function(d){return d.label})
-            //     .text(function(d){return d.lon+"°E, "+d.lat+"°N"})
+            // tooltipDiv = d3.select("body").append("div")
+            tooltipDiv = d3.select("body").select("svg").append("text")
+                .attr("class", "myToolTipDiv")
                         
         });
 
