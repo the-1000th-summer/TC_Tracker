@@ -28,33 +28,17 @@
             visibility: visible;
             fill: #f44;
             r: 5;
-            position: relative;
-            z-index: -999;
         }
         .points:hover {
             visibility: visible;
             fill: #f44;
             r: 8;
-            position: relative;
-            z-index: -999;
-        }
-        .myPoint {
-            position: relative;
-            z-index: -999;
         }
         .texts {
-            position: relative;
             visibility: hidden;
-            z-index: 9999;
         }
         .texts:hover {
-            position: relative;
             visibility: visible;
-            z-index: 9999;
-        }
-        .myText {
-            position: relative;
-            z-index: 9999;
         }
     </style>
 </head>
@@ -189,35 +173,24 @@
                 .on("mouseover",function(d){      // 参数d为经纬度数据！
                     d3.select(this.nextSibling)
                         .attr("visibility", "visible");
-                    var myDiv = document.getElementsByClassName("myToolTipDiv")[0];
-                    // console.log(d);
-                    // var myDivd3 = d3.select("body").select("div").select("text")
+                    var myDiv = document.getElementsByClassName("myToolTipText")[0];
                     var myDivd3 = d3.select(myDiv)
                         .datum(d)
                         .attr("transform", function(d){
-                            console.log(d);
-                            // console.log(track[ii]);
-                            return "translate("+projection([d.lon, d.lat])[0]+"," + projection([d.lon, d.lat])[1] + ")"
+                            return "translate("+projection([d.lon, d.lat])[0]+"," + projection([d.lon, d.lat])[1] + ")";
                         })
                         .attr("dx", function(d){return -50})
                         .attr("dy", function(d){return -20})
                         .text(function(d){return d.lon+"°E, "+d.lat+"°N"});
-                    // console.log(myDiv);
-
-                    // var content = document.createTextNode("<YOUR_CONTENT>");
-                    // myDiv.appendChild(content);
                 })
 
                 .on("mouseout",function(){
                     d3.select(this.nextSibling)
                         .attr("visibility", "hidden");
-                    var myDiv = document.getElementsByClassName("myToolTipDiv")[0];
-                    myDiv.textContent = ''
+                    document.getElementsByClassName("myToolTipText")[0].textContent = '';
+                    
                 })
                 .attr('class', 'points')
-                .attr('z-index', 10)
-                
-            //     .style('pointer-events', 'all')
 
             /* Create the text for each block */
             // elemEnter.append("text")
@@ -225,14 +198,12 @@
             //     .attr("dy", function(d){return -20})
             //     .attr("opacity", "1")
             //     .attr("visibility", "hidden")
-            //     .attr('class', 'myText')
             //     .text(function(d){return d.lon+"°E, "+d.lat+"°N"})
-
             }
 
             // tooltipDiv = d3.select("body").append("div")
-            tooltipDiv = d3.select("body").select("svg").append("text")
-                .attr("class", "myToolTipDiv")
+            tooltipText = d3.select("body").select("svg").append("text")
+                .attr("class", "myToolTipText")
                         
         });
 
