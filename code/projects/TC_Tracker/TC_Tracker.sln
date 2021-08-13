@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TC_Tracker", "TC_Tracker\TC_Tracker.csproj", "{4DED3223-EFFC-4F37-86F7-0B41965CB37A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTCore", "TTCore\TTCore.vcxproj", "{75F9C01D-068C-437E-B59E-4EB9BF3C345B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTWrapper", "TTWrapper\TTWrapper.vcxproj", "{1D0C6EE0-29EB-4268-90F5-9624959FFDE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,26 @@ Global
 		{4DED3223-EFFC-4F37-86F7-0B41965CB37A}.Release|x64.Build.0 = Release|x64
 		{4DED3223-EFFC-4F37-86F7-0B41965CB37A}.Release|x86.ActiveCfg = Release|Any CPU
 		{4DED3223-EFFC-4F37-86F7-0B41965CB37A}.Release|x86.Build.0 = Release|Any CPU
+		{75F9C01D-068C-437E-B59E-4EB9BF3C345B}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{75F9C01D-068C-437E-B59E-4EB9BF3C345B}.Debug|x64.ActiveCfg = Debug|x64
+		{75F9C01D-068C-437E-B59E-4EB9BF3C345B}.Debug|x64.Build.0 = Debug|x64
+		{75F9C01D-068C-437E-B59E-4EB9BF3C345B}.Debug|x86.ActiveCfg = Debug|Win32
+		{75F9C01D-068C-437E-B59E-4EB9BF3C345B}.Debug|x86.Build.0 = Debug|Win32
+		{75F9C01D-068C-437E-B59E-4EB9BF3C345B}.Release|Any CPU.ActiveCfg = Release|Win32
+		{75F9C01D-068C-437E-B59E-4EB9BF3C345B}.Release|x64.ActiveCfg = Release|x64
+		{75F9C01D-068C-437E-B59E-4EB9BF3C345B}.Release|x64.Build.0 = Release|x64
+		{75F9C01D-068C-437E-B59E-4EB9BF3C345B}.Release|x86.ActiveCfg = Release|Win32
+		{75F9C01D-068C-437E-B59E-4EB9BF3C345B}.Release|x86.Build.0 = Release|Win32
+		{1D0C6EE0-29EB-4268-90F5-9624959FFDE5}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{1D0C6EE0-29EB-4268-90F5-9624959FFDE5}.Debug|x64.ActiveCfg = Debug|x64
+		{1D0C6EE0-29EB-4268-90F5-9624959FFDE5}.Debug|x64.Build.0 = Debug|x64
+		{1D0C6EE0-29EB-4268-90F5-9624959FFDE5}.Debug|x86.ActiveCfg = Debug|Win32
+		{1D0C6EE0-29EB-4268-90F5-9624959FFDE5}.Debug|x86.Build.0 = Debug|Win32
+		{1D0C6EE0-29EB-4268-90F5-9624959FFDE5}.Release|Any CPU.ActiveCfg = Release|Win32
+		{1D0C6EE0-29EB-4268-90F5-9624959FFDE5}.Release|x64.ActiveCfg = Release|x64
+		{1D0C6EE0-29EB-4268-90F5-9624959FFDE5}.Release|x64.Build.0 = Release|x64
+		{1D0C6EE0-29EB-4268-90F5-9624959FFDE5}.Release|x86.ActiveCfg = Release|Win32
+		{1D0C6EE0-29EB-4268-90F5-9624959FFDE5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

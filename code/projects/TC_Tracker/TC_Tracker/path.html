@@ -24,6 +24,22 @@
             stroke-dasharray: 3,2;
             stroke: #f44;
         }
+        .points {
+            visibility: visible;
+            fill: #f44;
+            r: 5;
+        }
+        .points:hover {
+            visibility: visible;
+            fill: #f44;
+            r: 8;
+        }
+        .texts {
+            visibility: hidden;
+        }
+        .texts:hover {
+            visibility: visible;
+        }
     </style>
 </head>
 <body>
@@ -107,14 +123,73 @@
                     var haiyanPath = svg.append("path")
                         .attr("d", tcPathLine(myLatLonData[i]))
                         .attr("class", "path");
-                    for (j = 0; j < myLatLonData[i].length; ++j) {
-                        var bb = myLatLonData[i][j]
-                        var haiyanCircle = svg.append("circle")
-                            .attr("r", 3)
-                            .attr("cx", projection([bb.lon, bb.lat])[0])
-                            .attr("cy", projection([bb.lon, bb.lat])[1])
-                    }
-                    
+                    //for (j = 0; j < myLatLonData[i].length; ++j) {
+                    //    var bb = myLatLonData[i][j]
+                    //    var haiyanCircle = svg.append("circle")
+                    //        .attr("r", 3)
+                    //        .attr("cx", projection([bb.lon, bb.lat])[0])
+                    //        .attr("cy", projection([bb.lon, bb.lat])[1])
+                    //}
+
+                    var outer = svg.append("g")
+                        .attr("opacity", "0.5")
+                        .on("mouseover", function () {
+                            d3.select(this)
+                                .attr("opacity", "1")
+                            var node = this.parentNode.firstChild;
+                            while ( node ) {
+                                if ( node !== this && node.nodeType === Node.ELEMENT_NODE ) {
+                        // result.push( node );
+                                d3.select(node)
+                                    .attr("opacity", "0");
+                                }
+                                node = node.nextElementSibling || node.nextSibling;
+                            }
+                        })
+                        .on("mouseout", function () {
+                            d3.select(this)
+                                .attr("opacity", "0.5")
+                        });
+                    // var elem = svg.selectAll("g")
+
+                    var elem = outer.selectAll("g")
+                        .data(myLatLonData[i]);
+
+                    /*Create and place the "blocks" containing the circle and the text */
+                    var elemEnter = elem.enter()
+                        // var elemEnter = outerEnter
+                        .append("g")
+                        .attr("transform", function (d) { return "translate(" + projection([d.lon, d.lat])[0] + "," + projection([d.lon, d.lat])[1] + ")" })
+                        // .attr('class', 'texts')
+                        // .style('pointer-events', 'all')
+
+                    /*Create the circle for each block */
+                    var circle = elemEnter.append("circle")
+                        // .attr("r", function(d){return d.r} )
+                        .attr("r", 5)
+                        .attr("stroke", "red")
+                        .attr("fill", "red")
+                        .on("mouseover", function () {
+                            d3.select(this.nextSibling)
+                                // .attr("opacity", "1")
+                                .attr("visibility", "visible")
+                        })
+                        .on("mouseout", function () {
+                            d3.select(this.nextSibling)
+                                // .attr("opacity", "0")
+                                .attr("visibility", "hidden")
+                        })
+                        .attr('class', 'points');
+                    //     .style('pointer-events', 'all')
+
+                    /* Create the text for each block */
+                    elemEnter.append("text")
+                        .attr("dx", function (d) { return -50 })
+                        .attr("dy", function (d) { return -20 })
+                        .attr("opacity", "1")
+                        .attr("visibility", "hidden")
+                        // .text(function(d){return d.label})
+                        .text(function (d) { return d.lon + "°E, " + d.lat + "°N" })
                 }
             });
 
