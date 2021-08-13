@@ -37,28 +37,28 @@ namespace myCLI {
         std::vector<TTCore::Typhoon> unManagedTC;
         m_Instance->startTracking(unManagedTC);
         Console::WriteLine("unmanagedTC number: {0}",unManagedTC.size());
-        ttt(unManagedTC, realTCs);
+        copyToManaged(unManagedTC, realTCs);
     }
 
     void NCFileInfo::startFromStep2(List<Typhoon^>^ outTC) {
         std::vector<TTCore::Typhoon> unManagedTC;
         m_Instance->startFromStep2(unManagedTC);
         Console::WriteLine("step2: unmanagedTC number : {0}", unManagedTC.size());
-        ttt(unManagedTC, outTC);
+        copyToManaged(unManagedTC, outTC);
     }
 
     void NCFileInfo::startFromStep3(List<Typhoon^>^ outTC) {
         std::vector<TTCore::Typhoon> unManagedTC;
         m_Instance->startFromStep3(unManagedTC);
         Console::WriteLine("step3: unmanagedTC number: {0}", unManagedTC.size());
-        ttt(unManagedTC, outTC);
+        copyToManaged(unManagedTC, outTC);
     }
 
     void NCFileInfo::getLatLonData(std::vector<float>& latData, std::vector<float>& lonData) {
         m_Instance->getLatLonData(latData, lonData);
     }
 
-    void NCFileInfo::ttt(std::vector<TTCore::Typhoon>& inTC, List<Typhoon^>^ outTC) {
+    void NCFileInfo::copyToManaged(std::vector<TTCore::Typhoon>& inTC, List<Typhoon^>^ outTC) {
         std::vector<float> latData{}, lonData{};
         getLatLonData(latData, lonData);
 
@@ -70,6 +70,9 @@ namespace myCLI {
             newTC->endTimeIndex = inTC[i].endTimeIndex;
             for (const auto& df : inTC[i].maxVorCells) {
                 newTC->maxVorCells->Add(gcnew Tuple<float,float>{latData[df.first], lonData[df.second]});
+            }
+            for (const auto& geoCenter : inTC[i].geoCenters) {
+                newTC->geoCenters->Add(gcnew Tuple<float, float>{geoCenter.first, geoCenter.second});
             }
             
             outTC->Add(newTC);

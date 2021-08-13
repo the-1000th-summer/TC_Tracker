@@ -40,15 +40,15 @@ namespace TC_Tracker {
         }
 
         private void loadCompletedHandler(object sender, System.Windows.Navigation.NavigationEventArgs e) {
-            vd();
+            prepareData();
         }
-        private void vd() {
+        private void prepareData() {
 
             var tcsDataForJS = new List<List<Dictionary<string, float>>>();
 
             foreach (var tcData in tcsData) {
                 var tcDataForJS = new List<Dictionary<string, float>>();
-                foreach (var i in tcData.maxVorCells) {
+                foreach (var i in tcData.geoCenters) {
                     var tempDict = new Dictionary<string, float>();
                     tempDict.Add("lat", i.Item1);
                     tempDict.Add("lon", i.Item2);

@@ -15,6 +15,7 @@ namespace myCLI {
         // Typhoon();
         int serialNo;
         List<Tuple<float, float>^>^ maxVorCells = gcnew List<Tuple<float, float>^>();
+        List<Tuple<float, float>^>^ geoCenters = gcnew List<Tuple<float, float>^>();
         int startTimeIndex;
         int endTimeIndex;
     };
@@ -27,7 +28,7 @@ namespace myCLI {
         List<String^>^ getVarsName();
         void getLatLonData(std::vector<float> &latData, std::vector<float>& lonData);
 
-        void ttt(std::vector<TTCore::Typhoon> &inTC, List<Typhoon^> ^outTC);
+        void copyToManaged(std::vector<TTCore::Typhoon> &inTC, List<Typhoon^> ^outTC);
         void startTracking(List<Typhoon^>^ realTCs);
         void startFromStep2(List<Typhoon^>^ outTC);
         void startFromStep3(List<Typhoon^>^ outTC);

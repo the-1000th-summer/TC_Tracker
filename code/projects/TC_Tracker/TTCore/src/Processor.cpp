@@ -134,7 +134,7 @@ namespace TTCore {
                 
                     for (int i = 0; i < currentTimeTCNum; ++i) {
                         tempTCs.push_back(Typhoon{
-                            i+TC_No, {currentTimeVortexes[i].maxVorCellIndex}, timeIndex, timeIndex
+                            i+TC_No, {currentTimeVortexes[i].maxVorCellIndex}, {currentTimeVortexes[i].geoCenter}, timeIndex, timeIndex
                         });
                     }
                     // 更新气旋编号，注意更新后的编号所代表的气旋仍未出现
@@ -235,7 +235,8 @@ namespace TTCore {
                             // 更新台风四点中心移动到的位置
                             //
                             // 更新台风几何中心移动到的位置
-                            //
+                            tempTCs[minDistIndex.first].geoCenters.push_back(minD_currentTTC.geoCenter);
+                            // 更新台风消亡时间
                             tempTCs[minDistIndex.first].endTimeIndex = timeIndex;
 
                             tempTCsIndexForD.erase(minDistIndex.first);
@@ -262,7 +263,7 @@ namespace TTCore {
                         int currentTTCsNum = currentTimeVortexes.size();
                         for (int i = 0; i < currentTTCsNum; ++i) {
                             tempTCs.push_back(Typhoon{
-                                TC_No+i, {currentTimeVortexes[i].maxVorCellIndex}, timeIndex, timeIndex
+                                TC_No+i, {currentTimeVortexes[i].maxVorCellIndex}, {currentTimeVortexes[i].geoCenter}, timeIndex, timeIndex
                             });
                         }
                         // 更新台风编号，注意更新后的编号所代表的台风仍未出现
@@ -360,7 +361,7 @@ namespace TTCore {
 
             ++tpNum;
             auto vortexCenterLatLon = UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr.get(), lonArr.get());
-            vortexesThisTime.push_back(TC1Time{maxVorCell.first});
+            vortexesThisTime.push_back(TC1Time{maxVorCell.first, vortexCenterLatLon});
             removeVortex(vorField, timeIndex, allCellsIndex);
         }
         allVortexes.push_back(vortexesThisTime);

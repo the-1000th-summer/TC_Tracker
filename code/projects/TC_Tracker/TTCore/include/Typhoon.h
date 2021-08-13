@@ -12,6 +12,7 @@ namespace TTCore {
         // Typhoon();
         int serialNo;
         std::vector<std::pair<int, int>> maxVorCells;
+        std::vector<std::pair<float, float>> geoCenters;
         int startTimeIndex;
         int endTimeIndex;
     private:
@@ -20,6 +21,7 @@ namespace TTCore {
         void serialize(Archive& ar, const unsigned int version) {
             ar & serialNo;
             ar & maxVorCells;
+            ar & geoCenters;
             ar & startTimeIndex;
             ar & endTimeIndex;
         }

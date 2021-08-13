@@ -8,14 +8,16 @@
 namespace TTCore {
     class TC1Time {
     public:
-        // TC1Time();
+        //TC1Time(std::pair<int, int> maxVorCellIndex, std::pair<float, float> geoCenter);
         std::pair<int, int> maxVorCellIndex;
+        std::pair<float, float> geoCenter;
 
     private:
         friend class boost::serialization::access;
         template<class Archive>
         void serialize(Archive& ar, const unsigned int version) {
             ar & maxVorCellIndex;
+            ar & geoCenter;
         }
     };
 }
