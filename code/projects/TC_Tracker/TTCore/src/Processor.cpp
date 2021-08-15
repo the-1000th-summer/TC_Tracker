@@ -37,6 +37,14 @@ namespace TTCore {
         // iFile = netCDF::NcFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read)
     }
 
+    Processor::Processor(netCDF::NcFile& iFile, bool isWrfoutFile, const std::string& dumpDirectory) {
+        if (!isWrfoutFile) { throw std::runtime_error("should use another method!"); }
+        iiFile = &iFile;
+        isWrfoutFile = true;
+
+
+    }
+
     Processor::~Processor() {
         iiFile->close();
         iiFile = nullptr;
@@ -51,6 +59,49 @@ namespace TTCore {
         lonGridNum = vorVar.getDim(2).getSize();
     }
 
+    void Processor::calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv) {
+        size_t nt = inFile->getDim("Time").getSize();
+        size_t ny = inFile->getDim("south_north").getSize();
+        size_t nx = inFile->getDim("west_east").getSize();
+        float dx, dy;
+        inFile->getAtt("DX").getValues(&dx);
+        inFile->getAtt("DY").getValues(&dy);
+        auto msfm = ThreeDArray(nt, ny, nx);
+        inFile->getVar("MAPFAC_M").getVar(msfm.get());
+        auto u = ThreeDArray(nt, ny, nx + 1), msfu = ThreeDArray(nt, ny, nx + 1);
+        inFile->getVar("U").getVar({ 0,6,0,0 }, { nt,1,ny,nx + 1 }, u.get());
+        inFile->getVar("MAPFAC_U").getVar(msfu.get());
+        auto v = ThreeDArray(nt, ny + 1, nx), msfv = ThreeDArray(nt, ny + 1, nx);
+        inFile->getVar("V").getVar({ 0,6,0,0 }, { nt,1,ny + 1,nx }, v.get());
+        inFile->getVar("MAPFAC_V").getVar(msfv.get());
+
+        for (int k = 0; k < nt; ++k) {
+            for (int j = 0; j < ny; ++j) {
+                int jp1 = std::min(j + 2, static_cast<int>(ny));
+                int jm1 = std::max(j, 1);
+                for (int i = 0; i < nx; ++i) {
+                    int ip1 = std::min(i + 2, static_cast<int>(nx));
+                    int im1 = std::max(i, 1);
+
+                    float dsx = (ip1 - im1) * dx;
+                    float dsy = (jp1 - jm1) * dy;
+                    float mm = msfm(k, j, i) * msfm(k, j, i);
+
+                    auto dudy = 0.5 * (u(k, jp1, i) / msfu(k, jp1, i) +
+                        u(k, jp1, i + 1) / msfu(k, jp1, i + 1) -
+                        u(k, jm1, i) / msfu(k, jm1, i) -
+                        u(k, jm1, i + 1) / msfu(k, jm1, i + 1)) / dsy * mm;
+
+                    auto dvdx = 0.5 * (v(k, j, ip1) / msfv(k, j, ip1) +
+                        v(k, j + 1, ip1) / msfv(k, j + 1, ip1) -
+                        v(k, j, im1) / msfv(k, j, im1) -
+                        v(k, j + 1, im1) / msfv(k, j + 1, im1)) / dsx * mm;
+
+                    rv(k, j, i) = dvdx - dudy;
+                }
+            }
+        }
+    }
 
     /// 第一步：找出有台风的日期，记录日期与台风信息
     void Processor::recognizeTyphoon() {
@@ -58,22 +109,20 @@ namespace TTCore {
 
         /// 记录前一个时次的台风数目
         int TCNum_prevTime = 0;
-        constexpr int startYear = 1979, endYear = 2018;
+        //constexpr int startYear = 1979, endYear = 2018;
 
         /// startYear的1月1日0时时次在文件中的index
         int startIndexInFile = 0;
         /// endYear的12月31日0时时次在文件中的index
         int endIndexInFile = 58436;
 
-        auto vorVar = iiFile->getVar(vorVarName);
-
-        // float vorField[latGridNum][lonGridNum];
-        // auto vorField = TwoDArray(latGridNum, lonGridNum);
         auto vorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
 
-        // float (*arrayy)[Constants::latGridNum][Constants::lonGridNum] = new float[58440][Constants::latGridNum][Constants::lonGridNum];
-        // vorVar.getVar(arrayy);
-        vorVar.getVar(vorField.get());
+        if (isWrfoutFile) {
+            calcRelativeVorField(iiFile, vorField);
+        } else {
+            iiFile->getVar(vorVarName).getVar(vorField.get());
+        }
 
         for (unsigned long timeIndex = startIndexInFile; timeIndex <= endIndexInFile; ++timeIndex) {
             // std::cout << vorVar.getName() << std::endl;

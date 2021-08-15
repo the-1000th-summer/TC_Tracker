@@ -44,13 +44,25 @@ namespace TC_Tracker {
         private string lonVarStr;
         private string vorVarStr;
 
-        private bool _isTracking = false;
-        public bool isTracking {
-            get { return _isTracking; }
+        private bool _isNotTracking = true;
+        public bool isNotTracking {
+            get { return _isNotTracking; }
             set {
-                _isTracking = value;
-                RaisePropertyChanged("isTracking");
+                _isNotTracking = value;
+                RaisePropertyChanged("isNotTracking");
             }
+        }
+        private bool _selectedFile = false;
+        public bool selectedFile {
+            get { return _selectedFile; }
+            set {
+                _selectedFile = value;
+                RaisePropertyChanged("selectedFile");
+            }
+        }
+        public bool isNotWrfoutFile {
+            get { return !(bool)wrfoutCheckBox.IsChecked; }
+            set { RaisePropertyChanged("isNotWrfoutFile"); }
         }
 
         private void RaisePropertyChanged(string propertyName) {
@@ -101,7 +113,7 @@ namespace TC_Tracker {
                 //changeUIAccV(validateDir(dirTextBox.Text));
                 if (!checkFileValidAndUpdateUI(selectDir)) { return; }
                 cSelDir = selectDir;
-                selVarButton.IsEnabled = true;
+                selectedFile = true;
             }
         }
 
@@ -126,7 +138,7 @@ namespace TC_Tracker {
 
         private void exit_OnClick(object sender, RoutedEventArgs e) {
             //if (Properties.Settings.Default.isRunning) {
-            if (isTracking) {
+            if (!isNotTracking) {
                 if (MessageBox.Show("退出程序吗？任务仍在执行。", "退出程序吗？", MessageBoxButton.YesNo, MessageBoxImage.Question) ==
                     MessageBoxResult.No) {
                     return;
@@ -176,7 +188,7 @@ namespace TC_Tracker {
         private void startTrackButton_Click(object sender, RoutedEventArgs e) {
             //startTrackButton.IsEnabled = false;
             Console.WriteLine("sdffff");
-            isTracking = true;
+            isNotTracking = false;
 
             bgWorker.RunWorkerAsync();
 
@@ -184,7 +196,7 @@ namespace TC_Tracker {
 
         private void stopButtonClicked(object sender, RoutedEventArgs e) {
             Console.WriteLine("stop button clicked!");
-            isTracking = false;
+            isNotTracking = true;
         }
 
         /// <summary>
@@ -246,7 +258,7 @@ namespace TC_Tracker {
             resultView.Owner = this;
             resultView.ShowDialog();
         }
-
+        
         /// <summary>
         /// Drag and drop放手时执行的方法
         /// </summary>
@@ -280,6 +292,13 @@ namespace TC_Tracker {
             NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
             fileInfo.startFromStep3(realTCs);
             Console.WriteLine("msg from step3ButtonClick, realTCs number: {0}", realTCs.Count);
+        }
+
+        private void wrfoutCheckBox_Checked(object sender, RoutedEventArgs e) {
+            isNotWrfoutFile = false;
+        }
+        private void wrfoutCheckBox_Unchecked(object sender, RoutedEventArgs e) {
+            isNotWrfoutFile = true;
         }
     }
 }

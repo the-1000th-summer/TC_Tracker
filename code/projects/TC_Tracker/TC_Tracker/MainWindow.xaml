@@ -22,29 +22,46 @@
 
         <Menu>
             <MenuItem Header="文件(_F)">
-                <MenuItem x:Name="menu_selDir" Header="选择文件(_O)" Click="browseButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isTracking, Converter={StaticResource InverseBooleanConverter}}" />
+                <MenuItem x:Name="menu_selDir" Header="选择文件(_O)" Click="browseButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}" />
                 <MenuItem Header="退出(_X)" Click="exit_OnClick" />
             </MenuItem>
             <MenuItem Header="偏好设置(_P)" Click="MenuItem_Click">
-                <MenuItem x:Name="settings" Header="设置..." Click="settingsClicked" IsEnabled="{Binding ElementName=mainWin, Path=isTracking, Converter={StaticResource InverseBooleanConverter}}"></MenuItem>
+                <MenuItem x:Name="settings" Header="设置..." Click="settingsClicked" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}"></MenuItem>
                 <MenuItem Header="关于..." Click="about_OnClick"></MenuItem>
             </MenuItem>
         </Menu>
         <Label x:Name="label" Content="工作文件" HorizontalAlignment="Left" Margin="28,26,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="111,30,0,0" Grid.Row="1" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="507" Height="21" IsEnabled="{Binding ElementName=mainWin, Path=isTracking, Converter={StaticResource InverseBooleanConverter}}"/>
-        <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="660,28,0,0" Grid.Row="1" VerticalAlignment="Top" Height="25" Width="74" Click="browseButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isTracking, Converter={StaticResource InverseBooleanConverter}}"/>
-        <Button x:Name="selVarButton" Content="选择变量..." HorizontalAlignment="Left" Margin="111,110,0,0" Grid.Row="1" VerticalAlignment="Top" Height="27" Width="97" Click="varSelClicked" IsEnabled="False"/>
+        <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="111,30,0,0" Grid.Row="1" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="507" Height="21" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}"/>
+        <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="660,28,0,0" Grid.Row="1" VerticalAlignment="Top" Height="25" Width="74" Click="browseButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}"/>
+        <Button x:Name="selVarButton" Content="选择变量..." HorizontalAlignment="Left" Margin="111,110,0,0" Grid.Row="1" VerticalAlignment="Top" Height="27" Width="97" Click="varSelClicked" >
+            <Button.IsEnabled>
+                <MultiBinding Converter="{StaticResource booleanAndConverter}">
+                    <Binding ElementName="mainWin" Path="selectedFile" />
+                    <Binding ElementName="mainWin" Path="isNotTracking" />
+                    <Binding ElementName="mainWin" Path="isNotWrfoutFile" />
+                </MultiBinding>
+            </Button.IsEnabled>
+        </Button>
         <Label x:Name="label1" Content="纬度变量名：" HorizontalAlignment="Left" Margin="276,88,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Label x:Name="label2" Content="经度变量名：" HorizontalAlignment="Left" Margin="276,124,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Label x:Name="label3" Content="涡度变量名：" HorizontalAlignment="Left" Margin="276,161,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Label x:Name="latNameLabel" Content="未指定" HorizontalAlignment="Left" Margin="364,88,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Label x:Name="lonNameLabel" Content="未指定" HorizontalAlignment="Left" Margin="364,124,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Label x:Name="vorNameLabel" Content="未指定" HorizontalAlignment="Left" Margin="364,161,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <Button x:Name="startTrackButton" Content="开始识别" HorizontalAlignment="Left" Margin="346,282,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="89" Click="startTrackButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isTracking, Converter={StaticResource InverseBooleanConverter}}"/>
-        <Button x:Name="stopButton" Content="中止" HorizontalAlignment="Left" Margin="610,282,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-0.256,0.391" Height="23" Width="55" Click="stopButtonClicked" IsEnabled="{Binding ElementName=mainWin, Path=isTracking}" />
+        <Button x:Name="startTrackButton" Content="开始识别" HorizontalAlignment="Left" Margin="346,282,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="89" Click="startTrackButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}"/>
+        <Button x:Name="stopButton" Content="中止" HorizontalAlignment="Left" Margin="610,282,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-0.256,0.391" Height="23" Width="55" Click="stopButtonClicked" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking, Converter={StaticResource InverseBooleanConverter}}" />
         <Button x:Name="showWebButton" Content="Web" HorizontalAlignment="Left" Margin="495,355,0,0" Grid.Row="1" VerticalAlignment="Top" Click="showWebButton_Click"/>
         <Button x:Name="step2Button" Content="startFromStep2" HorizontalAlignment="Left" Margin="81,325,0,0" Grid.Row="1" VerticalAlignment="Top" Height="40" Width="107" Click="step2Button_Click"/>
-        <Button x:Name="step3Button" Content="startFromStep3" HorizontalAlignment="Left" Margin="215,328,0,0" Grid.Row="1" VerticalAlignment="Top" Height="34" Width="102" Click="step3Button_Click"/>
+        <Button x:Name="step3Button" Content="startFromStep3" HorizontalAlignment="Left" Margin="215,328,0,0" Grid.Row="1" VerticalAlignment="Top" Height="34" Width="102" Click="step3Button_Click">
+            <Button.IsEnabled>
+                <MultiBinding Converter="{StaticResource booleanAndConverter}">
+                    <Binding ElementName="wrfoutCheckBox" Path="IsChecked" />
+                    <Binding ElementName="checkBox" Path="IsChecked"  />
+                </MultiBinding>
+            </Button.IsEnabled>
+        </Button>
+        <CheckBox x:Name="wrfoutCheckBox" Content="wrfout文件" HorizontalAlignment="Left" Margin="656,67,0,0" Grid.Row="1" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}" Checked="wrfoutCheckBox_Checked" Unchecked="wrfoutCheckBox_Unchecked" />
+        <CheckBox x:Name="checkBox" Content="CheckBox" HorizontalAlignment="Left" Margin="656,102,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.542"/>
 
     </Grid>
 </Window>

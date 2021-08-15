@@ -16,8 +16,10 @@ namespace TTCore {
     class Processor {
     public:
         Processor(netCDF::NcFile &iFile, const std::string &latVName, const std::string &lonVName, const std::string &varVName, const std::string &dumpDirectory);
+        Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
         ~Processor();
         void getDimLength();
+        void calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv);
         void recognizeTyphoon();
         void getRealTC();
         void removeNoise();
@@ -45,6 +47,7 @@ namespace TTCore {
         unsigned long timeLength = 0;
         unsigned long latGridNum = 0;
         unsigned long lonGridNum = 0;
+        bool isWrfoutFile = false;
         /// 记录所有有台风的日期的数组（从基准日期起算的时次数）
         std::unique_ptr<float[]> latArr, lonArr;
         std::vector<int> hasTC_timeIndex{};

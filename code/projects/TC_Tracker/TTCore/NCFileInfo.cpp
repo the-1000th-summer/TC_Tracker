@@ -52,8 +52,13 @@ namespace TTCore {
     }
 
     void NCFileInfo::startTracking(std::vector<Typhoon> &tcs) {
+        
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
         Processor p(f, latVarName, lonVarName, vorVarName, dumpDir);
+        bool isWrfoutFile = true;
+        if (isWrfoutFile) {
+            o.
+        }
         p.recognizeTyphoon();
         //p.
         p.dumpStep1();
