@@ -2,8 +2,9 @@
 /.gitignore
 # build
 /code/pureCpp/build
+/code/pythonScripts/vorticity/cxxVer/build
 # cache
-/code/pureCpp/.cache
+.cache
 # vscode
 .vscode
 # data

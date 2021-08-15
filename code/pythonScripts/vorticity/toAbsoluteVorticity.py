@@ -1,5 +1,4 @@
 """_"""
-from os import abort
 import numpy as np
 from netCDF4 import Dataset
 from wrf import getvar, ALL_TIMES
@@ -42,6 +41,7 @@ class vorConverter:
         self.copyAttrs('XTIME',XTIMEVar)
         self.copyAttrs('XLAT',XLATVar)
         self.copyAttrs('XLONG',XLONGVar)
+        avoVar.units = 's^-1'
         # self.copyAttrs('avo',avoVar)
 
         XTIMEVar[:] = self.ncFile.variables['XTIME'][:]
