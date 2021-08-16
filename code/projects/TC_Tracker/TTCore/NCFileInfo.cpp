@@ -7,14 +7,12 @@
 #include "Processor.h"
 
 namespace TTCore {
-    NCFileInfo::NCFileInfo(const char *filePath, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
-        //checkFileValid();
+    NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
     }
 
     void NCFileInfo::checkFileValid() {
         try {
             netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-            //iiFile = &f;
             f.close();
         }
         catch (const std::exception& e) {
@@ -26,14 +24,7 @@ namespace TTCore {
             //return {false, e.what()};
         }
         isFileValid = true;
-        //return {true, ""};
     }
-
-    //void NCFileInfo::openFile() {
-    //    netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-    //    iiFile = &f;
-    //    std::cout << "sdf" << std::endl;
-    //}
 
     void NCFileInfo::getLatLonData(std::vector<float>& latData, std::vector<float>& lonData) {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
@@ -54,25 +45,25 @@ namespace TTCore {
     void NCFileInfo::startTracking(std::vector<Typhoon> &tcs) {
         
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-        Processor p(f, latVarName, lonVarName, vorVarName, dumpDir);
-        bool isWrfoutFile = true;
-        if (isWrfoutFile) {
-            o.
-        }
+
+        Processor p(f, isWrfoutFile, latVarName, lonVarName, vorVarName, dumpDir);
+
         p.recognizeTyphoon();
-        //p.
+
         p.dumpStep1();
         std::cout << "finish dump step1." << std::endl;
         p.getRealTC();
         p.dumpStep2();
 
         p.removeNoise();
+        p.dumpStep3();
+
         p.copyRealTCs(tcs);
     }
 
     void NCFileInfo::startFromStep2(std::vector<Typhoon>& tcs) {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-        Processor p(f, latVarName, lonVarName, vorVarName, dumpDir);
+        Processor p(f, isWrfoutFile, latVarName, lonVarName, vorVarName, dumpDir);
         std::string step1FilePath = "E:\\University\\TC_Tracker\\data\\stepFile\\step1\\step1.dat";
         p.getStep1DataFromFile(step1FilePath);
         p.getRealTC();
@@ -84,7 +75,7 @@ namespace TTCore {
 
     void NCFileInfo::startFromStep3(std::vector<Typhoon>& tcs) {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-        Processor p(f, latVarName, lonVarName, vorVarName, dumpDir);
+        Processor p(f, isWrfoutFile, latVarName, lonVarName, vorVarName, dumpDir);
         std::string step1FilePath = "E:\\University\\TC_Tracker\\data\\stepFile\\step2\\step2.dat";
         p.getStep2DataFromFile(step1FilePath);
         p.removeNoise();

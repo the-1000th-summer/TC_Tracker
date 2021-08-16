@@ -15,8 +15,8 @@ namespace TTCore {
 
     class Processor {
     public:
-        Processor(netCDF::NcFile &iFile, const std::string &latVName, const std::string &lonVName, const std::string &varVName, const std::string &dumpDirectory);
-        Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
+        Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &latVName="", const std::string& lonVName="", const std::string& vorVName="", const std::string& dumpDirectory="");
+        //Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
         ~Processor();
         void getDimLength();
         void calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv);
@@ -48,8 +48,10 @@ namespace TTCore {
         unsigned long latGridNum = 0;
         unsigned long lonGridNum = 0;
         bool isWrfoutFile = false;
-        /// 记录所有有台风的日期的数组（从基准日期起算的时次数）
+        
         std::unique_ptr<float[]> latArr, lonArr;
+        TwoDArray latArr2D = TwoDArray(0,0), lonArr2D = TwoDArray(0,0);
+        /// 记录所有有台风的日期的数组（从基准日期起算的时次数）
         std::vector<int> hasTC_timeIndex{};
         std::vector<std::vector<TC1Time>> allVortexes{};
         std::vector<Typhoon> realTCs{};

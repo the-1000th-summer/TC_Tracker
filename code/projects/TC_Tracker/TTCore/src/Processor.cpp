@@ -27,23 +27,28 @@
 
 namespace TTCore {
 
-    Processor::Processor(netCDF::NcFile &iFile, const std::string& latVName, const std::string& lonVName, const std::string& varVName, const std::string& dumpDirectory) : latVarName(latVName), lonVarName(lonVName), vorVarName(varVName), dumpDir(dumpDirectory) {
+    Processor::Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, const std::string& dumpDirectory) : isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
         iiFile = &iFile;
         getDimLength();
-        latArr = std::make_unique<float[]>(latGridNum);
-        lonArr = std::make_unique<float[]>(lonGridNum);
-        UtilFunc::getLatLonData(iiFile, latVarName, lonVarName, latArr.get(), lonArr.get());
+        if (isWrfoutFile) {
+            latArr2D = TwoDArray(latGridNum, lonGridNum);
+            lonArr2D = TwoDArray(latGridNum, lonGridNum);
+            UtilFunc::getLatLonData2d(iiFile, latGridNum, lonGridNum, latArr2D.get(), lonArr2D.get());
+        } else {
+            latArr = std::make_unique<float[]>(latGridNum);
+            lonArr = std::make_unique<float[]>(lonGridNum);
+            UtilFunc::getLatLonData(iiFile, latVarName, lonVarName, latArr.get(), lonArr.get());
+        }
+        
         // std::cout << a << std::endl;
         // iFile = netCDF::NcFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read)
     }
 
-    Processor::Processor(netCDF::NcFile& iFile, bool isWrfoutFile, const std::string& dumpDirectory) {
-        if (!isWrfoutFile) { throw std::runtime_error("should use another method!"); }
-        iiFile = &iFile;
-        isWrfoutFile = true;
-
-
-    }
+    //Processor::Processor(netCDF::NcFile& iFile, bool isWrfoutFile, const std::string& dumpDirectory) {
+    //    if (!isWrfoutFile) { throw std::runtime_error("should use another method!"); }
+    //    iiFile = &iFile;
+    //    isWrfoutFile = true;
+    //}
 
     Processor::~Processor() {
         iiFile->close();
@@ -53,10 +58,17 @@ namespace TTCore {
 
     /// 此方法找出文件的各维度的长度
     void Processor::getDimLength() {
-        auto vorVar = iiFile->getVar(vorVarName);
-        timeLength = vorVar.getDim(0).getSize();
-        latGridNum = vorVar.getDim(1).getSize();
-        lonGridNum = vorVar.getDim(2).getSize();
+        if (!isWrfoutFile) {
+            auto vorVar = iiFile->getVar(vorVarName);
+            timeLength = vorVar.getDim(0).getSize();
+            latGridNum = vorVar.getDim(1).getSize();
+            lonGridNum = vorVar.getDim(2).getSize();
+        } else {
+            timeLength = iiFile->getDim("Time").getSize();
+            latGridNum = iiFile->getDim("south_north").getSize();
+            lonGridNum = iiFile->getDim("west_east").getSize();
+        }
+        
     }
 
     void Processor::calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv) {
@@ -77,14 +89,18 @@ namespace TTCore {
 
         for (int k = 0; k < nt; ++k) {
             for (int j = 0; j < ny; ++j) {
-                int jp1 = std::min(j + 2, static_cast<int>(ny));
-                int jm1 = std::max(j, 1);
+                // jp1: 1,2,3,4...,ny-2,ny-1,ny-1
+                int jp1 = std::min(j+1, static_cast<int>(ny-1));
+                // jm1: 0,0,1,2...,ny-4,ny-3,ny-2
+                int jm1 = std::max(j-1, 0);
                 for (int i = 0; i < nx; ++i) {
-                    int ip1 = std::min(i + 2, static_cast<int>(nx));
-                    int im1 = std::max(i, 1);
+                    // ip1: 1,2,3,4,...,nx-2,nx-1,nx-1
+                    int ip1 = std::min(i+1, static_cast<int>(nx-1));
+                    // im1: 0,0,1,2,...,nx-4,nx-3,nx-2
+                    int im1 = std::max(i-1, 0);
 
-                    float dsx = (ip1 - im1) * dx;
-                    float dsy = (jp1 - jm1) * dy;
+                    float dsx = (ip1 - im1) * dx;     // (1,2,2,2,...,2,2,1)*dx
+                    float dsy = (jp1 - jm1) * dy;     // (1,2,2,2,...,2,2,1)*dy
                     float mm = msfm(k, j, i) * msfm(k, j, i);
 
                     auto dudy = 0.5 * (u(k, jp1, i) / msfu(k, jp1, i) +
@@ -124,7 +140,7 @@ namespace TTCore {
             iiFile->getVar(vorVarName).getVar(vorField.get());
         }
 
-        for (unsigned long timeIndex = startIndexInFile; timeIndex <= endIndexInFile; ++timeIndex) {
+        for (unsigned long timeIndex = startIndexInFile; timeIndex < timeLength; ++timeIndex) {
             // std::cout << vorVar.getName() << std::endl;
             if (timeIndex % 1000 == 0)
                 std::cout << timeIndex << std::endl;
@@ -404,12 +420,14 @@ namespace TTCore {
             if ((allCellsIndex.size() <= Constants::TP_MIN_PTS) && (TCNum_prevTime == 0) )
                 break;
 
-            float e = get_e(allCellsIndex);
-            if ((e > Constants::TP_MIN_E) && (TCNum_prevTime == 0))
-                break;
+            if (!isWrfoutFile) {
+                float e = get_e(allCellsIndex);
+                if ((e > Constants::TP_MIN_E) && (TCNum_prevTime == 0))
+                    break;
+            }
 
             ++tpNum;
-            auto vortexCenterLatLon = UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr.get(), lonArr.get());
+            auto vortexCenterLatLon = isWrfoutFile ? UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr2D, lonArr2D) : UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr.get(), lonArr.get());
             vortexesThisTime.push_back(TC1Time{maxVorCell.first, vortexCenterLatLon});
             removeVortex(vorField, timeIndex, allCellsIndex);
         }
@@ -476,7 +494,9 @@ namespace TTCore {
     float Processor::get_e(std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex) {
         std::vector<std::pair<int, int>> vortexCellsIndex_v(vortexCellsIndex.begin(), vortexCellsIndex.end());
         auto distMax = UtilFunc::getMaxDistance(vortexCellsIndex_v);
-        float gridRatio = latArr[1] - latArr[0];
+
+        //float gridRatio = latArr[1] - latArr[0];
+        float gridRatio = 1.0;
         /// 半长轴长度（单位：度）
         float A = distMax.second * gridRatio / 2.0;
         if (A == 0) {

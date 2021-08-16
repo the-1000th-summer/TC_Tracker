@@ -97,6 +97,11 @@ namespace TTCore {
         lonVec.assign(lonGet, lonGet + lonSize);
     }
 
+    void UtilFunc::getLatLonData2d(netCDF::NcFile* iFile, unsigned long latGridNum, unsigned long lonGridNum, float* latArray2d, float* lonArray2d) {
+        iFile->getVar("XLAT").getVar({0,0,0}, {1,latGridNum,lonGridNum}, latArray2d);
+        iFile->getVar("XLONG").getVar({0,0,0}, {1,latGridNum,lonGridNum}, lonArray2d);
+    }
+
     /// 此函数将相对涡度从文件中提取出来
     void UtilFunc::getVorField(netCDF::NcFile *iFile, float *vor) {
         iFile->getVar("Vorticity").getVar(vor);
@@ -187,6 +192,15 @@ namespace TTCore {
             lonAvg += lonArray[cellIndex.second]; 
         }
         return {latAvg / vortexCellsIndex.size(), lonAvg / vortexCellsIndex.size()};
+    }
+
+    std::pair<float, float> UtilFunc::getVortexCenterLatLon(const std::unordered_set<std::pair<int, int>, pair_hash>& vortexCellsIndex, TwoDArray& latArray2d, TwoDArray& lonArray2d) {
+        float latAvg = 0, lonAvg = 0;
+        for (auto& cellIndex : vortexCellsIndex) {
+            latAvg += latArray2d(cellIndex.first, cellIndex.second);
+            lonAvg += lonArray2d(cellIndex.first, cellIndex.second);
+        }
+        return { latAvg / vortexCellsIndex.size(), lonAvg / vortexCellsIndex.size() };
     }
 
     /// 此方法利用haversine公式计算两个点的真实距离(km)（大圆距离）

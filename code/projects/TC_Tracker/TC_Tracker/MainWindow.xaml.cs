@@ -40,9 +40,9 @@ namespace TC_Tracker {
             }
         }
 
-        private string latVarStr;
-        private string lonVarStr;
-        private string vorVarStr;
+        private string latVarStr = "";
+        private string lonVarStr = "";
+        private string vorVarStr = "";
 
         private bool _isNotTracking = true;
         public bool isNotTracking {
@@ -60,9 +60,13 @@ namespace TC_Tracker {
                 RaisePropertyChanged("selectedFile");
             }
         }
+        private bool _isNotWrfoutFile = true;
         public bool isNotWrfoutFile {
-            get { return !(bool)wrfoutCheckBox.IsChecked; }
-            set { RaisePropertyChanged("isNotWrfoutFile"); }
+            get { return _isNotWrfoutFile; }
+            set {
+                _isNotWrfoutFile = value;
+                RaisePropertyChanged("isNotWrfoutFile");
+            }
         }
 
         private void RaisePropertyChanged(string propertyName) {
@@ -118,7 +122,7 @@ namespace TC_Tracker {
         }
 
         private bool checkFileValidAndUpdateUI(string selectDir) {
-            NCFileInfo fileInfo = new NCFileInfo(selectDir, "", "", "", "");
+            NCFileInfo fileInfo = new NCFileInfo(selectDir, !isNotWrfoutFile, "", "", "", "");
             fileInfo.checkFileValid();
             Debug.WriteLine(fileInfo.fileValidInfo, " from cs.");
             if (!fileInfo.isFileValid) {
@@ -190,13 +194,19 @@ namespace TC_Tracker {
             Console.WriteLine("sdffff");
             isNotTracking = false;
 
-            bgWorker.RunWorkerAsync();
+            //bgWorker.RunWorkerAsync();
 
+            syncRun();
         }
 
         private void stopButtonClicked(object sender, RoutedEventArgs e) {
             Console.WriteLine("stop button clicked!");
             isNotTracking = true;
+        }
+
+        private void syncRun() {
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            fileInfo.startTracking(realTCs);
         }
 
         /// <summary>
@@ -205,7 +215,7 @@ namespace TC_Tracker {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void bgWorker_DoWork(object sender, DoWorkEventArgs e) {
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
             fileInfo.startTracking(realTCs);
         }
 
@@ -282,14 +292,14 @@ namespace TC_Tracker {
 
         private void step2Button_Click(object sender, RoutedEventArgs e) {
             realTCs.Clear();
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
             fileInfo.startFromStep2(realTCs);
             Console.WriteLine("msg from step2ButtonClick, realTCs number: {0}", realTCs.Count);
         }
 
         private void step3Button_Click(object sender, RoutedEventArgs e) {
             realTCs.Clear();
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
             fileInfo.startFromStep3(realTCs);
             Console.WriteLine("msg from step3ButtonClick, realTCs number: {0}", realTCs.Count);
         }

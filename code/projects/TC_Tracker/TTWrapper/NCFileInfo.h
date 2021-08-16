@@ -22,7 +22,7 @@ namespace myCLI {
     public ref class NCFileInfo: public ManagedObject<TTCore::NCFileInfo> {
     public:
         // 无法在managed class的方法里使用optional paramater
-        NCFileInfo(String ^filePath, String ^latVarName, String ^lonVarName, String ^vorVarName, String ^dumpDirectory);
+        NCFileInfo(String ^filePath, bool isWrfoutFile, String ^latVarName, String ^lonVarName, String ^vorVarName, String ^dumpDirectory);
         void checkFileValid();
         //void openFile();
         List<String^>^ getVarsName();
@@ -32,6 +32,13 @@ namespace myCLI {
         void startTracking(List<Typhoon^>^ realTCs);
         void startFromStep2(List<Typhoon^>^ outTC);
         void startFromStep3(List<Typhoon^>^ outTC);
+        
+        property bool isWrfoutFile {
+        public:
+            bool get() { return m_Instance->isWrfoutFile; }
+        private:
+            void set(bool value) {}
+        }
 
         property bool isFileValid {
         public:

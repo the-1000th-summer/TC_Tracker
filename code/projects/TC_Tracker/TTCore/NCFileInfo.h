@@ -13,10 +13,11 @@ namespace TTCore {
         std::string lonVarName;
         std::string vorVarName;
         std::string dumpDir;
+        bool isWrfoutFile = false;
         bool isFileValid = false;
         std::string fileValidInfo;
 
-        NCFileInfo(const char *filePath, const char *latVName, const char *lonVName, const char *vorVName, const char *dumpDirectory);
+        NCFileInfo(const char *filePath, bool isWrfoutFile, const char *latVName, const char *lonVName, const char *vorVName, const char *dumpDirectory);
         void checkFileValid();
         //void openFile();
         void getLatLonData(std::vector<float> &latData, std::vector<float>& lonData);
