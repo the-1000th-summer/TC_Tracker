@@ -86,14 +86,18 @@ void computeAbsVort(netCDF::NcFile &inFile, ThreeDArray &av) {
 
     for (int k = 0; k < nt; ++k) {
         for (int j = 0; j < ny; ++j) {
-            int jp1 = std::min(j+2, static_cast<int>(ny));
-            int jm1 = std::max(j, 1);
+            // jp1: 1,2,3,4...,ny-2,ny-1,ny-1
+            int jp1 = std::min(j+1, static_cast<int>(ny-1));
+            // jm1: 0,0,1,2...,ny-4,ny-3,ny-2
+            int jm1 = std::max(j-1, 0);
             for (int i = 0; i < nx; ++i) {
-                int ip1 = std::min(i+2, static_cast<int>(nx));
-                int im1 = std::max(i, 1);
+                // ip1: 1,2,3,4,...,nx-2,nx-1,nx-1
+                int ip1 = std::min(i+1, static_cast<int>(nx-1));
+                // im1: 0,0,1,2,...,nx-4,nx-3,nx-2
+                int im1 = std::max(i-1, 0);
                 
-                float dsx = (ip1 - im1) * dx;
-                float dsy = (jp1 - jm1) * dy;
+                float dsx = (ip1 - im1) * dx;  // (1,2,2,2,...,2,2,1)*dx
+                float dsy = (jp1 - jm1) * dy;  // (1,2,2,2,...,2,2,1)*dy
                 float mm = msfm(k,j,i) * msfm(k,j,i);
 
                 auto dudy = 0.5 * (u(k,jp1,i)/msfu(k,jp1,i) + 
@@ -106,11 +110,15 @@ void computeAbsVort(netCDF::NcFile &inFile, ThreeDArray &av) {
                     v(k,j,im1)/msfv(k,j,im1) -
                     v(k,j+1,im1)/msfv(k,j+1,im1)) / dsx * mm;
 
-                auto avort = dvdx - dudy;
+                auto avort = dvdx - dudy + cor(k,j,i);
+                // auto avort = dvdx - dudy;
                 av(k,j,i) = avort*1.0e5;
             }
         }
     }
+    std::cout << av(0,0,0) << std::endl;
+    std::cout << av(1,154,0) << std::endl;
+    std::cout << av(1,155,0) << std::endl;
 }
 
 void toAbsoluteVort() {
