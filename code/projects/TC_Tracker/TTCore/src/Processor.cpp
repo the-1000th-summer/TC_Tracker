@@ -226,12 +226,15 @@ namespace TTCore {
                     }
                     
 
+                    // 涡度最大点index实现
+                    //std::vector<std::pair<int, int>> temp_TCs_max_pt, currentT_TCs_maxVorCellIndex;
+                    //std::transform(tempTCs.begin(), tempTCs.end(), std::back_inserter(temp_TCs_max_pt), [](const Typhoon &temp_TC) {return temp_TC.maxVorCells.back();});
+                    //std::transform(currentTimeVortexes.begin(), currentTimeVortexes.end(), std::back_inserter(currentT_TCs_maxVorCellIndex), [](const TC1Time &currentTimeVortex) {return currentTimeVortex.maxVorCellIndex;});
 
-                    std::vector<std::pair<int, int>> temp_TCs_max_pt, currentT_TCs_maxVorCellIndex;
-                    std::transform(tempTCs.begin(), tempTCs.end(), std::back_inserter(temp_TCs_max_pt), [](const Typhoon &temp_TC) {return temp_TC.maxVorCells.back();});
-                    std::transform(currentTimeVortexes.begin(), currentTimeVortexes.end(), std::back_inserter(currentT_TCs_maxVorCellIndex), [](const TC1Time &currentTimeVortex) {return currentTimeVortex.maxVorCellIndex;});
-
-                
+                    // 几何中心实现
+                    std::vector<std::pair<float, float>> tempTCsGeoCenters, currentT_TCs_GeoCenters;
+                    std::transform(tempTCs.begin(), tempTCs.end(), std::back_inserter(tempTCsGeoCenters), [](const Typhoon& temp_TC) {return temp_TC.geoCenters.back(); });
+                    std::transform(currentTimeVortexes.begin(), currentTimeVortexes.end(), std::back_inserter(currentT_TCs_GeoCenters), [](const TC1Time& currentTimeVortex) {return currentTimeVortex.geoCenter; });
 
                     /// 距离矩阵（多维数组实现）
                     // float distMatrix[tempTCsSize][currentTVortexesSize];
@@ -246,10 +249,21 @@ namespace TTCore {
                     // for (int i = 0; i < tempTCsSize; ++i)
                     //     distMatrix[i] = new float[currentTVortexesSize];
                     // float **distMatrix = new float[tempTCsSize][currentTVortexesSize];
+
                     auto distMatrix = TwoDArray(tempTCsSize, currentTVortexesSize);
+                    
+                    // 涡度最大点index实现
+                    //for (int i = 0; i < tempTCsSize; ++i) {
+                    //    for (int j = 0; j < currentTVortexesSize; ++j) {
+                    //        distMatrix(i,j) = UtilFunc::cellDist(latArr.get(), lonArr.get(), temp_TCs_max_pt[i], currentT_TCs_maxVorCellIndex[j]);
+                    //    }
+                    //}
+                    // 几何中心实现
                     for (int i = 0; i < tempTCsSize; ++i) {
                         for (int j = 0; j < currentTVortexesSize; ++j) {
-                            distMatrix(i,j) = UtilFunc::cellDist(latArr.get(), lonArr.get(), temp_TCs_max_pt[i], currentT_TCs_maxVorCellIndex[j]);
+                            auto [lat1, lon1] = tempTCsGeoCenters[i];
+                            auto [lat2, lon2] = currentT_TCs_GeoCenters[j];
+                            distMatrix(i,j) = UtilFunc::cellDist(lat1, lon1, lat2, lon2);
                         }
                     }
 
@@ -334,7 +348,10 @@ namespace TTCore {
                         // 更新台风编号，注意更新后的编号所代表的台风仍未出现
                         TC_No += currentTTCsNum;
                     }
+
                 }
+
+                // TODO: 如果当前时次是最后一个时次，应处理tempTC
             }
             hasTCPrevTime = hasTCCurrentTime;
         }
@@ -357,8 +374,10 @@ namespace TTCore {
 
         for (int i = 0; i < realTCsNum; ++i) {
             auto realTC = realTCs[i];
-            int tcStartLat = latArr[realTC.maxVorCells.front().first], tcStartLon = lonArr[realTC.maxVorCells.front().second];
-            int tcEndLat = latArr[realTC.maxVorCells.back().first], tcEndLon = lonArr[realTC.maxVorCells.back().second];
+            //float tcStartLat = latArr[realTC.maxVorCells.front().first], tcStartLon = lonArr[realTC.maxVorCells.front().second];
+            //float tcEndLat = latArr[realTC.maxVorCells.back().first], tcEndLon = lonArr[realTC.maxVorCells.back().second];
+            auto [tcStartLat, tcStartLon] = realTC.geoCenters.front();
+            auto [tcEndLat, tcEndLon] = realTC.geoCenters.back();
 
             // 去除不动的点（即包括单个点）
             if ((tcStartLon == tcEndLon) && (tcStartLat == tcEndLat)) {

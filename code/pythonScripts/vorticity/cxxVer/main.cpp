@@ -174,6 +174,9 @@ void toAbsoluteVort() {
 }
 
 int main(int, char**) {
-    toAbsoluteVort();
+    // toAbsoluteVort();
+    std::pair<int, int> b = {5, 6};
+    auto [a, c] = b;
+    std::cout << a << c << std::endl;
 
 }

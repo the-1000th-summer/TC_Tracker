@@ -210,11 +210,16 @@ namespace TTCore {
     /// @param[in] cell2Index 第二个cell
     float UtilFunc::cellDist(float *latArray, float *lonArray, std::pair<int, int> cell1Index, std::pair<int, int> cell2Index) {
         // 两cell的纬度、经度（弧度形式）
-        double lat1 = sin(latArray[cell1Index.first]*M_PI/180.0), lon1 = sin(lonArray[cell1Index.second]*M_PI/180.0);
-        double lat2 = sin(latArray[cell2Index.first]*M_PI/180.0), lon2 = sin(lonArray[cell2Index.second]*M_PI/180.0);
+        double lat1 = sin(latArray[cell1Index.first]), lon1 = sin(lonArray[cell1Index.second]);
+        double lat2 = sin(latArray[cell2Index.first]), lon2 = sin(lonArray[cell2Index.second]);
+        return cellDist(lat1, lon1, lat2, lon2);
+    }
 
-        double dlat = lat2 - lat1, dlon = lon2 - lon1;
-        double a = pow(sin(dlat/2), 2) + cos(lat1) * cos(lat2) * pow(sin(dlon/2), 2);
+    float UtilFunc::cellDist(float lat1, float lon1, float lat2, float lon2) {
+        double lat1_r = lat1 * M_PI / 180.0, lon1_r = lon1 * M_PI / 180.0;
+        double lat2_r = lat2 * M_PI / 180.0, lon2_r = lon2 * M_PI / 180.0;
+        double dlat = lat2_r - lat1_r, dlon = lon2_r - lon1_r;
+        double a = pow(sin(dlat / 2), 2) + cos(lat1_r) * cos(lat2_r) * pow(sin(dlon / 2), 2);
         float c = 2 * asin(sqrt(a));
         constexpr float r = 6371;
         return c * r;

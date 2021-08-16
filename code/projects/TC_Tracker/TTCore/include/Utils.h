@@ -62,6 +62,7 @@ namespace TTCore {
         std::pair<float, float> getVortexCenterLatLon(const std::unordered_set<std::pair<int, int>, pair_hash>& vortexCellsIndex, TwoDArray &latArray, TwoDArray &lonArray);
 
         float cellDist(float *latArray, float *lonArray, std::pair<int, int> cell1Index, std::pair<int, int> cell2Index);
+        float cellDist(float lat1, float lon1, float lat2, float lon2);
 
         std::pair<std::pair<int, int>, float> getMaxDistance(std::vector<std::pair<int, int>> &cellsIndex);
     
