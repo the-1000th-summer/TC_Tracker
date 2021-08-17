@@ -264,7 +264,8 @@ namespace TC_Tracker {
 
         private void showWebButton_Click(object sender, RoutedEventArgs e) {
             var resultView = new ResultWindow();
-            resultView.tcsData = realTCs.GetRange(0,10);
+            //resultView.tcsData = realTCs.GetRange(0,1);
+            resultView.tcsData = realTCs;
             resultView.Owner = this;
             resultView.ShowDialog();
         }

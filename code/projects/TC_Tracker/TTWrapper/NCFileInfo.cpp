@@ -59,8 +59,9 @@ namespace myCLI {
     }
 
     void NCFileInfo::copyToManaged(std::vector<TTCore::Typhoon>& inTC, List<Typhoon^>^ outTC) {
-        std::vector<float> latData{}, lonData{};
-        getLatLonData(latData, lonData);
+        //std::vector<float> latData{}, lonData{};
+        //getLatLonData(latData, lonData);
+        
 
         int n = inTC.size();
         for (int i = 0; i < n; ++i) {
@@ -68,8 +69,9 @@ namespace myCLI {
             newTC->serialNo = inTC[i].serialNo;
             newTC->startTimeIndex = inTC[i].startTimeIndex;
             newTC->endTimeIndex = inTC[i].endTimeIndex;
-            for (const auto& df : inTC[i].maxVorCells) {
-                newTC->maxVorCells->Add(gcnew Tuple<float,float>{latData[df.first], lonData[df.second]});
+            for (const auto& maxVorCell : inTC[i].maxVorCells) {
+                // newTC->maxVorCells->Add(gcnew Tuple<float,float>{latData[maxVorCell.first], lonData[maxVorCell.second]});
+                newTC->maxVorCells->Add(gcnew Tuple<float, float>{maxVorCell.first, maxVorCell.second});
             }
             for (const auto& geoCenter : inTC[i].geoCenters) {
                 newTC->geoCenters->Add(gcnew Tuple<float, float>{geoCenter.first, geoCenter.second});

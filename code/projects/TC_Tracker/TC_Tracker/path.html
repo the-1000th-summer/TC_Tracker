@@ -121,7 +121,7 @@
 
                 var outOfouter = svg.append("g");
 
-                for (i = 0; i < 10; ++i) {
+                for (i = 0; i < Math.min(myLatLonData.length,10); ++i) {
                     
                     var haiyanPath = svg.append("path")
                         .attr("d", tcPathLine(myLatLonData[i]))

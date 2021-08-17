@@ -352,9 +352,14 @@ namespace TTCore {
                 }
 
                 // TODO: 如果当前时次是最后一个时次，应处理tempTC
+
             }
             hasTCPrevTime = hasTCCurrentTime;
         }
+        for (auto& tempTC : tempTCs)
+            tempTC.endTimeIndex = hasTCLastTimeIndex - 1;
+        realTCs.insert(realTCs.end(), tempTCs.begin(), tempTCs.end());
+        tempTCs.clear();
         
         std::cout << "msg from getRealTC, realTC number" << realTCs.size() << std::endl;
     }
@@ -383,8 +388,8 @@ namespace TTCore {
             if ((tcStartLon == tcEndLon) && (tcStartLat == tcEndLat)) {
                 addRMIndex(i);
             // 去除小于3个点的轨迹
-            } else if (realTC.maxVorCells.size() < 9) {
-                addRMIndex(i);
+            //} else if (realTC.maxVorCells.size() < 9) {
+            //    addRMIndex(i);
             // 去除一直在东边的轨迹
             } else if ((tcStartLon >= 170) && (tcEndLon >= 170)) {
                 addRMIndex(i);
@@ -398,10 +403,12 @@ namespace TTCore {
             } else if (pnpolys(tcStartLat, tcStartLon)) {
                 addRMIndex(i);
             // 排除纬度太低的气旋
-            } else if ((tcEndLat < 5) && UtilFunc::cellsLatOrLonAvg(latArr.get(), realTC.maxVorCells)) {
+            //} else if ((tcEndLat < 5) && UtilFunc::cellsLatAvg(latArr.get(), realTC.maxVorCells) < 5) {
+            } else if ((tcEndLat < 5) && UtilFunc::cellsLatAvg(realTC.geoCenters) < 5) {
                 addRMIndex(i);
             // 排除印度洋的台风
-            } else if (UtilFunc::cellsLatOrLonAvg(lonArr.get(), realTC.maxVorCells) < 103) {
+            //} else if (UtilFunc::cellsLonAvg(lonArr.get(), realTC.maxVorCells) < 103) {
+            } else if (UtilFunc::cellsLonAvg(realTC.geoCenters) < 103) {
                 addRMIndex(i);
             }
         }

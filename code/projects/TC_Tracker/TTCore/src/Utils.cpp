@@ -254,10 +254,17 @@ namespace TTCore {
     }
 
     /// 返回一组cell的平均纬度
-    float UtilFunc::cellsLatOrLonAvg(const float *latOrLonArray, const std::vector<std::pair<int, int>> &cells) {
+    float UtilFunc::cellsLatAvg(const float *latArray, const std::vector<std::pair<int, int>> &cells) {
         float avg = 0.0;
         for (const auto &cell : cells)
-            avg += latOrLonArray[cell.first];
+            avg += latArray[cell.first];
+        return avg / cells.size();
+    }
+
+    float UtilFunc::cellsLonAvg(const float* lonArray, const std::vector<std::pair<int, int>>& cells) {
+        float avg = 0.0;
+        for (const auto& cell : cells)
+            avg += lonArray[cell.second];
         return avg / cells.size();
     }
 

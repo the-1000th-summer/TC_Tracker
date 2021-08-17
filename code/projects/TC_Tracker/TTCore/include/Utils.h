@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 #include <unordered_set>
+#include <numeric>
 
 #include "multiArray.h"
 
@@ -74,8 +75,10 @@ namespace TTCore {
         std::pair<float, float> getCellsCenterLatLon(const std::pair<int, int> &cell1Index, const std::pair<int, int> &cell2Index, const float *latArray, const float *lonArray);
 
         bool alwaysMoveEast(const std::vector<std::pair<int, int>> &cells);
-        float cellsLatOrLonAvg(const float *latOrLonArray, const std::vector<std::pair<int, int>> &cells);
-
+        float cellsLatAvg(const float *latArray, const std::vector<std::pair<int, int>> &cells);
+        inline float cellsLatAvg(const std::vector<std::pair<float, float>>& geoCenters);
+        float cellsLonAvg(const float* lonArray, const std::vector<std::pair<int, int>>& cells);
+        inline float cellsLonAvg(const std::vector<std::pair<float, float>>& geoCenters);
     }
 
     /// 计算两点欧氏距离
@@ -86,5 +89,12 @@ namespace TTCore {
     /// 计算两点斜率
     inline float UtilFunc::getSlope(const std::pair<float, float> &cell1Index, const std::pair<float, float> &cell2Index) {
         return (cell2Index.first == cell1Index.first) ? std::numeric_limits<float>::infinity() : (cell2Index.second - cell1Index.second) / (cell2Index.first - cell1Index.first);
+    }
+
+    inline float UtilFunc::cellsLatAvg(const std::vector<std::pair<float, float>>& geoCenters) {
+        return std::accumulate(geoCenters.begin(), geoCenters.end(), 0.0f, [](auto& a, auto& b) {return a + b.first; }) / geoCenters.size();
+    }
+    inline float UtilFunc::cellsLonAvg(const std::vector<std::pair<float, float>>& geoCenters) {
+        return std::accumulate(geoCenters.begin(), geoCenters.end(), 0.0f, [](auto& a, auto& b) {return a + b.second; }) / geoCenters.size();
     }
 }

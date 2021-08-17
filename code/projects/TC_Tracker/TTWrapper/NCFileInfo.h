@@ -33,12 +33,12 @@ namespace myCLI {
         void startFromStep2(List<Typhoon^>^ outTC);
         void startFromStep3(List<Typhoon^>^ outTC);
         
-        property bool isWrfoutFile {
-        public:
-            bool get() { return m_Instance->isWrfoutFile; }
-        private:
-            void set(bool value) {}
-        }
+        //property bool isWrfoutFile {
+        //public:
+        //    bool get() { return m_Instance->isWrfoutFile; }
+        //private:
+        //    void set(bool value) {}
+        //}
 
         property bool isFileValid {
         public:
