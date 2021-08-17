@@ -88,7 +88,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>D:\VisualStudio\cxxLib\boost_1_76_0;$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Release;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
