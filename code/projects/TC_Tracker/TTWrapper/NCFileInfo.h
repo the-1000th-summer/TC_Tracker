@@ -55,10 +55,10 @@ namespace myCLI {
                 std::string unmanaged = m_Instance->fileValidInfo;
                 //std::cout << m_Instance->isFileValid << "IS VALID?" << std::endl;
                 //std::cout << unmanaged << "unmanGED" << std::endl;
-                Debug::WriteLine(m_Instance->isFileValid+"DEBUG");
+                Console::WriteLine(m_Instance->isFileValid+"DEBUG");
                 //Debug::WriteLine(m_Instance->fileValidInfo+"DEBUGbvz");
                 String ^a = gcnew String(unmanaged.c_str());
-                Debug::WriteLine(a+"from proper");
+                Console::WriteLine(a+"from proper");
                 return a;
 
             }
