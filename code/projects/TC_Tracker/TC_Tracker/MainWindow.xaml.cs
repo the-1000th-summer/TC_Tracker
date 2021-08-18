@@ -60,6 +60,23 @@ namespace TC_Tracker {
                 RaisePropertyChanged("selectedFile");
             }
         }
+        private bool _trackFinished = false;
+        public bool trackFinished {
+            get { return _trackFinished; }
+            set {
+                _trackFinished = value;
+                RaisePropertyChanged("trackFinished");
+            }
+        }
+        private bool _varNameSelected = false;
+        public bool varNameSelected {
+            get { return _varNameSelected; }
+            set {
+                _varNameSelected = value;
+                RaisePropertyChanged("varNameSelected");
+            }
+        }
+
         private bool _isNotWrfoutFile = true;
         public bool isNotWrfoutFile {
             get { return _isNotWrfoutFile; }
@@ -115,7 +132,10 @@ namespace TC_Tracker {
 
                 ncFileTextBox.Text = selectDir;
                 //changeUIAccV(validateDir(dirTextBox.Text));
-                if (!checkFileValidAndUpdateUI(selectDir)) { return; }
+                if (!checkFileValidAndUpdateUI(selectDir)) {
+                    selectedFile = false;
+                    return;
+                }
                 cSelDir = selectDir;
                 selectedFile = true;
             }
@@ -135,25 +155,7 @@ namespace TC_Tracker {
 
         private void notValidUI() {
             selVarButton.IsEnabled = false;
-            latNameLabel.Content = "未指定";
-            lonNameLabel.Content = "未指定";
-            vorNameLabel.Content = "未指定";
-        }
-
-        private void exit_OnClick(object sender, RoutedEventArgs e) {
-            //if (Properties.Settings.Default.isRunning) {
-            if (!isNotTracking) {
-                if (MessageBox.Show("退出程序吗？任务仍在执行。", "退出程序吗？", MessageBoxButton.YesNo, MessageBoxImage.Question) ==
-                    MessageBoxResult.No) {
-                    return;
-                }
-            }
-            Application.Current.Shutdown();
-        }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e) {
-            //Debug
-            Trace.WriteLine("ssdfsdf");
+            setVarNameLabel("未指定", "未指定", "未指定");
         }
 
         /// <summary>
@@ -174,7 +176,10 @@ namespace TC_Tracker {
             var varSelView = new VarSelector();
             varSelView.Owner = this;
             varSelView.ShowDialog();
-            if (!varSelView.selectOK) { return; }
+            if (!varSelView.selectOK) {
+                varNameSelected = false;
+                return;
+            }
 
             latVarStr = (string)varSelView.comboBox_lat.SelectedValue;
             lonVarStr = (string)varSelView.comboBox_lon.SelectedValue;
@@ -182,6 +187,7 @@ namespace TC_Tracker {
             latNameLabel.Content = latVarStr;
             lonNameLabel.Content = lonVarStr;
             vorNameLabel.Content = vorVarStr;
+            varNameSelected = true;
         }
 
         /// <summary>
@@ -191,22 +197,24 @@ namespace TC_Tracker {
         /// <param name="e"></param>
         private void startTrackButton_Click(object sender, RoutedEventArgs e) {
             //startTrackButton.IsEnabled = false;
-            Console.WriteLine("sdffff");
+            Console.WriteLine("stack tracking.");
             isNotTracking = false;
 
-            //bgWorker.RunWorkerAsync();
-
-            syncRun();
+            bgWorker.RunWorkerAsync();
+            //syncRun();
         }
 
         private void stopButtonClicked(object sender, RoutedEventArgs e) {
-            Console.WriteLine("stop button clicked!");
+            Console.WriteLine("stop!");
             isNotTracking = true;
+            trackFinished = false;
         }
 
         private void syncRun() {
             NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
             fileInfo.startTracking(realTCs);
+            isNotTracking = true;
+            trackFinished = true;
         }
 
         /// <summary>
@@ -235,6 +243,8 @@ namespace TC_Tracker {
         /// <param name="e"></param>
         private void bgWorker_runCompleted(object sender, RunWorkerCompletedEventArgs e) {
             Console.WriteLine("run completed!");
+            isNotTracking = true;
+            trackFinished = true;
         }
 
         /// <summary>
@@ -307,9 +317,41 @@ namespace TC_Tracker {
 
         private void wrfoutCheckBox_Checked(object sender, RoutedEventArgs e) {
             isNotWrfoutFile = false;
+            varNameSelected = true;
+            setVarNameLabel("XLAT", "XLONG", "---");
         }
         private void wrfoutCheckBox_Unchecked(object sender, RoutedEventArgs e) {
             isNotWrfoutFile = true;
+            varNameSelected = false;
+            latVarStr = lonVarStr = vorVarStr = "";
+            setVarNameLabel("未指定", "未指定", "未指定");
+        }
+
+        private void setVarNameLabel(string latLabelName, string lonLabelName, string varNameLabelName) {
+            latNameLabel.Content = latLabelName;
+            lonNameLabel.Content = lonLabelName;
+            vorNameLabel.Content = varNameLabelName;
+        }
+
+        private void exit_OnClick(object sender, RoutedEventArgs e) {
+            //if (Properties.Settings.Default.isRunning) {
+            if (!isNotTracking) {
+                if (MessageBox.Show("退出程序吗？任务仍在执行。", "退出程序吗？", MessageBoxButton.YesNo, MessageBoxImage.Question) ==
+                    MessageBoxResult.No) {
+                    return;
+                }
+            }
+            Application.Current.Shutdown();
+        }
+
+        private void windowClosing(object sender, CancelEventArgs e) {
+            if (!isNotTracking) {
+                if (MessageBox.Show("退出程序吗？任务仍在执行。", "退出程序吗？", MessageBoxButton.YesNo, MessageBoxImage.Question) ==
+                    MessageBoxResult.No) {
+                    e.Cancel = true;
+                    return;
+                }
+            }
         }
     }
 }

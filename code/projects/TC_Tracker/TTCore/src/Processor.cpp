@@ -139,11 +139,11 @@ namespace TTCore {
         } else {
             iiFile->getVar(vorVarName).getVar(vorField.get());
         }
-
+        int itsPerCheck = timeLength / 20;
         for (unsigned long timeIndex = startIndexInFile; timeIndex < timeLength; ++timeIndex) {
             // std::cout << vorVar.getName() << std::endl;
-            if (timeIndex % 1000 == 0)
-                std::cout << timeIndex << std::endl;
+            if (timeIndex % itsPerCheck == 0)
+                std::cout << static_cast<int>(timeIndex / static_cast<float>(timeLength) * 100) << "%" << std::endl;
             // vorVar.getVar({timeIndex,0,0}, {1, latGridNum, lonGridNum}, vorField.get());
 
             int tpNum_timei = getVortexNum1Time(vorField, timeIndex, TCNum_prevTime);
