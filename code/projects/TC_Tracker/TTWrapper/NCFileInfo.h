@@ -28,7 +28,7 @@ namespace myCLI {
         ~NCFileInfo() { if (isCanceled != nullptr) delete isCanceled; isCanceled = nullptr; }
         !NCFileInfo() { if (isCanceled != nullptr) delete isCanceled; isCanceled = nullptr; }
 
-        void checkFileValid();
+        bool checkFileValid(String^ %fileValidInfo);
         //void openFile();
         List<String^>^ getVarsName();
         void getLatLonData(std::vector<float> &latData, std::vector<float>& lonData);
@@ -45,28 +45,6 @@ namespace myCLI {
         //    void set(bool value) {}
         //}
 
-        property bool isFileValid {
-        public:
-            bool get() { return m_Instance->isFileValid; }
-        private:
-            void set(bool value) {}
-        }
-
-        property String^ fileValidInfo {
-        public:
-            String^ get() {
-                std::string unmanaged = m_Instance->fileValidInfo;
-                //std::cout << m_Instance->isFileValid << "IS VALID?" << std::endl;
-                //std::cout << unmanaged << "unmanGED" << std::endl;
-                Console::WriteLine(m_Instance->isFileValid+"DEBUG");
-                //Debug::WriteLine(m_Instance->fileValidInfo+"DEBUGbvz");
-                String ^a = gcnew String(unmanaged.c_str());
-                Console::WriteLine(a+"from proper");
-                return a;
-
-            }
-            void set(String^ value) {}
-        }
     private:
         bool *isCanceled;
         //void (*unmanagedFunctionPointer)(bool*);

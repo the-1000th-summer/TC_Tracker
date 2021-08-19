@@ -13,8 +13,15 @@ namespace myCLI {
         /*this->unmanagedFunctionPointer = unmanagedFunctionPointer;*/
         isCanceled = new bool;
     }
-    void NCFileInfo::checkFileValid() {
+
+    bool NCFileInfo::checkFileValid(String^ %fileValidInfo) {
         m_Instance->checkFileValid();
+        std::string unmanaged = m_Instance->fileValidInfo;
+        Console::WriteLine(m_Instance->isFileValid + "DEBUG");
+        //Debug::WriteLine(m_Instance->fileValidInfo+"DEBUGbvz");
+        fileValidInfo = gcnew String(unmanaged.c_str());
+
+        return m_Instance->isFileValid;
     }
 
     //void NCFileInfo::openFile() {

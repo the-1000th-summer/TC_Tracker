@@ -114,8 +114,6 @@ namespace TC_Tracker {
 
         }
 
-
-
         private void browseButton_Click(object sender, RoutedEventArgs e) {
             //ConsoleManager.Show();
             Console.WriteLine("browse button clicked!");
@@ -143,10 +141,11 @@ namespace TC_Tracker {
 
         private bool checkFileValidAndUpdateUI(string selectDir) {
             NCFileInfo fileInfo = new NCFileInfo(selectDir, !isNotWrfoutFile, "", "", "", "");
-            fileInfo.checkFileValid();
-            Debug.WriteLine(fileInfo.fileValidInfo, " from cs.");
-            if (!fileInfo.isFileValid) {
-                MessageBox.Show($"File\n{selectDir}\n is not valid:\n {fileInfo.fileValidInfo}");
+            var fileValidInfo = "";
+            var isFileValid = fileInfo.checkFileValid(ref fileValidInfo);
+            Debug.WriteLine(fileValidInfo, " from cs.");
+            if (!isFileValid) {
+                MessageBox.Show($"File\n{selectDir}\n is not valid:\n {fileValidInfo}");
                 notValidUI();
                 return false;
             }
