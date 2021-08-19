@@ -19,6 +19,7 @@ namespace TTCore {
 
         NCFileInfo(const char *filePath, bool isWrfoutFile, const char *latVName, const char *lonVName, const char *vorVName, const char *dumpDirectory);
         void checkFileValid();
+        int getZLvDimLenName();
         //void openFile();
         void getLatLonData(std::vector<float> &latData, std::vector<float>& lonData);
 

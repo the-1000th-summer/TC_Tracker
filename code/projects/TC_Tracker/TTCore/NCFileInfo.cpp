@@ -26,6 +26,14 @@ namespace TTCore {
         isFileValid = true;
     }
 
+    int NCFileInfo::getZLvDimLenName() {
+        netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+        auto uVar = f.getVar("U");
+        if (uVar.getDimCount() != 4)
+            return 0;
+        return uVar.getDim(1).getSize();
+    }
+
     void NCFileInfo::getLatLonData(std::vector<float>& latData, std::vector<float>& lonData) {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
         UtilFunc::getLatLonData(&f, latVarName, lonVarName, latData, lonData);

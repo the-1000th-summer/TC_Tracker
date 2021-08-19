@@ -183,10 +183,27 @@ namespace TC_Tracker {
             latVarStr = (string)varSelView.comboBox_lat.SelectedValue;
             lonVarStr = (string)varSelView.comboBox_lon.SelectedValue;
             vorVarStr = (string)varSelView.comboBox_vor.SelectedValue;
-            latNameLabel.Content = latVarStr;
-            lonNameLabel.Content = lonVarStr;
-            vorNameLabel.Content = vorVarStr;
+            setVarNameLabel(latVarStr, lonVarStr, vorVarStr);
+            handleZLevelDim();
             varNameSelected = true;
+
+        }
+
+        private void handleZLevelDim() {
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            var zLvDimName = "";
+            var zLvDimLen = fileInfo.getZLvDimLenName(ref zLvDimName);
+            
+            if (zLvDimLen == 0) {    // 无z维度
+                zDimName.Content = "(无)";
+                zLvComboBox.IsEnabled = false;
+                return;
+            }
+            zDimName.Content = zLvDimName;
+            zLvComboBox.IsEnabled = true;
+            var cbis = new List<int> { zLvDimLen };
+            zLvComboBox.ItemsSource = cbis;
+            zLvComboBox.SelectedIndex = 0;
         }
 
         private System.Threading.CancellationTokenSource m_Cts;
@@ -331,6 +348,7 @@ namespace TC_Tracker {
             isNotWrfoutFile = false;
             varNameSelected = true;
             setVarNameLabel("XLAT", "XLONG", "---");
+            handleZLevelDim();
         }
         private void wrfoutCheckBox_Unchecked(object sender, RoutedEventArgs e) {
             isNotWrfoutFile = true;

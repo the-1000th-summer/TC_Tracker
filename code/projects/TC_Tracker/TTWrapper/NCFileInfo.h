@@ -29,6 +29,7 @@ namespace myCLI {
         !NCFileInfo() { if (isCanceled != nullptr) delete isCanceled; isCanceled = nullptr; }
 
         bool checkFileValid(String^ %fileValidInfo);
+        int getZLvDimLenName(String^ %zLvDimName);
         //void openFile();
         List<String^>^ getVarsName();
         void getLatLonData(std::vector<float> &latData, std::vector<float>& lonData);

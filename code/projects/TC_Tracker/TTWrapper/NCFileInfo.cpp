@@ -24,6 +24,11 @@ namespace myCLI {
         return m_Instance->isFileValid;
     }
 
+    int NCFileInfo::getZLvDimLenName(String^% zLvDimName) {
+        int zLvDimLen = m_Instance->getZLvDimLenName();
+        return zLvDimLen;
+    }
+
     //void NCFileInfo::openFile() {
     //    m_Instance->openFile();
     //}
