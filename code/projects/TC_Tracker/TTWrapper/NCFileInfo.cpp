@@ -4,11 +4,15 @@
 
 using namespace System::Collections::Generic;
 
+
 namespace myCLI {
     NCFileInfo::NCFileInfo(String ^filePath, bool isWrfoutFile, String^ latVarName, String^ lonVarName, String^ vorVarName, String^ dumpDirectory) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName), string2Char(dumpDirectory))) {
-        
-    }
 
+    }
+    NCFileInfo::NCFileInfo(String^ filePath, bool isWrfoutFile, String^ latVarName, String^ lonVarName, String^ vorVarName, String^ dumpDirectory, bool isAsync) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName), string2Char(dumpDirectory))) {
+        /*this->unmanagedFunctionPointer = unmanagedFunctionPointer;*/
+        isCanceled = new bool;
+    }
     void NCFileInfo::checkFileValid() {
         m_Instance->checkFileValid();
     }
@@ -32,10 +36,18 @@ namespace myCLI {
         return sd;
     }
 
-    void NCFileInfo::startTracking(List<Typhoon ^> ^realTCs) {
+    void NCFileInfo::startTracking(List<Typhoon ^> ^realTCs, CancellationToken cancelToken) {
         //Debug::WriteLine("sdf");
+        *isCanceled = false;
+        CancellationTokenRegistration reg = cancelToken.Register(
+            gcnew Action(this, &NCFileInfo::Canceled));
+
         std::vector<TTCore::Typhoon> unManagedTC;
-        m_Instance->startTracking(unManagedTC);
+        m_Instance->startTracking(unManagedTC, isCanceled);
+        if (*isCanceled) {
+            Console::WriteLine("msg from wrapper: cancelled!!!");
+            return;
+        }
         Console::WriteLine("unmanagedTC number: {0}",unManagedTC.size());
         copyToManaged(unManagedTC, realTCs);
     }

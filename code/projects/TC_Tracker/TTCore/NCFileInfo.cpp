@@ -42,14 +42,14 @@ namespace TTCore {
         //std::transform(tt.cbegin(), tt.end(), std::back_inserter(varsName), []( std::pair<std::string, netCDF::NcVar> &a) {return a.first;} );
     }
 
-    void NCFileInfo::startTracking(std::vector<Typhoon> &tcs) {
+    void NCFileInfo::startTracking(std::vector<Typhoon> &tcs, bool* isCanceled) {
         
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
 
-        Processor p(f, isWrfoutFile, latVarName, lonVarName, vorVarName, dumpDir);
+        Processor p(isCanceled, f, isWrfoutFile, latVarName, lonVarName, vorVarName, dumpDir);
 
         p.recognizeTyphoon();
-
+        if (*isCanceled) return;
         p.dumpStep1();
         std::cout << "finish dump step1." << std::endl;
         p.getRealTC();
@@ -63,24 +63,24 @@ namespace TTCore {
 
     void NCFileInfo::startFromStep2(std::vector<Typhoon>& tcs) {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-        Processor p(f, isWrfoutFile, latVarName, lonVarName, vorVarName, dumpDir);
-        std::string step1FilePath = "E:\\University\\TC_Tracker\\data\\stepFile\\step1\\step1.dat";
-        p.getStep1DataFromFile(step1FilePath);
-        p.getRealTC();
-        p.removeNoise();
-        p.dumpStep3();
-        p.copyRealTCs(tcs);
+        //Processor p(f, isWrfoutFile, latVarName, lonVarName, vorVarName, dumpDir);
+        //std::string step1FilePath = "E:\\University\\TC_Tracker\\data\\stepFile\\step1\\step1.dat";
+        //p.getStep1DataFromFile(step1FilePath);
+        //p.getRealTC();
+        //p.removeNoise();
+        //p.dumpStep3();
+        //p.copyRealTCs(tcs);
         
     }
 
     void NCFileInfo::startFromStep3(std::vector<Typhoon>& tcs) {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-        Processor p(f, isWrfoutFile, latVarName, lonVarName, vorVarName, dumpDir);
-        std::string step1FilePath = "E:\\University\\TC_Tracker\\data\\stepFile\\step2\\step2.dat";
-        p.getStep2DataFromFile(step1FilePath);
-        p.removeNoise();
-        p.dumpStep3();
-        p.copyRealTCs(tcs);
+        //Processor p(f, isWrfoutFile, latVarName, lonVarName, vorVarName, dumpDir);
+        //std::string step1FilePath = "E:\\University\\TC_Tracker\\data\\stepFile\\step2\\step2.dat";
+        //p.getStep2DataFromFile(step1FilePath);
+        //p.removeNoise();
+        //p.dumpStep3();
+        //p.copyRealTCs(tcs);
     }
 
      

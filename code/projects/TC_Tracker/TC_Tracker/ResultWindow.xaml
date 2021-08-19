@@ -6,10 +6,15 @@
         xmlns:local="clr-namespace:TC_Tracker"
         mc:Ignorable="d"
         Title="ResultWindow" Height="720" Width="1280">
+    <Window.Resources>
+        <ContextMenu x:Key="MnuCustom" StaysOpen="True">
+            <MenuItem Header="导出当前路径..." Click="exClick"></MenuItem>
+            <MenuItem Header="Custom 1"></MenuItem>
+        </ContextMenu>
+    </Window.Resources>
     <Grid>
 
         <WebBrowser x:Name="webBrowser" Margin="0,0,135,0" LoadCompleted="loadCompletedHandler"/>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="670,360,0,0" VerticalAlignment="Top" Click="button_Click"/>
 
     </Grid>
 </Window>

@@ -190,6 +190,9 @@ namespace TC_Tracker {
             varNameSelected = true;
         }
 
+        private System.Threading.CancellationTokenSource m_Cts;
+        private System.Threading.CancellationToken m_Ct;
+
         /// <summary>
         /// 点击了开始识别按钮
         /// </summary>
@@ -200,21 +203,31 @@ namespace TC_Tracker {
             Console.WriteLine("stack tracking.");
             isNotTracking = false;
 
-            bgWorker.RunWorkerAsync();
-            //syncRun();
+            //bgWorker.RunWorkerAsync();
+
+            syncRun();
         }
 
         private void stopButtonClicked(object sender, RoutedEventArgs e) {
             Console.WriteLine("stop!");
+            m_Cts.Cancel();
             isNotTracking = true;
             trackFinished = false;
         }
 
-        private void syncRun() {
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
-            fileInfo.startTracking(realTCs);
-            isNotTracking = true;
-            trackFinished = true;
+        private async void syncRun() {
+            m_Cts = new System.Threading.CancellationTokenSource();
+            m_Ct = m_Cts.Token;
+
+            await Task.Factory.StartNew(() => {
+                // Launching a cancelable operation performed by a managed C++Cli Object :
+                NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir, true);
+                fileInfo.startTracking(realTCs, m_Ct);
+                isNotTracking = true;
+                trackFinished = true;
+            });
+
+            
         }
 
         /// <summary>
@@ -223,8 +236,8 @@ namespace TC_Tracker {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void bgWorker_DoWork(object sender, DoWorkEventArgs e) {
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
-            fileInfo.startTracking(realTCs);
+            //NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            //fileInfo.startTracking(realTCs);
         }
 
         /// <summary>
@@ -351,6 +364,23 @@ namespace TC_Tracker {
                     e.Cancel = true;
                     return;
                 }
+            }
+        }
+
+        private void exportButton_Click(object sender, RoutedEventArgs e) {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = "Document"; // Default file name
+            dlg.DefaultExt = ".text"; // Default file extension
+            dlg.Filter = "json files (.json)|*.json"; // Filter files by extension
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            // Process save file dialog box results
+            if (result == true) {
+                // Save document
+                string filename = dlg.FileName;
+                Console.WriteLine("filterindex: {0}", dlg.FilterIndex);
+                Console.WriteLine("FIlename: {0}", filename);
             }
         }
     }

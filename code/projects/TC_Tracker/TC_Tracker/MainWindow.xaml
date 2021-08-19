@@ -59,7 +59,7 @@
             </Button.IsEnabled>
         </Button>
         <Button x:Name="stopButton" Content="中止" HorizontalAlignment="Left" Margin="610,282,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-0.256,0.391" Height="23" Width="55" Click="stopButtonClicked" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking, Converter={StaticResource InverseBooleanConverter}}" />
-        <Button x:Name="showWebButton" Content="Web" HorizontalAlignment="Left" Margin="495,355,0,0" Grid.Row="1" VerticalAlignment="Top" Click="showWebButton_Click">
+        <Button x:Name="showWebButton" Content="查看结果..." HorizontalAlignment="Left" Margin="495,355,0,0" Grid.Row="1" VerticalAlignment="Top" Click="showWebButton_Click">
             <Button.IsEnabled>
                 <MultiBinding Converter="{StaticResource booleanAndConverter}">
                     <Binding ElementName="mainWin" Path="selectedFile" />
@@ -71,5 +71,6 @@
         <Button x:Name="step2Button" Content="startFromStep2" HorizontalAlignment="Left" Margin="81,325,0,0" Grid.Row="1" VerticalAlignment="Top" Height="40" Width="107" Click="step2Button_Click" IsEnabled="False" />
         <Button x:Name="step3Button" Content="startFromStep3" HorizontalAlignment="Left" Margin="215,328,0,0" Grid.Row="1" VerticalAlignment="Top" Height="34" Width="102" Click="step3Button_Click" IsEnabled="False" />
         <CheckBox x:Name="wrfoutCheckBox" Content="wrfout文件" HorizontalAlignment="Left" Margin="656,67,0,0" Grid.Row="1" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}" Checked="wrfoutCheckBox_Checked" Unchecked="wrfoutCheckBox_Unchecked" />
+        <Button x:Name="exportButton" Content="导出全部结果..." HorizontalAlignment="Left" Margin="580,355,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Click="exportButton_Click"/>
     </Grid>
 </Window>

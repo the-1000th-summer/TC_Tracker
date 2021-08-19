@@ -7,6 +7,7 @@
 using namespace System;
 using namespace System::Diagnostics;
 using namespace System::Collections::Generic;
+using namespace System::Threading;
 
 namespace myCLI {
     
@@ -23,13 +24,17 @@ namespace myCLI {
     public:
         // 无法在managed class的方法里使用optional paramater
         NCFileInfo(String ^filePath, bool isWrfoutFile, String ^latVarName, String ^lonVarName, String ^vorVarName, String ^dumpDirectory);
+        NCFileInfo(String^ filePath, bool isWrfoutFile, String^ latVarName, String^ lonVarName, String^ vorVarName, String^ dumpDirectory, bool isAsync);
+        ~NCFileInfo() { if (isCanceled != nullptr) delete isCanceled; isCanceled = nullptr; }
+        !NCFileInfo() { if (isCanceled != nullptr) delete isCanceled; isCanceled = nullptr; }
+
         void checkFileValid();
         //void openFile();
         List<String^>^ getVarsName();
         void getLatLonData(std::vector<float> &latData, std::vector<float>& lonData);
 
         void copyToManaged(std::vector<TTCore::Typhoon> &inTC, List<Typhoon^> ^outTC);
-        void startTracking(List<Typhoon^>^ realTCs);
+        void startTracking(List<Typhoon^>^ realTCs, CancellationToken cancelToken);
         void startFromStep2(List<Typhoon^>^ outTC);
         void startFromStep3(List<Typhoon^>^ outTC);
         
@@ -42,9 +47,7 @@ namespace myCLI {
 
         property bool isFileValid {
         public:
-            bool get() {
-                return m_Instance->isFileValid;
-            }
+            bool get() { return m_Instance->isFileValid; }
         private:
             void set(bool value) {}
         }
@@ -64,7 +67,10 @@ namespace myCLI {
             }
             void set(String^ value) {}
         }
-    //private:
+    private:
+        bool *isCanceled;
+        //void (*unmanagedFunctionPointer)(bool*);
+        void Canceled() { if (isCanceled != nullptr) *isCanceled = true; }
     //    netCDF::NcFile* iiFile = nullptr;
         
     };

@@ -27,7 +27,7 @@
 
 namespace TTCore {
 
-    Processor::Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, const std::string& dumpDirectory) : isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
+    Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
         iiFile = &iFile;
         getDimLength();
         if (isWrfoutFile) {
@@ -142,8 +142,14 @@ namespace TTCore {
         int itsPerCheck = timeLength / 20;
         for (unsigned long timeIndex = startIndexInFile; timeIndex < timeLength; ++timeIndex) {
             // std::cout << vorVar.getName() << std::endl;
-            if (timeIndex % itsPerCheck == 0)
-                std::cout << static_cast<int>(timeIndex / static_cast<float>(timeLength) * 100) << "%" << std::endl;
+            if (timeIndex % itsPerCheck == 0) {
+                //std::cout << static_cast<int>(timeIndex / static_cast<float>(timeLength) * 100) << "%" << std::endl;
+                std::cout << timeIndex << std::endl;
+                if (*isCanceled) { 
+                    std::cout << "msg from step1: Canceled!!!" << std::endl;
+                    return;
+                }
+            }
             // vorVar.getVar({timeIndex,0,0}, {1, latGridNum, lonGridNum}, vorField.get());
 
             int tpNum_timei = getVortexNum1Time(vorField, timeIndex, TCNum_prevTime);

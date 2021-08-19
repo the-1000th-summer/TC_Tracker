@@ -15,7 +15,8 @@ namespace TTCore {
 
     class Processor {
     public:
-        Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &latVName="", const std::string& lonVName="", const std::string& vorVName="", const std::string& dumpDirectory="");
+        Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &latVName="", const std::string& lonVName="", const std::string& vorVName="", const std::string& dumpDirectory="");
+
         //Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
         ~Processor();
         void getDimLength();
@@ -39,6 +40,7 @@ namespace TTCore {
         void copyRealTCs(std::vector<Typhoon> &tcs);
     
     private:
+        bool* isCanceled;
         netCDF::NcFile *iiFile;
         std::string latVarName;
         std::string lonVarName;

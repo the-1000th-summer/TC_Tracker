@@ -12,8 +12,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Newtonsoft.Json;
+using MSHTML;
 
+using Newtonsoft.Json;
 using myCLI;
 
 namespace TC_Tracker {
@@ -22,6 +23,7 @@ namespace TC_Tracker {
     /// </summary>
     public partial class ResultWindow : Window {
         public List<Typhoon> tcsData;
+        private HTMLDocumentEvents2_Event _docEvent;
 
         public ResultWindow() {
             InitializeComponent();
@@ -29,19 +31,36 @@ namespace TC_Tracker {
             //Uri uri = new Uri(@"pack://application:,,,/data/myyy.html");
             //Stream source = Application.GetContentStream(uri).Stream;
             //webBrowser.NavigateToStream(source);
+            
             webBrowser.NavigateToStream(System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream("TC_Tracker.path.html"));
             //webBrowser.Document.inv
         }
 
-        private void button_Click(object sender, RoutedEventArgs e) {
-            //if (webBrowser.LoadCompleted) {
-                
-            //}
-        }
-
         private void loadCompletedHandler(object sender, System.Windows.Navigation.NavigationEventArgs e) {
             prepareData();
+
+            if (_docEvent != null) {
+                _docEvent.oncontextmenu -= _docEvent_oncontextmenu;
+            }
+            if (webBrowser.Document != null) {
+                _docEvent = (HTMLDocumentEvents2_Event)webBrowser.Document;
+                _docEvent.oncontextmenu += _docEvent_oncontextmenu;
+            }
         }
+
+        bool _docEvent_oncontextmenu(IHTMLEventObj pEvtObj) {
+            WbShowContextMenu();
+            return false;
+        }
+
+        public void WbShowContextMenu() {
+            ContextMenu cm = FindResource("MnuCustom") as ContextMenu;
+            if (cm == null)
+                return;
+            cm.PlacementTarget = webBrowser;
+            cm.IsOpen = true;
+        }
+
         private void prepareData() {
 
             var tcsDataForJS = new List<List<Dictionary<string, float>>>();
@@ -60,13 +79,19 @@ namespace TC_Tracker {
             try {
 
                 var bbba = JsonConvert.SerializeObject(tcsDataForJS);
-                Console.WriteLine(bbba);
+                //Console.WriteLine(bbba);
                 webBrowser.InvokeScript("drawPath", bbba);
             } catch (Exception ex) {
                 string msg = "Could not call script: " + ex.Message + "\n\nPlease click the 'Load HTML Document with Script' button to load.";
                 MessageBox.Show(msg);
             }
 
+        }
+
+        private void exClick(object sender, RoutedEventArgs e) {
+            Console.WriteLine("ex 1 tc!");
+            int b = (int)webBrowser.InvokeScript("getTcIndex");
+            Console.WriteLine("tcindex: {0}", b);
         }
     }
 }
