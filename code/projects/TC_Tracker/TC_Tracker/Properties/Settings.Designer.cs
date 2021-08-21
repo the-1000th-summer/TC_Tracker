@@ -58,5 +58,29 @@ namespace TC_Tracker.Properties {
                 this["tempFileDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string step3FileDir {
+            get {
+                return ((string)(this["step3FileDir"]));
+            }
+            set {
+                this["step3FileDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string jsonFExportDir {
+            get {
+                return ((string)(this["jsonFExportDir"]));
+            }
+            set {
+                this["jsonFExportDir"] = value;
+            }
+        }
     }
 }

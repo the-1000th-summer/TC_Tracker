@@ -32,6 +32,20 @@ namespace TC_Tracker {
                 Properties.Settings.Default.Save();
             }
         }
+        private string step3FileDir {
+            get => Properties.Settings.Default.step3FileDir;
+            set {
+                Properties.Settings.Default.step3FileDir = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+        private string jsonFExportDir {
+            get => Properties.Settings.Default.jsonFExportDir;
+            set {
+                Properties.Settings.Default.jsonFExportDir = value;
+                Properties.Settings.Default.Save();
+            }
+        }
         private string s_TempFileDir {
             get => Properties.Settings.Default.tempFileDir;
             set {
@@ -129,21 +143,21 @@ namespace TC_Tracker {
             var dialog = new CommonOpenFileDialog();
 
             var savedSDir = cSelDir;
-            dialog.InitialDirectory = savedSDir == "" ? "C:\\Users" : savedSDir;
-            //dialog.is
+            dialog.InitialDirectory = string.IsNullOrEmpty(savedSDir) ? "C:\\Users" : savedSDir;
+            dialog.RestoreDirectory = true;
             //dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
                 trackFinished = false;
-                var selectDir = dialog.FileName;
-                Debug.WriteLine(selectDir);
+                var filePath = dialog.FileName;
+                Debug.WriteLine(filePath);
 
-                ncFileTextBox.Text = selectDir;
+                ncFileTextBox.Text = filePath;
                 //changeUIAccV(validateDir(dirTextBox.Text));
-                if (!checkFileValidAndUpdateUI(selectDir)) {
+                if (!checkFileValidAndUpdateUI(filePath)) {
                     selectedFile = false;
                     return;
                 }
-                cSelDir = selectDir;
+                cSelDir = filePath;
                 selectedFile = true;
                 checkIsWrfoutFile();
             }
@@ -392,21 +406,45 @@ namespace TC_Tracker {
             }
         }
 
-        private void exportButton_Click(object sender, RoutedEventArgs e) {
+        private void exportFile(bool selStep3FileFirst, string step3FilePath="") {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.InitialDirectory = string.IsNullOrEmpty(jsonFExportDir) ? "C:\\Users" : jsonFExportDir;
+            dlg.RestoreDirectory = true;
             dlg.FileName = "Document"; // Default file name
             dlg.DefaultExt = ".text"; // Default file extension
-            dlg.Filter = "json files (.json)|*.json"; // Filter files by extension
+            dlg.Filter = "json files|*.json"; // Filter files by extension
 
             Nullable<bool> result = dlg.ShowDialog();
 
             // Process save file dialog box results
             if (result == true) {
                 // Save document
-                string filename = dlg.FileName;
+                jsonFExportDir = System.IO.Path.GetDirectoryName(dlg.FileName);
+                string outFilePath = dlg.FileName;
                 Console.WriteLine("filterindex: {0}", dlg.FilterIndex);
-                Console.WriteLine("FIlename: {0}", filename);
+                Console.WriteLine("filePath: {0}", outFilePath);
+
+                NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", s_TempFileDir);
+                if (selStep3FileFirst) {
+                    fileInfo.exportFile(step3FilePath, outFilePath);
+                } else {
+                    fileInfo.exportFile(outFilePath);
+                }
             }
+        }
+
+        private void exportButton_Click(object sender, RoutedEventArgs e) {
+            exportFile(false);
+        }
+
+        private void menu_exportJson_Click(object sender, RoutedEventArgs e) {
+            var dialog = new CommonOpenFileDialog();
+            dialog.InitialDirectory = string.IsNullOrEmpty(step3FileDir) ? "C:\\Users" : step3FileDir;
+            dialog.RestoreDirectory = true;
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                return;
+            step3FileDir = System.IO.Path.GetDirectoryName(dialog.FileName);
+            exportFile(true, dialog.FileName);
         }
     }
 }

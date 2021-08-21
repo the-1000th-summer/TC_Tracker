@@ -30,6 +30,9 @@ namespace TTCore {
         void startTracking(std::vector<Typhoon>& tcs, bool* isCanceled);
         void startFromStep2(std::vector<Typhoon>& tcs);
         void startFromStep3(std::vector<Typhoon>& tcs);
+
+        void exportFile(const std::string &inFilePath, const std::string &outFilePath);
+        void exportFile(const std::string &outFilePath);
     //private:
     //    netCDF::NcFile *iiFile = nullptr;
     };

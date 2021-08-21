@@ -599,16 +599,6 @@ namespace TTCore {
         }
     }
 
-    void to_json(nlohmann::json& j, const TC1Time& tc) {
-        j = nlohmann::json{
-            {"maxVorCellIndex", tc.maxVorCellIndex}
-        };
-    }
-
-    void from_json(const nlohmann::json& j, TC1Time& tc) {
-        tc.maxVorCellIndex = j.at("maxVorCellIndex").get<std::pair<int,int>>();
-    }
-
 
     /// @brief 此方法检查一个文件夹名字对应的路径是否为路径
     /// @param folderName 文件夹名称
@@ -637,10 +627,6 @@ namespace TTCore {
 
     void Processor::dumpStep1(const std::string ncFilePath) {
         //checkDirAndCreate("step1");
-        //nlohmann::json j(allVortexes);
-        //std::string jsonArray = j.dump();
-        //std::ofstream o(dumpDir+"pretty.json");
-        //o << std::setw(4) << j << std::endl;
 
         std::filesystem::path stepDumpDir(dumpDir);
         std::ofstream ofs(stepDumpDir / (std::filesystem::path(ncFilePath).stem().string() + "_step1.dat"), std::ios::binary);

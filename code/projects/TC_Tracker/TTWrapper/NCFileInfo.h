@@ -46,6 +46,8 @@ namespace myCLI {
         //private:
         //    void set(bool value) {}
         //}
+        void exportFile(String ^inFilePath, String^ outFilePath);
+        void exportFile(String^ outFilePath);
 
     private:
         bool *isCanceled;

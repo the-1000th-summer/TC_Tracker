@@ -17,15 +17,15 @@ namespace TTCore {
         /// 一天中最多会出现的涡旋数量
         constexpr int TODAY_MAX_TP_NUM = 5;
         /// 查看相对涡度场时认为可能有台风的最小相对涡度值
-        //constexpr float HAS_TP_MIN_ReVOR = 100e-5;
-        constexpr float HAS_TP_MIN_ReVOR = 8e-5;
+        constexpr float HAS_TP_MIN_ReVOR = 100e-5;
+        //constexpr float HAS_TP_MIN_ReVOR = 8e-5;
         /// 递归找出“台风”包含的所有空间点，如果点数少于这个值则认为这不是台风
         constexpr int TP_MIN_PTS = 4;
         /// 认为这个是台风的最大偏心率（偏心率计算方法仍需改进）
         constexpr float TP_MIN_E = 0.9;
         /// 找出所有点的递归中限定相对涡度的最小值
-        //constexpr float RECURSION_MIN_ReVOR = 30e-5;
-        constexpr float RECURSION_MIN_ReVOR = 6e-5;
+        constexpr float RECURSION_MIN_ReVOR = 30e-5;
+        //constexpr float RECURSION_MIN_ReVOR = 6e-5;
         /// 台风在一个时次内走的最远距离，超过此距离认为是两个不同的台风
         constexpr float LINK_TP_MAX_DIST = 340.0;
 

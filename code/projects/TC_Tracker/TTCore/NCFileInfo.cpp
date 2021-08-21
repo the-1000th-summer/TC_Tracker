@@ -1,10 +1,17 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <netcdf>
 #include <algorithm>
+#include <filesystem>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
 
+#include "include/json.hpp"
 #include "NCFileInfo.h"
 #include "Processor.h"
+#include "include/Typhoon.h"
 
 namespace TTCore {
     NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
@@ -118,5 +125,36 @@ namespace TTCore {
         //p.copyRealTCs(tcs);
     }
 
-     
+    void to_json(nlohmann::json& j, const Typhoon& tc) {
+        j = nlohmann::json{
+            {"mvc", tc.maxVorCells},
+            {"gc", tc.geoCenters},
+            {"sti", tc.startTimeIndex},
+            {"eti", tc.endTimeIndex}
+        };
+    }
+
+    void from_json(const nlohmann::json& j, Typhoon& tc) {
+        j.at("mvc").get_to(tc.maxVorCells);
+        j.at("gc").get_to(tc.geoCenters);
+        j.at("sti").get_to(tc.startTimeIndex);
+        j.at("eti").get_to(tc.endTimeIndex);
+    }
+
+    void NCFileInfo::exportFile(const std::string& inFilePath, const std::string& outFilePath) {
+        std::vector<Typhoon> realTCs{};
+
+        std::ifstream ifs(inFilePath, std::ios::binary);
+        boost::archive::binary_iarchive ia(ifs);
+        ia >> realTCs;
+
+        nlohmann::json j(realTCs);
+        std::ofstream jsonFile(outFilePath);
+        //o << std::setw(4) << j << std::endl;
+        jsonFile << j;
+    }
+
+    void NCFileInfo::exportFile(const std::string& outFilePath) {
+        exportFile((std::filesystem::path(dumpDir) / (std::filesystem::path(ncFilePath).stem().string() + "_step3.dat")).string(), outFilePath);
+    }
 }

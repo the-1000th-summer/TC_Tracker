@@ -109,4 +109,11 @@ namespace myCLI {
         }
     }
 
+    void NCFileInfo::exportFile(String^ inFilePath, String^ outFilePath) {
+        m_Instance->exportFile(string2Char(inFilePath), string2Char(outFilePath));
+    }
+    void NCFileInfo::exportFile(String ^outFilePath) {
+        m_Instance->exportFile(string2Char(outFilePath));
+    }
+
 }
