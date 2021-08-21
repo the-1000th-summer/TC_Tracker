@@ -27,7 +27,7 @@
 
 namespace TTCore {
 
-    Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
+    Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {
         iiFile = &iFile;
         getDimLength();
         if (isWrfoutFile) {
@@ -42,6 +42,7 @@ namespace TTCore {
         
         // std::cout << a << std::endl;
         // iFile = netCDF::NcFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read)
+        checkDirAndCreate("stepFile");
     }
 
     //Processor::Processor(netCDF::NcFile& iFile, bool isWrfoutFile, const std::string& dumpDirectory) {
@@ -81,10 +82,10 @@ namespace TTCore {
         auto msfm = ThreeDArray(nt, ny, nx);
         inFile->getVar("MAPFAC_M").getVar(msfm.get());
         auto u = ThreeDArray(nt, ny, nx + 1), msfu = ThreeDArray(nt, ny, nx + 1);
-        inFile->getVar("U").getVar({ 0,6,0,0 }, { nt,1,ny,nx + 1 }, u.get());
+        inFile->getVar("U").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny,nx + 1 }, u.get());
         inFile->getVar("MAPFAC_U").getVar(msfu.get());
         auto v = ThreeDArray(nt, ny + 1, nx), msfv = ThreeDArray(nt, ny + 1, nx);
-        inFile->getVar("V").getVar({ 0,6,0,0 }, { nt,1,ny + 1,nx }, v.get());
+        inFile->getVar("V").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny + 1,nx }, v.get());
         inFile->getVar("MAPFAC_V").getVar(msfv.get());
 
         for (int k = 0; k < nt; ++k) {
@@ -613,13 +614,14 @@ namespace TTCore {
     /// @param folderName 文件夹名称
     void Processor::checkDirAndCreate(const std::string& folderName) {
         //std::filesystem::path dumpDir("E:\\University\\TC_Tracker\\data\\stepFile\\");
-        if (dumpDir.empty()) {
-            std::cout << "未设定中间文件的储存位置，将中间文件储存在exe文件的位置下" << std::endl;
-            dumpDir = boost::dll::program_location().parent_path().string();
+        if (!dumpDir.empty()) {
+            return;
         }
+        std::cout << "未设定中间文件的储存位置，将中间文件储存在exe文件的位置下" << std::endl;
+        dumpDir = boost::dll::program_location().parent_path().string();
         std::filesystem::path dumpDir(dumpDir);
         std::filesystem::path folderPath = dumpDir / folderName;
-        //std::cout << folderPath << std::endl;
+
         // 文件或文件夹不存在，创建文件夹
         if (!std::filesystem::exists(folderPath)) {
             std::filesystem::create_directories(folderPath);
@@ -633,24 +635,25 @@ namespace TTCore {
 
     }
 
-    void Processor::dumpStep1() {
-        checkDirAndCreate("step1");
+    void Processor::dumpStep1(const std::string ncFilePath) {
+        //checkDirAndCreate("step1");
         //nlohmann::json j(allVortexes);
         //std::string jsonArray = j.dump();
         //std::ofstream o(dumpDir+"pretty.json");
         //o << std::setw(4) << j << std::endl;
+
         std::filesystem::path stepDumpDir(dumpDir);
-        std::ofstream ofs(stepDumpDir / "step1\\step1.dat", std::ios::binary);
+        std::ofstream ofs(stepDumpDir / (std::filesystem::path(ncFilePath).stem().string() + "_step1.dat"), std::ios::binary);
         boost::archive::binary_oarchive oa(ofs);
         // write class instance to archive
         std::cout << "msg from dump step1, vortex number: " << allVortexes.size() << std::endl;
         oa << hasTC_timeIndex << allVortexes;
     }
 
-    void Processor::dumpStep2() {
-        checkDirAndCreate("step2");
+    void Processor::dumpStep2(const std::string ncFilePath) {
+        //checkDirAndCreate("step2");
         std::filesystem::path stepDumpDir(dumpDir);
-        std::ofstream ofs(stepDumpDir / "step2\\step2.dat", std::ios::binary);
+        std::ofstream ofs(stepDumpDir / (std::filesystem::path(ncFilePath).stem().string() + "_step2.dat"), std::ios::binary);
         boost::archive::binary_oarchive oa(ofs);
         oa << realTCs;
 
@@ -665,10 +668,10 @@ namespace TTCore {
         //std::cout << pnpolys(20.260121, 107.827437) << std::endl;  // false
     }
 
-    void Processor::dumpStep3() {
-        checkDirAndCreate("step3");
+    void Processor::dumpStep3(const std::string ncFilePath) {
+        //checkDirAndCreate("step3");
         std::filesystem::path stepDumpDir(dumpDir);
-        std::ofstream ofs(stepDumpDir / "step3\\step3.dat", std::ios::binary);
+        std::ofstream ofs(stepDumpDir / (std::filesystem::path(ncFilePath).stem().string() + "_step3.dat"), std::ios::binary);
         boost::archive::binary_oarchive oa(ofs);
         oa << realTCs;
     }

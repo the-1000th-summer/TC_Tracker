@@ -66,8 +66,6 @@ namespace TC_Tracker {
             Console.WriteLine("asdsfd");
         }
 
-        
-
         private void OKbutton_Click(object sender, RoutedEventArgs e) {
             var dirIsValid = checkDirIsValid();
             if (!dirIsValid) {
@@ -88,6 +86,13 @@ namespace TC_Tracker {
                 MessageBox.Show("文件夹不存在！");
                 return false;
             }
+            // 暂且不使用子文件夹
+            //return checkSubDirIsValid();
+
+            return true;
+        }
+
+        private bool checkSubDirIsValid() {
             string[] stepsFolderName = { "step1", "step2", "step3" };
             foreach (string folderName in stepsFolderName) {
                 //Console.WriteLine(i);

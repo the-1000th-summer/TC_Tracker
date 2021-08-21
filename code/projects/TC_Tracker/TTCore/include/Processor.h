@@ -15,7 +15,7 @@ namespace TTCore {
 
     class Processor {
     public:
-        Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &latVName="", const std::string& lonVName="", const std::string& vorVName="", const std::string& dumpDirectory="");
+        Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &latVName="", const std::string& lonVName="", const std::string& vorVName="", int zLevelIndex=-1, const std::string& dumpDirectory="");
 
         //Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
         ~Processor();
@@ -32,9 +32,9 @@ namespace TTCore {
 
         inline void removeVortex(ThreeDArray &vorField, int timeIndex, std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex);
 
-        void dumpStep1();
-        void dumpStep2();
-        void dumpStep3();
+        void dumpStep1(const std::string ncFilePath);
+        void dumpStep2(const std::string ncFilePath);
+        void dumpStep3(const std::string ncFilePath);
         void getStep1DataFromFile(const std::string &filePath);
         void getStep2DataFromFile(const std::string &filePath);
         void copyRealTCs(std::vector<Typhoon> &tcs);
@@ -45,6 +45,7 @@ namespace TTCore {
         std::string latVarName;
         std::string lonVarName;
         std::string vorVarName;
+        int zLevelIndex = -1;
         std::string dumpDir;
         unsigned long timeLength = 0;
         unsigned long latGridNum = 0;

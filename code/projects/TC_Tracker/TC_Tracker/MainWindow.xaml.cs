@@ -60,20 +60,28 @@ namespace TC_Tracker {
                 RaisePropertyChanged("selectedFile");
             }
         }
-        private bool _trackFinished = false;
-        public bool trackFinished {
-            get { return _trackFinished; }
-            set {
-                _trackFinished = value;
-                RaisePropertyChanged("trackFinished");
-            }
-        }
         private bool _varNameSelected = false;
         public bool varNameSelected {
             get { return _varNameSelected; }
             set {
                 _varNameSelected = value;
                 RaisePropertyChanged("varNameSelected");
+            }
+        }
+        private bool _zDimLvCanSelect = false;
+        public bool zDimLvCanSelect {
+            get { return _zDimLvCanSelect; }
+            set {
+                _zDimLvCanSelect = value;
+                RaisePropertyChanged("zDimLvCanSelect");
+            }
+        }
+        private bool _trackFinished = false;
+        public bool trackFinished {
+            get { return _trackFinished; }
+            set {
+                _trackFinished = value;
+                RaisePropertyChanged("trackFinished");
             }
         }
 
@@ -125,6 +133,7 @@ namespace TC_Tracker {
             //dialog.is
             //dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+                trackFinished = false;
                 var selectDir = dialog.FileName;
                 Debug.WriteLine(selectDir);
 
@@ -136,6 +145,7 @@ namespace TC_Tracker {
                 }
                 cSelDir = selectDir;
                 selectedFile = true;
+                checkIsWrfoutFile();
             }
         }
 
@@ -157,14 +167,21 @@ namespace TC_Tracker {
             setVarNameLabel("未指定", "未指定", "未指定");
         }
 
-        /// <summary>
-        /// 保存工作文件夹字符串到settings中
-        /// </summary>
-        /// <param name="text"></param>
-        //private void saveSelectDir(string text) {
-        //    Properties.Settings.Default.selectDir = text;
-        //    Properties.Settings.Default.Save();
-        //}
+        private void checkIsWrfoutFile() {
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", "");
+            var exceptionInfo = "";
+            var isWrfoutFile = fileInfo.checkIsWrfoutFile(ref exceptionInfo);
+
+            if (isWrfoutFile) {
+                isNotWrfoutFile = false;
+                varNameSelected = true;
+                setVarNameLabel("XLAT", "XLONG", "---");
+                handleZLevelDim();
+            } else {
+                isNotWrfoutFile = true;
+                setVarNameLabel("未指定", "未指定", "未指定");
+            }
+        }
 
         /// <summary>
         /// 点击选择变量按钮
@@ -195,15 +212,16 @@ namespace TC_Tracker {
             var zLvDimLen = fileInfo.getZLvDimLenName(ref zLvDimName);
             
             if (zLvDimLen == 0) {    // 无z维度
-                zDimName.Content = "(无)";
-                zLvComboBox.IsEnabled = false;
+                zLvNameTextBlock.Text = "(无)";
+                zLvComboBox.SelectedIndex = -1;
+                zDimLvCanSelect = false;
                 return;
             }
-            zDimName.Content = zLvDimName;
-            zLvComboBox.IsEnabled = true;
-            var cbis = new List<int> { zLvDimLen };
-            zLvComboBox.ItemsSource = cbis;
+            zLvNameTextBlock.Text = zLvDimName;
+            List<int> zLvIndex = Enumerable.Range(1, zLvDimLen).ToList();
+            zLvComboBox.ItemsSource = zLvIndex;
             zLvComboBox.SelectedIndex = 0;
+            zDimLvCanSelect = true;
         }
 
         private System.Threading.CancellationTokenSource m_Cts;
@@ -221,7 +239,7 @@ namespace TC_Tracker {
 
             //bgWorker.RunWorkerAsync();
 
-            syncRun();
+            asyncRun();
         }
 
         private void stopButtonClicked(object sender, RoutedEventArgs e) {
@@ -231,19 +249,22 @@ namespace TC_Tracker {
             trackFinished = false;
         }
 
-        private async void syncRun() {
+        private async void asyncRun() {
             m_Cts = new System.Threading.CancellationTokenSource();
             m_Ct = m_Cts.Token;
-
+            var selectedIndex = zLvComboBox.SelectedIndex;
             await Task.Factory.StartNew(() => {
                 // Launching a cancelable operation performed by a managed C++Cli Object :
-                NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir, true);
+
+                Console.WriteLine(selectedIndex);
+                NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, selectedIndex, s_TempFileDir, true);
                 fileInfo.startTracking(realTCs, m_Ct);
+                if (m_Ct.IsCancellationRequested)
+                    return;
                 isNotTracking = true;
                 trackFinished = true;
             });
 
-            
         }
 
         /// <summary>
@@ -344,23 +365,10 @@ namespace TC_Tracker {
             Console.WriteLine("msg from step3ButtonClick, realTCs number: {0}", realTCs.Count);
         }
 
-        private void wrfoutCheckBox_Checked(object sender, RoutedEventArgs e) {
-            isNotWrfoutFile = false;
-            varNameSelected = true;
-            setVarNameLabel("XLAT", "XLONG", "---");
-            handleZLevelDim();
-        }
-        private void wrfoutCheckBox_Unchecked(object sender, RoutedEventArgs e) {
-            isNotWrfoutFile = true;
-            varNameSelected = false;
-            latVarStr = lonVarStr = vorVarStr = "";
-            setVarNameLabel("未指定", "未指定", "未指定");
-        }
-
         private void setVarNameLabel(string latLabelName, string lonLabelName, string varNameLabelName) {
-            latNameLabel.Content = latLabelName;
-            lonNameLabel.Content = lonLabelName;
-            vorNameLabel.Content = varNameLabelName;
+            latNameTextBlock.Text = latLabelName;
+            lonNameTextBlock.Text = lonLabelName;
+            vorNameTextBlock.Text = varNameLabelName;
         }
 
         private void exit_OnClick(object sender, RoutedEventArgs e) {

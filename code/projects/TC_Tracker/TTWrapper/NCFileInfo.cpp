@@ -9,8 +9,7 @@ namespace myCLI {
     NCFileInfo::NCFileInfo(String ^filePath, bool isWrfoutFile, String^ latVarName, String^ lonVarName, String^ vorVarName, String^ dumpDirectory) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName), string2Char(dumpDirectory))) {
 
     }
-    NCFileInfo::NCFileInfo(String^ filePath, bool isWrfoutFile, String^ latVarName, String^ lonVarName, String^ vorVarName, String^ dumpDirectory, bool isAsync) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName), string2Char(dumpDirectory))) {
-        /*this->unmanagedFunctionPointer = unmanagedFunctionPointer;*/
+    NCFileInfo::NCFileInfo(String^ filePath, bool isWrfoutFile, String^ latVarName, String^ lonVarName, String^ vorVarName, int zLevelIndex, String^ dumpDirectory, bool isAsync) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName), zLevelIndex, string2Char(dumpDirectory))) {
         isCanceled = new bool;
     }
 
@@ -25,13 +24,18 @@ namespace myCLI {
     }
 
     int NCFileInfo::getZLvDimLenName(String^% zLvDimName) {
-        int zLvDimLen = m_Instance->getZLvDimLenName();
+        std::string dimName = "";
+        int zLvDimLen = m_Instance->getZLvDimLenName(dimName);
+        zLvDimName = gcnew String(dimName.c_str());
         return zLvDimLen;
     }
 
-    //void NCFileInfo::openFile() {
-    //    m_Instance->openFile();
-    //}
+    bool NCFileInfo::checkIsWrfoutFile(String^% exceptionInfo) {
+        std::string eInfo = "";
+        bool isWrfoutFile = m_Instance->checkIsWrfoutFile(eInfo);
+        exceptionInfo = gcnew String(eInfo.c_str());
+        return isWrfoutFile;
+    }
 
     List<String^>^ NCFileInfo::getVarsName() {
         std::vector<std::string> varsName;

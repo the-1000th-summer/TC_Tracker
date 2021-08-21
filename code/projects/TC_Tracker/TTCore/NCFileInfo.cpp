@@ -7,7 +7,9 @@
 #include "Processor.h"
 
 namespace TTCore {
-    NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
+    NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
+    }
+    NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* latVName, const char* lonVName, const char* vorVName, int zLevelIndex, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {
     }
 
     void NCFileInfo::checkFileValid() {
@@ -26,12 +28,37 @@ namespace TTCore {
         isFileValid = true;
     }
 
-    int NCFileInfo::getZLvDimLenName() {
+    int NCFileInfo::getZLvDimLenName(std::string& zLvDimName) {
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-        auto uVar = f.getVar("U");
+        auto uVar = f.getVar(isWrfoutFile ? "U" : vorVarName);
         if (uVar.getDimCount() != 4)
             return 0;
+        zLvDimName = uVar.getDim(1).getName();
+        std::cout << "ZName: " << zLvDimName << std::endl;
         return uVar.getDim(1).getSize();
+    }
+
+    bool NCFileInfo::checkIsWrfoutFile(std::string& exceptionInfo) {
+        netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+        for (const std::string &dimName : {"Time", "south_north", "west_east"}) {
+            if (f.getDim(dimName).isNull()) {
+                exceptionInfo = "No dimension: " + dimName;
+                return false;
+            } 
+        }
+        for (const std::string& globalAttName : { "DX", "DY" }) {
+            if (f.getAtt(globalAttName).isNull()) {
+                exceptionInfo = "No global attribute: " + globalAttName;
+                return false;
+            }
+        }
+        for (const std::string& varName : { "U", "V", "MAPFAC_U", "MAPFAC_V", "MAPFAC_M"}) {
+            if (f.getVar(varName).isNull()) {
+                exceptionInfo = "No variable: " + varName;
+                return false;
+            }
+        }
+        return true;
     }
 
     void NCFileInfo::getLatLonData(std::vector<float>& latData, std::vector<float>& lonData) {
@@ -54,17 +81,17 @@ namespace TTCore {
         
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
 
-        Processor p(isCanceled, f, isWrfoutFile, latVarName, lonVarName, vorVarName, dumpDir);
+        Processor p(isCanceled, f, isWrfoutFile, latVarName, lonVarName, vorVarName, zLevelIndex, dumpDir);
 
         p.recognizeTyphoon();
         if (*isCanceled) return;
-        p.dumpStep1();
+        p.dumpStep1(ncFilePath);
         std::cout << "finish dump step1." << std::endl;
         p.getRealTC();
-        p.dumpStep2();
+        p.dumpStep2(ncFilePath);
 
         p.removeNoise();
-        p.dumpStep3();
+        p.dumpStep3(ncFilePath);
 
         p.copyRealTCs(tcs);
     }

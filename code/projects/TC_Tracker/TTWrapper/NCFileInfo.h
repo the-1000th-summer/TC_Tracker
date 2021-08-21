@@ -24,12 +24,13 @@ namespace myCLI {
     public:
         // 无法在managed class的方法里使用optional paramater
         NCFileInfo(String ^filePath, bool isWrfoutFile, String ^latVarName, String ^lonVarName, String ^vorVarName, String ^dumpDirectory);
-        NCFileInfo(String^ filePath, bool isWrfoutFile, String^ latVarName, String^ lonVarName, String^ vorVarName, String^ dumpDirectory, bool isAsync);
+        NCFileInfo(String^ filePath, bool isWrfoutFile, String^ latVarName, String^ lonVarName, String^ vorVarName, int zLevelIndex, String^ dumpDirectory, bool isAsync);
         ~NCFileInfo() { if (isCanceled != nullptr) delete isCanceled; isCanceled = nullptr; }
         !NCFileInfo() { if (isCanceled != nullptr) delete isCanceled; isCanceled = nullptr; }
 
         bool checkFileValid(String^ %fileValidInfo);
         int getZLvDimLenName(String^ %zLvDimName);
+        bool checkIsWrfoutFile(String^ %exceptionInfo);
         //void openFile();
         List<String^>^ getVarsName();
         void getLatLonData(std::vector<float> &latData, std::vector<float>& lonData);
