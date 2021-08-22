@@ -72,37 +72,32 @@
     </script>
     <script>
         var tcIndex = 1;
+        var width = 800, height = 500;
+        var projection = d3.geo.mercator()
+            .scale(5 * (width + 1) / 2 / Math.PI)
+            .translate([width / 2, height / 2])
+            .rotate([-130, -20, 0])
+            .precision(.1);
+        var svg = d3.select("body").append("svg")
+            .attr("id", "theSvg")
+            .attr("width", width)
+            .attr("height", height);
+
         function getTcIndex() {
             return tcIndex;
         }
-        function drawPath(jsonArg) {
-            var myLatLonData = JSON.parse(jsonArg);
-
-            var width = 800, height = 500;
-
-            var projection = d3.geo.mercator()
-                .scale(5 * (width + 1) / 2 / Math.PI)
-                .translate([width / 2, height / 2])
-                .rotate([-130, -20, 0])
-                .precision(.1);
+        function drawBaseMap() {
 
             var landPath = d3.geo.path()
                 .projection(projection);
 
             var graticule = d3.geo.graticule();
 
-            var svg = d3.select("body").append("svg")
-                .attr("width", width)
-                .attr("height", height);
             // 经纬度线
             svg.append("path")
                 .datum(graticule)
                 .attr("class", "graticule")
                 .attr("d", landPath);
-
-            // d3.json("track.json", function(error, track) {
-            //track = [{ "lat": 5.8, "lon": 157.2 }, { "lat": 6.1, "lon": 155.5 }, { "lat": 6.1, "lon": 153.3 }, { "lat": 6.1, "lon": 152.2 }, { "lat": 6.2, "lon": 150.4 }, { "lat": 6.3, "lon": 148.8 }, { "lat": 6.5, "lon": 147.2 }, { "lat": 6.5, "lon": 145.9 }, { "lat": 6.5, "lon": 144.6 }, { "lat": 6.9, "lon": 142.9 }, { "lat": 7.1, "lon": 141.3 }, { "lat": 7.3, "lon": 139.7 }, { "lat": 7.6, "lon": 138.0 }, { "lat": 7.9, "lon": 136.2 }, { "lat": 8.2, "lon": 134.4 }, { "lat": 8.7, "lon": 132.8 }, { "lat": 9.3, "lon": 131.1 }, { "lat": 10.2, "lon": 129.1 }, { "lat": 10.6, "lon": 126.9 }, { "lat": 11.0, "lon": 124.8 }, { "lat": 11.4, "lon": 122.5 }, { "lat": 11.9, "lon": 120.5 }, { "lat": 12.2, "lon": 118.0 }, { "lat": 12.3, "lon": 116.6 }, { "lat": 13.5, "lon": 114.8 }, { "lat": 14.4, "lon": 113.1 }, { "lat": 15.4, "lon": 111.4 }, { "lat": 16.5, "lon": 110.3 }, { "lat": 17.9, "lon": 109.0, }, { "lat": 19.4, "lon": 108.0 }, { "lat": 20.4, "lon": 107.5 }, { "lat": 21.5, "lon": 107.1 }, { "lat": 22.4, "lon": 107.7 }];
-
             d3.json("https://unpkg.com/world-atlas@1/world/50m.json", function (error, world) {
                 console.log("fetch json succeed.");
                 // 海岸线
@@ -115,102 +110,112 @@
                     .datum(topojson.mesh(world, world.objects.countries, function (a, b) { return a !== b; }))
                     .attr("class", "boundary")
                     .attr("d", landPath);
-
-                var tcPathLine = d3.svg.line()
-                    .interpolate("cardinal")
-                    .x(function (d) { return projection([d.lon, d.lat])[0]; })
-                    .y(function (d) { return projection([d.lon, d.lat])[1]; });
-
-                var outOfouter = svg.append("g");
-
-                var haiyanPath = svg.append("g")
-                    .selectAll("path")
-                    .data(myLatLonData).enter()
-                    .append("path")
-                    // .attr("d", pathLine(track[ii]))
-                    .attr("d", function (d) { return tcPathLine(d) })
-                    .attr("class", "path")
-                    .attr('pointer-events', 'none');
- 
-                //for (j = 0; j < myLatLonData[i].length; ++j) {
-                //    var bb = myLatLonData[i][j]
-                //    var haiyanCircle = svg.append("circle")
-                //        .attr("r", 3)
-                //        .attr("cx", projection([bb.lon, bb.lat])[0])
-                //        .attr("cy", projection([bb.lon, bb.lat])[1])
-                //}
-
-                var outer = outOfouter
-                    .selectAll("path")
-                    .data(myLatLonData).enter()
-                    .append("g")
-                    .attr("opacity", "0.3")
-                    .on("mouseover", function () {
-                        var node = this.parentNode.firstChild;
-                        while (node) {
-                            if (node !== this && node.nodeType === Node.ELEMENT_NODE) {
-                                d3.select(node)
-                                    .attr("opacity", "0");
-                            }
-                            // node = node.nextElementSibling || node.nextSibling;
-                            node = node.nextSibling;
-                        }
-                        d3.select(this)
-                            .attr("opacity", "1")
-                    })
-                    .on("mouseout", function () {
-                        //d3.select(this)
-                        //   .attr("opacity", "0.5")
-                        var node = this.parentNode.firstChild;
-                        while (node) {
-                            if (node !== this && node.nodeType === Node.ELEMENT_NODE) {
-                                d3.select(node)
-                                    .attr("opacity", "0.3");
-                            }
-                            // node = node.nextElementSibling || node.nextSibling;
-                            node = node.nextSibling;
-                        }
-                    });
-
-                /*Create and place the "blocks" containing the circle and the text */
-                var elemEnter = outer.selectAll("g")
-                    .data(function (d) { return d; }).enter()
-                    .append("g")
-                    .attr("transform", function (d) { return "translate(" + projection([d.lon, d.lat])[0] + "," + projection([d.lon, d.lat])[1] + ")"; })
-
-                /*Create the circle for each block */
-                var circle = elemEnter.append("circle")
-                    // .attr("r", function(d){return d.r} )
-                    .attr("r", 5)
-                    .attr("stroke", "red")
-                    .attr("fill", "red")
-                    .on("mouseover", function (d, i, j) {   
-                        d3.select(this)
-                            .attr("r", 8);
-                        var myDiv = document.getElementsByClassName("myToolTipText")[0];
-                        var myDivd3 = d3.select(myDiv)
-                            .datum(d)
-                            .attr("transform", function (d) {
-                                return "translate(" + projection([d.lon, d.lat])[0] + "," + projection([d.lon, d.lat])[1] + ")";
-                            })
-                            .attr("dx", function (d) { return -50 })
-                            .attr("dy", function (d) { return -20 })
-                            .text(function (d) { return d.lon + "°E, " + d.lat + "°N: "+j });
-                        tcIndex = j;
-                    })
-                    .on("mouseout", function () {
-                        d3.select(this)
-                            .attr("r", 5);
-                        document.getElementsByClassName("myToolTipText")[0].textContent = '';
-                    })
-                    .attr('class', 'points')
-                    // .style('pointer-events', 'all');
-
-                tooltipText = d3.select("body").select("svg").append("text")
-                    .attr("class", "myToolTipText")
             });
+        }
+        function drawPath(jsonArg) {
+            var myLatLonData = JSON.parse(jsonArg);
+
+            // d3.json("track.json", function(error, track) {
+            //track = [{ "lat": 5.8, "lon": 157.2 }, { "lat": 6.1, "lon": 155.5 }, { "lat": 6.1, "lon": 153.3 }, { "lat": 6.1, "lon": 152.2 }, { "lat": 6.2, "lon": 150.4 }, { "lat": 6.3, "lon": 148.8 }, { "lat": 6.5, "lon": 147.2 }, { "lat": 6.5, "lon": 145.9 }, { "lat": 6.5, "lon": 144.6 }, { "lat": 6.9, "lon": 142.9 }, { "lat": 7.1, "lon": 141.3 }, { "lat": 7.3, "lon": 139.7 }, { "lat": 7.6, "lon": 138.0 }, { "lat": 7.9, "lon": 136.2 }, { "lat": 8.2, "lon": 134.4 }, { "lat": 8.7, "lon": 132.8 }, { "lat": 9.3, "lon": 131.1 }, { "lat": 10.2, "lon": 129.1 }, { "lat": 10.6, "lon": 126.9 }, { "lat": 11.0, "lon": 124.8 }, { "lat": 11.4, "lon": 122.5 }, { "lat": 11.9, "lon": 120.5 }, { "lat": 12.2, "lon": 118.0 }, { "lat": 12.3, "lon": 116.6 }, { "lat": 13.5, "lon": 114.8 }, { "lat": 14.4, "lon": 113.1 }, { "lat": 15.4, "lon": 111.4 }, { "lat": 16.5, "lon": 110.3 }, { "lat": 17.9, "lon": 109.0, }, { "lat": 19.4, "lon": 108.0 }, { "lat": 20.4, "lon": 107.5 }, { "lat": 21.5, "lon": 107.1 }, { "lat": 22.4, "lon": 107.7 }];
+
+            var tcPathLine = d3.svg.line()
+                .interpolate("cardinal")
+                .x(function (d) { return projection([d.lon, d.lat])[0]; })
+                .y(function (d) { return projection([d.lon, d.lat])[1]; });
+
+            var outOfouter = svg.append("g");
+
+            var haiyanPath = svg.append("g")
+                .selectAll("path")
+                .data(myLatLonData).enter()
+                .append("path")
+                // .attr("d", pathLine(track[ii]))
+                .attr("d", function (d) { return tcPathLine(d) })
+                .attr("class", "path")
+                .attr('pointer-events', 'none');
+ 
+            //for (j = 0; j < myLatLonData[i].length; ++j) {
+            //    var bb = myLatLonData[i][j]
+            //    var haiyanCircle = svg.append("circle")
+            //        .attr("r", 3)
+            //        .attr("cx", projection([bb.lon, bb.lat])[0])
+            //        .attr("cy", projection([bb.lon, bb.lat])[1])
+            //}
+
+            var outer = outOfouter
+                .selectAll("path")
+                .data(myLatLonData).enter()
+                .append("g")
+                .attr("opacity", "0.3")
+                .on("mouseover", function () {
+                    var node = this.parentNode.firstChild;
+                    while (node) {
+                        if (node !== this && node.nodeType === Node.ELEMENT_NODE) {
+                            d3.select(node)
+                                .attr("opacity", "0");
+                        }
+                        // node = node.nextElementSibling || node.nextSibling;
+                        node = node.nextSibling;
+                    }
+                    d3.select(this)
+                        .attr("opacity", "1")
+                })
+                .on("mouseout", function () {
+                    //d3.select(this)
+                    //   .attr("opacity", "0.5")
+                    var node = this.parentNode.firstChild;
+                    while (node) {
+                        if (node !== this && node.nodeType === Node.ELEMENT_NODE) {
+                            d3.select(node)
+                                .attr("opacity", "0.3");
+                        }
+                        // node = node.nextElementSibling || node.nextSibling;
+                        node = node.nextSibling;
+                    }
+                });
+
+            /*Create and place the "blocks" containing the circle and the text */
+            var elemEnter = outer.selectAll("g")
+                .data(function (d) { return d; }).enter()
+                .append("g")
+                .attr("transform", function (d) { return "translate(" + projection([d.lon, d.lat])[0] + "," + projection([d.lon, d.lat])[1] + ")"; })
+
+            /*Create the circle for each block */
+            var circle = elemEnter.append("circle")
+                // .attr("r", function(d){return d.r} )
+                .attr("r", 5)
+                .attr("stroke", "red")
+                .attr("fill", "red")
+                .on("mouseover", function (d, i, j) {   
+                    d3.select(this)
+                        .attr("r", 8);
+                    var myDiv = document.getElementsByClassName("myToolTipText")[0];
+                    var myDivd3 = d3.select(myDiv)
+                        .datum(d)
+                        .attr("transform", function (d) {
+                            return "translate(" + projection([d.lon, d.lat])[0] + "," + projection([d.lon, d.lat])[1] + ")";
+                        })
+                        .attr("dx", function (d) { return -50 })
+                        .attr("dy", function (d) { return -20 })
+                        .text(function (d) { return d.lon + "°E, " + d.lat + "°N: "+j });
+                    tcIndex = j;
+                })
+                .on("mouseout", function () {
+                    d3.select(this)
+                        .attr("r", 5);
+                    document.getElementsByClassName("myToolTipText")[0].textContent = '';
+                })
+                .attr('class', 'points')
+                // .style('pointer-events', 'all');
+
+            tooltipText = d3.select("body").select("svg").append("text")
+                .attr("class", "myToolTipText")
 
             d3.select(self.frameElement).style("height", height + "px");
+        }
+        function delPath() {
+            var mySvg = document.getElementById("theSvg");
+            d3.select(mySvg).selectAll("g").remove()
         }
     </script>
 

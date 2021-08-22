@@ -7,5 +7,7 @@
         <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <local:BooleanAndConverter x:Key="booleanAndConverter" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <local:PrevPageBtnConverter x:Key="PrevPageBtnConverter"/>
+        <local:NextPageBtnConverter x:Key="NextPageBtnConverter"/>
     </Application.Resources>
 </Application>

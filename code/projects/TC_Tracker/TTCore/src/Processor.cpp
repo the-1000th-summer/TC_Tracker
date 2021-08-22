@@ -395,8 +395,8 @@ namespace TTCore {
             if ((tcStartLon == tcEndLon) && (tcStartLat == tcEndLat)) {
                 addRMIndex(i);
             // 去除小于3个点的轨迹
-            //} else if (realTC.maxVorCells.size() < 9) {
-            //    addRMIndex(i);
+            } else if (realTC.maxVorCells.size() < 9) {
+                addRMIndex(i);
             // 去除一直在东边的轨迹
             } else if ((tcStartLon >= 170) && (tcEndLon >= 170)) {
                 addRMIndex(i);

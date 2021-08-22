@@ -116,4 +116,10 @@ namespace myCLI {
         m_Instance->exportFile(string2Char(outFilePath));
     }
 
+    void NCFileInfo::getDataFromStep3File(String^ inFilePath, List<Typhoon^>^ outTCs) {
+        std::vector<TTCore::Typhoon> inTCs{};
+        m_Instance->getDataFromStep3File(string2Char(inFilePath), inTCs);
+        copyToManaged(inTCs, outTCs);
+    }
+
 }

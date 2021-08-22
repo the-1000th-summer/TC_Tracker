@@ -48,7 +48,7 @@ namespace myCLI {
         //}
         void exportFile(String ^inFilePath, String^ outFilePath);
         void exportFile(String^ outFilePath);
-
+        void getDataFromStep3File(String^ inFilePath, List<Typhoon^>^ outTCs);
     private:
         bool *isCanceled;
         //void (*unmanagedFunctionPointer)(bool*);

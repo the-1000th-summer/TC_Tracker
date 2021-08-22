@@ -25,6 +25,7 @@
             <MenuItem Header="文件(_F)">
                 <MenuItem x:Name="menu_selDir" Header="选择文件(_O)" Click="browseButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}" />
                 <MenuItem x:Name="menu_exportJson" Header="从step3文件导出json..." Click="menu_exportJson_Click" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}" />
+                <MenuItem x:Name="menu_drawStep3" Header="导入step3文件以查看结果..." Click="menu_drawStep3_Click" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}" />
                 <MenuItem Header="退出(_X)" Click="exit_OnClick" />
             </MenuItem>
             <MenuItem Header="偏好设置(_P)">

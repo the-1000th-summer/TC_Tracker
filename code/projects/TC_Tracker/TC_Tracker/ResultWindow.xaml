@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TC_Tracker"
+        x:Name="resultWin"
         mc:Ignorable="d"
         Title="ResultWindow" Height="720" Width="1280">
     <Window.Resources>
@@ -15,6 +16,18 @@
     <Grid>
 
         <WebBrowser x:Name="webBrowser" Margin="0,0,135,0" LoadCompleted="loadCompletedHandler"/>
+        <Button x:Name="prevPageBtn" Content="&lt;" HorizontalAlignment="Left" Margin="1141,620,0,0" VerticalAlignment="Top" Width="20" Click="prevPageBtn_Click" Height="20" IsEnabled="{Binding ElementName=resultWin, Path=currentPage, Converter={StaticResource PrevPageBtnConverter}}"/>
+        <Button x:Name="nextPageBtn" Content=">" HorizontalAlignment="Left" Margin="1250,620,0,0" VerticalAlignment="Top" Width="20" Height="20" Click="nextPageBtn_Click">
+            <Button.IsEnabled>
+                <MultiBinding Converter="{StaticResource NextPageBtnConverter}">
+                    <Binding ElementName="resultWin" Path="currentPage" />
+                    <Binding ElementName="resultWin" Path="pages" />
+                </MultiBinding>
+            </Button.IsEnabled>
+        </Button>
+        <Label x:Name="currentPageLabel" Content="{Binding ElementName=resultWin, Path=currentPage}" HorizontalAlignment="Left" Margin="1169,617,0,0" VerticalAlignment="Top" />
+        <Label x:Name="slashLabel" Content="/" HorizontalAlignment="Left" Margin="1196,617,0,0" VerticalAlignment="Top" Height="27" Width="17"/>
+        <Label x:Name="pagesLabel" Content="{Binding ElementName=resultWin, Path=pages}" HorizontalAlignment="Left" Margin="1208,620,0,0" VerticalAlignment="Top" />
 
     </Grid>
 </Window>

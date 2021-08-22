@@ -446,5 +446,24 @@ namespace TC_Tracker {
             step3FileDir = System.IO.Path.GetDirectoryName(dialog.FileName);
             exportFile(true, dialog.FileName);
         }
+
+        private void menu_drawStep3_Click(object sender, RoutedEventArgs e) {
+            var dialog = new CommonOpenFileDialog();
+            dialog.InitialDirectory = string.IsNullOrEmpty(step3FileDir) ? "C:\\Users" : step3FileDir;
+            dialog.RestoreDirectory = true;
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                return;
+            step3FileDir = System.IO.Path.GetDirectoryName(dialog.FileName);
+
+            var tcs = new List<Typhoon>();
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", s_TempFileDir);
+            fileInfo.getDataFromStep3File(dialog.FileName, tcs);
+
+            var resultView = new ResultWindow();
+            //resultView.tcsData = realTCs.GetRange(0,1);
+            resultView.tcsData = tcs;
+            resultView.Owner = this;
+            resultView.ShowDialog();
+        }
     }
 }

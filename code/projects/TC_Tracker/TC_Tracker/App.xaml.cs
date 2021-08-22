@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -34,6 +35,28 @@ namespace TC_Tracker {
         }
 
         #endregion
+    }
+
+    public class PrevPageBtnConverter : IValueConverter {
+        public object Convert(object value, Type targetType, object parameter,
+            System.Globalization.CultureInfo culture) {
+            //if (targetType != typeof(int))
+            //    throw new InvalidOperationException("The target must be a int. target type: " + targetType.ToString());
+            return ((int)value == 1) ? false : true;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            throw new NotSupportedException();
+        }
+    }
+
+    public class NextPageBtnConverter : IMultiValueConverter {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
+            return ((int)values[0] == (int)values[1]) ? false : true;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) {
+            throw new NotSupportedException();
+        }
     }
 
     public class BooleanAndConverter : IMultiValueConverter {

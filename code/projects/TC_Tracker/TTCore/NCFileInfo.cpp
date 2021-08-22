@@ -153,8 +153,13 @@ namespace TTCore {
         //o << std::setw(4) << j << std::endl;
         jsonFile << j;
     }
-
     void NCFileInfo::exportFile(const std::string& outFilePath) {
         exportFile((std::filesystem::path(dumpDir) / (std::filesystem::path(ncFilePath).stem().string() + "_step3.dat")).string(), outFilePath);
+    }
+
+    void NCFileInfo::getDataFromStep3File(const std::string& inFilePath, std::vector<Typhoon>& tcs) {
+        std::ifstream ifs(inFilePath, std::ios::binary);
+        boost::archive::binary_iarchive ia(ifs);
+        ia >> tcs;
     }
 }

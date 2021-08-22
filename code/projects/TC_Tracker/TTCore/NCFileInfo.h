@@ -33,6 +33,8 @@ namespace TTCore {
 
         void exportFile(const std::string &inFilePath, const std::string &outFilePath);
         void exportFile(const std::string &outFilePath);
+
+        void getDataFromStep3File(const std::string& inFilePath, std::vector<Typhoon>& tcs);
     //private:
     //    netCDF::NcFile *iiFile = nullptr;
     };

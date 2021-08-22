@@ -203,10 +203,15 @@
             // tooltipDiv = d3.select("body").append("div")
             tooltipText = d3.select("body").select("svg").append("text")
                 .attr("class", "myToolTipText")
-                        
+            var mySvg = document.getElementById("mySvg");
+            console.log(mySvg);
+            var gg = d3.select(mySvg).selectAll("g");
+            console.log(gg);
         });
 
         d3.select(self.frameElement).style("height", height + "px");
+
+        
     </script>
     
 </body>
