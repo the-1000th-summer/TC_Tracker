@@ -19,6 +19,9 @@
     <Compile Update="SettingsWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="TCsJsonWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="VarSelector.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -34,6 +37,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="SettingsWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="TCsJsonWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="VarSelector.xaml">

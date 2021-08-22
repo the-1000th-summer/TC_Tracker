@@ -120,9 +120,14 @@ namespace TC_Tracker {
 
 
         private void exClick(object sender, RoutedEventArgs e) {
-            Console.WriteLine("ex 1 tc!");
             int b = (int)webBrowser.InvokeScript("getTcIndex");
             Console.WriteLine("tcindex: {0}", b);
+            var jsonWindow = new TCsJsonWindow();
+            int tcIndex = (currentPage - 1) * 10 + b;
+            jsonWindow.jsonTextBox.Text = JsonConvert.SerializeObject(tcsDataForJS[tcIndex]);
+            jsonWindow.Owner = this;
+            jsonWindow.ShowDialog();
+
         }
 
         private void prevPageBtn_Click(object sender, RoutedEventArgs e) {
