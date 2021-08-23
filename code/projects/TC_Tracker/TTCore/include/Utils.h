@@ -24,7 +24,8 @@ namespace TTCore {
         /// 认为这个是台风的最大偏心率（偏心率计算方法仍需改进）
         constexpr float TP_MIN_E = 0.9;
         /// 找出所有点的递归中限定相对涡度的最小值
-        constexpr float RECURSION_MIN_ReVOR = 30e-5;
+        extern float RECURSION_MIN_ReVOR;
+        //constexpr float RECURSION_MIN_ReVOR = 30e-5;
         //constexpr float RECURSION_MIN_ReVOR = 6e-5;
         /// 台风在一个时次内走的最远距离，超过此距离认为是两个不同的台风
         constexpr float LINK_TP_MAX_DIST = 340.0;

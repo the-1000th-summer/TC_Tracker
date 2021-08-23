@@ -66,7 +66,7 @@ void copyVarAtts(const netCDF::NcVar &inVar, netCDF::NcVar &outVar) {
     }
 }
 
-void computeAbsVort(netCDF::NcFile &inFile, ThreeDArray &av) {
+void computeAbsVort(netCDF::NcFile &inFile, ThreeDArray &rv) {
     size_t nt = inFile.getDim("Time").getSize();
     size_t ny = inFile.getDim("south_north").getSize();
     size_t nx = inFile.getDim("west_east").getSize();
@@ -110,21 +110,23 @@ void computeAbsVort(netCDF::NcFile &inFile, ThreeDArray &av) {
                     v(k,j,im1)/msfv(k,j,im1) -
                     v(k,j+1,im1)/msfv(k,j+1,im1)) / dsx * mm;
 
-                auto avort = dvdx - dudy + cor(k,j,i);
+                // auto avort = dvdx - dudy + cor(k,j,i);
                 // auto avort = dvdx - dudy;
-                av(k,j,i) = avort*1.0e5;
+                // av(k,j,i) = avort*1.0e5;
+                rv(k, j, i) = dvdx - dudy;
+
             }
         }
     }
-    std::cout << av(0,0,0) << std::endl;
-    std::cout << av(1,154,0) << std::endl;
-    std::cout << av(1,155,0) << std::endl;
+    // std::cout << av(0,0,0) << std::endl;
+    // std::cout << av(1,154,0) << std::endl;
+    // std::cout << av(1,155,0) << std::endl;
 }
 
 void toAbsoluteVort() {
     std::string fileDir = "/mnt/e/University/TC_Tracker/data/wrfFile/";
-    std::string inFilePath = fileDir + "wrfout_haimaReport_try1.nc";
-    std::string outputFilePath = fileDir + "absVor_cxx.nc";
+    std::string inFilePath = fileDir + "wrfout_d01_2016-10-19_00_00_00.nc";
+    std::string outputFilePath = fileDir + "relVor_cxx.nc";
 
     netCDF::NcFile inFile(inFilePath, netCDF::NcFile::read);
     
@@ -174,9 +176,6 @@ void toAbsoluteVort() {
 }
 
 int main(int, char**) {
-    // toAbsoluteVort();
-    std::pair<int, int> b = {5, 6};
-    auto [a, c] = b;
-    std::cout << a << c << std::endl;
+    toAbsoluteVort();
 
 }

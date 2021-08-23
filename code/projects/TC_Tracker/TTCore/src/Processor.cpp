@@ -140,6 +140,8 @@ namespace TTCore {
         } else {
             iiFile->getVar(vorVarName).getVar(vorField.get());
         }
+        Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue());
+        std::cout << "RECURSION_MIN_ReVOR: " << Constants::RECURSION_MIN_ReVOR << std::endl;
         int itsPerCheck = timeLength / 20;
         for (unsigned long timeIndex = startIndexInFile; timeIndex < timeLength; ++timeIndex) {
             // std::cout << vorVar.getName() << std::endl;

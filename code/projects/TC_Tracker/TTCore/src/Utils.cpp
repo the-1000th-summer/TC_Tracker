@@ -19,6 +19,8 @@
 
 namespace TTCore {
 
+    float Constants::RECURSION_MIN_ReVOR = 30e-5;
+
     bool UtilFunc::ifFileExists (const std::string& name) {
         struct stat buffer;
         return (stat (name.c_str(), &buffer) == 0);

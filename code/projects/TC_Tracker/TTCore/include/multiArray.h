@@ -72,12 +72,19 @@ namespace TTCore {
             auto maxElemIter = std::max_element(data.get()+index*_rows*_columns, data.get()+(index+1)*_rows*_columns);
             auto maxElemIndex = std::distance(data.get()+index*_rows*_columns, maxElemIter);
             return {{maxElemIndex/_columns, maxElemIndex%_columns}, *maxElemIter};
-    }
-    std::pair<std::tuple<int, int, int>, float> min() const {
-        auto minElemIter = std::min_element(data.get(), data.get() + _times*_rows*_columns);
-        auto minElemIndex = std::distance(data.get(), minElemIter);
-        return {{minElemIndex/(_rows*_columns), minElemIndex%(_rows*_columns)/_columns, minElemIndex%_columns}, *minElemIter};
-    }
+        }
+        std::pair<std::tuple<int, int, int>, float> min() const {
+            auto minElemIter = std::min_element(data.get(), data.get() + _times*_rows*_columns);
+            auto minElemIndex = std::distance(data.get(), minElemIter);
+            return {{minElemIndex/(_rows*_columns), minElemIndex%(_rows*_columns)/_columns, minElemIndex%_columns}, *minElemIter};
+        }
+        float avgMinValue() const {
+            float avgValue = 0;
+            for (size_t i = 0; i < _times; ++i) {
+                avgValue += (*std::min_element(i*_rows*_columns + data.get(), (i+1)*_rows*_columns + data.get()));
+            }
+            return avgValue / _times;
+        }
     // void printData() {
     //     for (int i = 0; i < 2; i++) {
     //         for (int j = 0; j < _columns; ++j) {
