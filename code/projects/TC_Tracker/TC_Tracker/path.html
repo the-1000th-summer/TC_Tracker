@@ -189,7 +189,7 @@
                 .on("mouseover", function (d, i, j) {   
                     d3.select(this)
                         .attr("r", 8);
-                    var myDiv = document.getElementsByClassName("myToolTipText")[0];
+                    var myDiv = document.getElementById("myToolTipText");
                     var myDivd3 = d3.select(myDiv)
                         .datum(d)
                         .attr("transform", function (d) {
@@ -203,19 +203,20 @@
                 .on("mouseout", function () {
                     d3.select(this)
                         .attr("r", 5);
-                    document.getElementsByClassName("myToolTipText")[0].textContent = '';
+                    document.getElementById("myToolTipText").textContent = '';
                 })
                 .attr('class', 'points')
                 // .style('pointer-events', 'all');
 
             tooltipText = d3.select("body").select("svg").append("text")
-                .attr("class", "myToolTipText")
+                .attr("id", "myToolTipText")
 
             d3.select(self.frameElement).style("height", height + "px");
         }
         function delPath() {
             var mySvg = document.getElementById("theSvg");
-            d3.select(mySvg).selectAll("g").remove()
+            d3.select(mySvg).selectAll("g").remove();
+            d3.select(mySvg).selectAll("text").remove();
         }
     </script>
 
