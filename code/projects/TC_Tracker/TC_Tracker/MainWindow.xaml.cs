@@ -203,6 +203,8 @@ namespace TC_Tracker {
                 handleZLevelDim();
             } else {
                 isNotWrfoutFile = true;
+                zDimLvCanSelect = false;
+                zLvComboBox.SelectedIndex = -1;
                 setVarNameLabel("未指定", "未指定", "未指定", "未指定");
             }
         }
