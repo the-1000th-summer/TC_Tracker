@@ -124,6 +124,8 @@ namespace TTCore {
             Constants::LINK_TP_MAX_DIST /= 60.0;
         } else if (timeUnitLen == "hours") {
             // 什么都不做
+        } else if (timeUnitLen == "days") {
+            Constants::LINK_TP_MAX_DIST *= 24.0;
         } else if (timeUnitLen == "seconds") {
             Constants::LINK_TP_MAX_DIST /= 3600.0;
         } else {

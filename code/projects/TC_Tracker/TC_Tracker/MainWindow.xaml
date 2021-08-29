@@ -46,12 +46,12 @@
             </Button.IsEnabled>
         </Button>
         <Label x:Name="timeVarLabel" Content="时间变量名：" HorizontalAlignment="Left" Margin="149,132.333,0,0" Grid.Row="1" VerticalAlignment="Top" />
-        <Label x:Name="label1" Content="纬度变量名：" HorizontalAlignment="Left" Margin="149,159.333,0,0" Grid.Row="1" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotWrfoutFile}"/>
-        <Label x:Name="label2" Content="经度变量名：" HorizontalAlignment="Left" Margin="149,189.333,0,0" Grid.Row="1" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotWrfoutFile}"/>
+        <Label x:Name="label1" Content="纬度变量名：" HorizontalAlignment="Left" Margin="149,159.333,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <Label x:Name="label2" Content="经度变量名：" HorizontalAlignment="Left" Margin="149,189.333,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Label x:Name="label3" Content="涡度变量名：" HorizontalAlignment="Left" Margin="149,219.333,0,0" Grid.Row="1" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotWrfoutFile}" Visibility="{Binding ElementName=mainWin, Path=isNotWrfoutFile, Converter={StaticResource BoolToVis}}" />
         <TextBlock x:Name="timeNameTextBlock" HorizontalAlignment="Left" Margin="236,137.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top" />
-        <TextBlock x:Name="latNameTextBlock" HorizontalAlignment="Left" Margin="236,164.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotWrfoutFile}"/>
-        <TextBlock x:Name="lonNameTextBlock" HorizontalAlignment="Left" Margin="236,194.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotWrfoutFile}"/>
+        <TextBlock x:Name="latNameTextBlock" HorizontalAlignment="Left" Margin="236,164.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
+        <TextBlock x:Name="lonNameTextBlock" HorizontalAlignment="Left" Margin="236,194.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top" />
         <TextBlock x:Name="vorNameTextBlock" HorizontalAlignment="Left" Margin="236,224.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotWrfoutFile}" Visibility="{Binding ElementName=mainWin, Path=isNotWrfoutFile, Converter={StaticResource BoolToVis}}"/>
 
         <Label x:Name="label4" Content="z方向维度名：" HorizontalAlignment="Left" Margin="395,124,0,0" Grid.Row="1" VerticalAlignment="Top"/>

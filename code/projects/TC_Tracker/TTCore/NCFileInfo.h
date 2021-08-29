@@ -28,6 +28,7 @@ namespace TTCore {
         void getLatLonData(std::vector<float> &latData, std::vector<float>& lonData);
 
         void getVarsName(std::vector<std::string>& varsName);
+        void getVorDimsName(const std::string &vorVarName, std::vector<std::string>& varsName);
         void startTracking(std::vector<Typhoon>& tcs, bool* isCanceled);
         void startFromStep2(std::vector<Typhoon>& tcs);
         void startFromStep3(std::vector<Typhoon>& tcs);

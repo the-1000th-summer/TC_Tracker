@@ -44,12 +44,20 @@ namespace myCLI {
         //Debug::WriteLine("varsName::"+varsName);
         //List<String> ^csVarsName = gcnew List<String>;
         //int a = ;
-        List<String^> ^sd = gcnew List<String^>(varsName.size());
+        List<String^> ^varsNameList = gcnew List<String^>(varsName.size());
         //varsNam
-        for (auto &f : varsName) {
-            sd->Add(gcnew String(f.c_str()));
+        for (auto &varName : varsName) {
+            varsNameList->Add(gcnew String(varName.c_str()));
         }
-        return sd;
+        return varsNameList;
+    }
+
+    void NCFileInfo::getVorDimsName(String^ vorVarName, List<String^>^ vorDimList) {
+        std::vector<std::string> vorDimVec;
+        m_Instance->getVorDimsName(string2Char(vorVarName), vorDimVec);
+        for (auto& vorDimName : vorDimVec) {
+            vorDimList->Add(gcnew String(vorDimName.c_str()));
+        }
     }
 
     void NCFileInfo::startTracking(List<Typhoon ^> ^realTCs, CancellationToken cancelToken) {

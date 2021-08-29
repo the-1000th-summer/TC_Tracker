@@ -212,11 +212,11 @@ namespace TC_Tracker {
                 varNameSelected = false;
                 return;
             }
-            //timeVarStr = (string)varSelView
+            timeVarStr = (string)varSelView.comboBox_time.SelectedValue;
             latVarStr = (string)varSelView.comboBox_lat.SelectedValue;
             lonVarStr = (string)varSelView.comboBox_lon.SelectedValue;
             vorVarStr = (string)varSelView.comboBox_vor.SelectedValue;
-            setVarNameLabel("未实现", latVarStr, lonVarStr, vorVarStr);
+            setVarNameLabel(timeVarStr, latVarStr, lonVarStr, vorVarStr);
             handleZLevelDim();
             varNameSelected = true;
 

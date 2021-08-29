@@ -33,6 +33,7 @@ namespace myCLI {
         bool checkIsWrfoutFile(String^ %exceptionInfo);
         //void openFile();
         List<String^>^ getVarsName();
+        void getVorDimsName(String ^vorVarName, List<String^>^ vorDimList);
         void getLatLonData(std::vector<float> &latData, std::vector<float>& lonData);
 
         void copyToManaged(std::vector<TTCore::Typhoon> &inTC, List<Typhoon^> ^outTC);

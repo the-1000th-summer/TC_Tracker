@@ -14,9 +14,9 @@
 #include "include/Typhoon.h"
 
 namespace TTCore {
-    NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVarName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
+    NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
     }
-    NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, int zLevelIndex, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVarName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {
+    NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, int zLevelIndex, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {
     }
 
     void NCFileInfo::checkFileValid() {
@@ -82,6 +82,14 @@ namespace TTCore {
         }
         f.close();
         //std::transform(tt.cbegin(), tt.end(), std::back_inserter(varsName), []( std::pair<std::string, netCDF::NcVar> &a) {return a.first;} );
+    }
+
+    void NCFileInfo::getVorDimsName(const std::string& vorVarName, std::vector<std::string>& varsName) {
+        netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+        auto vorVarDims = f.getVar(vorVarName).getDims();
+        for (auto const& dim : vorVarDims) {
+            varsName.push_back(dim.getName());
+        }
     }
 
     void NCFileInfo::startTracking(std::vector<Typhoon> &tcs, bool* isCanceled) {
