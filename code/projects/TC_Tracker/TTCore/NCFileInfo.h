@@ -9,6 +9,7 @@ namespace TTCore {
     public:
         std::string ncFilePath;
         //const char* ncFilePath;
+        std::string timeVarName;
         std::string latVarName;
         std::string lonVarName;
         std::string vorVarName;
@@ -18,8 +19,8 @@ namespace TTCore {
         bool isFileValid = false;
         std::string fileValidInfo;
 
-        NCFileInfo(const char* filePath, bool isWrfoutFile, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory);
-        NCFileInfo(const char *filePath, bool isWrfoutFile, const char *latVName, const char *lonVName, const char *vorVName, int zLevelIndex, const char *dumpDirectory);
+        NCFileInfo(const char* filePath, bool isWrfoutFile, const char *timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory);
+        NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char *latVName, const char *lonVName, const char *vorVName, int zLevelIndex, const char *dumpDirectory);
         void checkFileValid();
         int getZLvDimLenName(std::string &zLvDimName);
         bool checkIsWrfoutFile(std::string &exceptionInfo);

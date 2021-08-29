@@ -6,10 +6,10 @@ using namespace System::Collections::Generic;
 
 
 namespace myCLI {
-    NCFileInfo::NCFileInfo(String ^filePath, bool isWrfoutFile, String^ latVarName, String^ lonVarName, String^ vorVarName, String^ dumpDirectory) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName), string2Char(dumpDirectory))) {
+    NCFileInfo::NCFileInfo(String ^filePath, bool isWrfoutFile, String ^timeVarName, String^ latVarName, String^ lonVarName, String^ vorVarName, String^ dumpDirectory) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, string2Char(timeVarName), string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName), string2Char(dumpDirectory))) {
 
     }
-    NCFileInfo::NCFileInfo(String^ filePath, bool isWrfoutFile, String^ latVarName, String^ lonVarName, String^ vorVarName, int zLevelIndex, String^ dumpDirectory, bool isAsync) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName), zLevelIndex, string2Char(dumpDirectory))) {
+    NCFileInfo::NCFileInfo(String^ filePath, bool isWrfoutFile, String ^timeVarName, String^ latVarName, String^ lonVarName, String^ vorVarName, int zLevelIndex, String^ dumpDirectory, bool isAsync) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, string2Char(timeVarName), string2Char(latVarName), string2Char(lonVarName), string2Char(vorVarName), zLevelIndex, string2Char(dumpDirectory))) {
         isCanceled = new bool;
     }
 

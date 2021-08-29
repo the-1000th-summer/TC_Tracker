@@ -14,9 +14,9 @@
 #include "include/Typhoon.h"
 
 namespace TTCore {
-    NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
+    NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVarName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
     }
-    NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* latVName, const char* lonVName, const char* vorVName, int zLevelIndex, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {
+    NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, int zLevelIndex, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVarName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {
     }
 
     void NCFileInfo::checkFileValid() {
@@ -88,7 +88,7 @@ namespace TTCore {
         
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
 
-        Processor p(isCanceled, f, isWrfoutFile, latVarName, lonVarName, vorVarName, zLevelIndex, dumpDir);
+        Processor p(isCanceled, f, isWrfoutFile, timeVarName, latVarName, lonVarName, vorVarName, zLevelIndex, dumpDir);
 
         p.recognizeTyphoon();
         if (*isCanceled) return;

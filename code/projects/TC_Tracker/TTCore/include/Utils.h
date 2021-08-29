@@ -17,7 +17,7 @@ namespace TTCore {
         /// 一天中最多会出现的涡旋数量
         constexpr int TODAY_MAX_TP_NUM = 5;
         /// 查看相对涡度场时认为可能有台风的最小相对涡度值
-        constexpr float HAS_TP_MIN_ReVOR = 100e-5;
+        extern float HAS_TP_MIN_ReVOR;
         //constexpr float HAS_TP_MIN_ReVOR = 8e-5;
         /// 递归找出“台风”包含的所有空间点，如果点数少于这个值则认为这不是台风
         constexpr int TP_MIN_PTS = 4;
@@ -28,10 +28,10 @@ namespace TTCore {
         //constexpr float RECURSION_MIN_ReVOR = 30e-5;
         //constexpr float RECURSION_MIN_ReVOR = 6e-5;
         /// 台风在一个时次内走的最远距离，超过此距离认为是两个不同的台风
-        constexpr float LINK_TP_MAX_DIST = 340.0;
+        extern double LINK_TP_MAX_DIST;
 
-        const std::string VOR_FILE_DIR = "/mnt/e/University/TC_Tracker/data/";
-        const std::string VOR_FILE_PATH = VOR_FILE_DIR + "Vorticity_JRA-55_hourly.nc";
+        //const std::string VOR_FILE_DIR = "/mnt/e/University/TC_Tracker/data/";
+        //const std::string VOR_FILE_PATH = VOR_FILE_DIR + "Vorticity_JRA-55_hourly.nc";
 
         // constexpr int latGridNum = 41, lonGridNum = 89;
     }
@@ -52,6 +52,7 @@ namespace TTCore {
         void getLatLonData(netCDF::NcFile *iFile, const std::string& latVarName, const std::string& lonVarName, std::vector<float> &latVec, std::vector<float> &lonVec);
         void getLatLonData2d(netCDF::NcFile *iFile, unsigned long latGridNum, unsigned long lonGridNum, float* latArray2d, float* lonArray2d);
         void getVorField(netCDF::NcFile *iFile, float *vor);
+        void modifyMaxDist(netCDF::NcFile *iFile, const std::string &timeVarName);
 
         // std::pair<std::pair<int, int>, float> max_element_2d(float vorField[Constants::latGridNum][Constants::lonGridNum]);
         // template <int latGridNum, int lonGridNum>

@@ -23,8 +23,8 @@ namespace myCLI {
     public ref class NCFileInfo: public ManagedObject<TTCore::NCFileInfo> {
     public:
         // 无法在managed class的方法里使用optional paramater
-        NCFileInfo(String ^filePath, bool isWrfoutFile, String ^latVarName, String ^lonVarName, String ^vorVarName, String ^dumpDirectory);
-        NCFileInfo(String^ filePath, bool isWrfoutFile, String^ latVarName, String^ lonVarName, String^ vorVarName, int zLevelIndex, String^ dumpDirectory, bool isAsync);
+        NCFileInfo(String ^filePath, bool isWrfoutFile, String ^timeVarName, String ^latVarName, String ^lonVarName, String ^vorVarName, String ^dumpDirectory);
+        NCFileInfo(String^ filePath, bool isWrfoutFile, String ^timeVarName, String^ latVarName, String^ lonVarName, String^ vorVarName, int zLevelIndex, String^ dumpDirectory, bool isAsync);
         ~NCFileInfo() { if (isCanceled != nullptr) delete isCanceled; isCanceled = nullptr; }
         !NCFileInfo() { if (isCanceled != nullptr) delete isCanceled; isCanceled = nullptr; }
 

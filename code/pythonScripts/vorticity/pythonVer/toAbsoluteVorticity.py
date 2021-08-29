@@ -7,8 +7,8 @@ class vorConverter:
     """_"""
     def __init__(self):
         self.fileDir = '/mnt/e/University/TC_Tracker/data/wrfFile/'
-        self.filePath = self.fileDir + 'wrfout_haimaReport_try1.nc'
-        self.outputFilePath = self.fileDir + 'absVor.nc'
+        self.filePath = self.fileDir + 'wrfout_d01_2016-10-19_00_00_00.nc'
+        self.outputFilePath = self.fileDir + 'absVor_python.nc'
         self.ncFile = Dataset(self.filePath)
         self.ncFile.set_always_mask(False)
     
@@ -32,10 +32,12 @@ class vorConverter:
         outNCFile.createDimension('south_north', vorShape[1])
         outNCFile.createDimension('west_east', vorShape[2])
         outNCFile.createDimension('Time', None)
+        outNCFile.createDimension('DateStrLen', self.ncFile.dimensions['DateStrLen'].size)
 
         XTIMEVar = outNCFile.createVariable('XTIME', np.float32, ('Time',))
         XLATVar = outNCFile.createVariable('XLAT', np.float32, ('Time','south_north','west_east'))
         XLONGVar = outNCFile.createVariable('XLONG', np.float32, ('Time','south_north','west_east'))
+        TimesVar = outNCFile.createVariable('Times', 'c', ('Time', 'DateStrLen'))
         avoVar = outNCFile.createVariable('avo', np.float32, ('Time','south_north','west_east'))
 
         self.copyAttrs('XTIME',XTIMEVar)
@@ -47,6 +49,7 @@ class vorConverter:
         XTIMEVar[:] = self.ncFile.variables['XTIME'][:]
         XLATVar[:] = self.ncFile.variables['XLAT'][:]
         XLONGVar[:] = self.ncFile.variables['XLONG'][:]
+        TimesVar[:] = self.ncFile.variables['Times'][:]
         avoVar[:] = absoluteVor_850hPa
         
         outNCFile.close()

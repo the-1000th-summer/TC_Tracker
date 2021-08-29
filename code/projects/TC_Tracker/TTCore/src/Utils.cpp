@@ -20,6 +20,8 @@
 namespace TTCore {
 
     float Constants::RECURSION_MIN_ReVOR = 30e-5;
+    float Constants::HAS_TP_MIN_ReVOR = 100e-5;
+    double Constants::LINK_TP_MAX_DIST = 56.67;
 
     bool UtilFunc::ifFileExists (const std::string& name) {
         struct stat buffer;
@@ -107,6 +109,26 @@ namespace TTCore {
     /// 此函数将相对涡度从文件中提取出来
     void UtilFunc::getVorField(netCDF::NcFile *iFile, float *vor) {
         iFile->getVar("Vorticity").getVar(vor);
+    }
+
+    void UtilFunc::modifyMaxDist(netCDF::NcFile* iFile, const std::string &timeVarName) {
+        auto timeVar = iFile->getVar(timeVarName);
+        double firstValue, secondValue;
+        timeVar.getVar({0}, {1}, &firstValue);
+        timeVar.getVar({1}, {1}, &secondValue);
+        Constants::LINK_TP_MAX_DIST *= (secondValue - firstValue);
+        std::string timeUnits;
+        timeVar.getAtt("units").getValues(timeUnits);
+        std::string timeUnitLen = timeUnits.substr(0, timeUnits.find(" "));
+        if (timeUnitLen == "minutes") {
+            Constants::LINK_TP_MAX_DIST /= 60.0;
+        } else if (timeUnitLen == "hours") {
+            // 什么都不做
+        } else if (timeUnitLen == "seconds") {
+            Constants::LINK_TP_MAX_DIST /= 3600.0;
+        } else {
+            std::cout << "未知单位: " << timeUnitLen << std::endl;
+        }
     }
 
     /// 找出2d array的最大值和相应的index

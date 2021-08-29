@@ -27,7 +27,7 @@
 
 namespace TTCore {
 
-    Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {
+    Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& timeVName, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {
         iiFile = &iFile;
         getDimLength();
         if (isWrfoutFile) {
@@ -141,6 +141,7 @@ namespace TTCore {
             iiFile->getVar(vorVarName).getVar(vorField.get());
         }
         Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue());
+        Constants::HAS_TP_MIN_ReVOR = isWrfoutFile ? 100e-5 : 8e-5;
         std::cout << "RECURSION_MIN_ReVOR: " << Constants::RECURSION_MIN_ReVOR << std::endl;
         int itsPerCheck = timeLength / 20;
         for (unsigned long timeIndex = startIndexInFile; timeIndex < timeLength; ++timeIndex) {
@@ -169,6 +170,7 @@ namespace TTCore {
     /// 第二步：跟踪第一步生成的每个时次的气旋，生成真正的气旋对象。
     void Processor::getRealTC() {
         std::cout << "开始跟踪" << std::endl;
+        UtilFunc::modifyMaxDist(iiFile, isWrfoutFile ? "XTIME" : timeVarName);
 
         /// 当前时次和前一时次是否有气旋
         bool hasTCCurrentTime = false, hasTCPrevTime = false;
@@ -624,7 +626,7 @@ namespace TTCore {
         // 存在文件，重命名原有文件，并创建新文件夹
         std::filesystem::rename(folderPath, dumpDir / (folderName+".original"));
         std::filesystem::create_directories(folderPath);
-
+        this->dumpDir = folderPath.string();
     }
 
     void Processor::dumpStep1(const std::string ncFilePath) {

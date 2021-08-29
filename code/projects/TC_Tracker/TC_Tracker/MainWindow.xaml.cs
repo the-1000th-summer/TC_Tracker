@@ -54,6 +54,7 @@ namespace TC_Tracker {
             }
         }
 
+        private string timeVarStr = "";
         private string latVarStr = "";
         private string lonVarStr = "";
         private string vorVarStr = "";
@@ -164,7 +165,7 @@ namespace TC_Tracker {
         }
 
         private bool checkFileValidAndUpdateUI(string selectDir) {
-            NCFileInfo fileInfo = new NCFileInfo(selectDir, !isNotWrfoutFile, "", "", "", "");
+            NCFileInfo fileInfo = new NCFileInfo(selectDir, !isNotWrfoutFile, "", "", "", "", "");
             var fileValidInfo = "";
             var isFileValid = fileInfo.checkFileValid(ref fileValidInfo);
             Debug.WriteLine(fileValidInfo, " from cs.");
@@ -178,22 +179,23 @@ namespace TC_Tracker {
 
         private void notValidUI() {
             selVarButton.IsEnabled = false;
-            setVarNameLabel("未指定", "未指定", "未指定");
+            setVarNameLabel("未指定", "未指定", "未指定", "未指定");
         }
 
         private void checkIsWrfoutFile() {
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", "");
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", "", "");
             var exceptionInfo = "";
             var isWrfoutFile = fileInfo.checkIsWrfoutFile(ref exceptionInfo);
 
             if (isWrfoutFile) {
                 isNotWrfoutFile = false;
                 varNameSelected = true;
-                setVarNameLabel("XLAT", "XLONG", "---");
+                //timeNameTextBlock.
+                setVarNameLabel("XTIME", "XLAT", "XLONG", "---");
                 handleZLevelDim();
             } else {
                 isNotWrfoutFile = true;
-                setVarNameLabel("未指定", "未指定", "未指定");
+                setVarNameLabel("未指定", "未指定", "未指定", "未指定");
             }
         }
 
@@ -210,18 +212,18 @@ namespace TC_Tracker {
                 varNameSelected = false;
                 return;
             }
-
+            //timeVarStr = (string)varSelView
             latVarStr = (string)varSelView.comboBox_lat.SelectedValue;
             lonVarStr = (string)varSelView.comboBox_lon.SelectedValue;
             vorVarStr = (string)varSelView.comboBox_vor.SelectedValue;
-            setVarNameLabel(latVarStr, lonVarStr, vorVarStr);
+            setVarNameLabel("未实现", latVarStr, lonVarStr, vorVarStr);
             handleZLevelDim();
             varNameSelected = true;
 
         }
 
         private void handleZLevelDim() {
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
             var zLvDimName = "";
             var zLvDimLen = fileInfo.getZLvDimLenName(ref zLvDimName);
             
@@ -271,7 +273,7 @@ namespace TC_Tracker {
                 // Launching a cancelable operation performed by a managed C++Cli Object :
 
                 Console.WriteLine(selectedIndex);
-                NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, selectedIndex, s_TempFileDir, true);
+                NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, selectedIndex, s_TempFileDir, true);
                 fileInfo.startTracking(realTCs, m_Ct);
                 if (m_Ct.IsCancellationRequested)
                     return;
@@ -367,19 +369,20 @@ namespace TC_Tracker {
 
         private void step2Button_Click(object sender, RoutedEventArgs e) {
             realTCs.Clear();
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
             fileInfo.startFromStep2(realTCs);
             Console.WriteLine("msg from step2ButtonClick, realTCs number: {0}", realTCs.Count);
         }
 
         private void step3Button_Click(object sender, RoutedEventArgs e) {
             realTCs.Clear();
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
             fileInfo.startFromStep3(realTCs);
             Console.WriteLine("msg from step3ButtonClick, realTCs number: {0}", realTCs.Count);
         }
 
-        private void setVarNameLabel(string latLabelName, string lonLabelName, string varNameLabelName) {
+        private void setVarNameLabel(string timeLabelName, string latLabelName, string lonLabelName, string varNameLabelName) {
+            timeNameTextBlock.Text = timeLabelName;
             latNameTextBlock.Text = latLabelName;
             lonNameTextBlock.Text = lonLabelName;
             vorNameTextBlock.Text = varNameLabelName;
@@ -424,7 +427,7 @@ namespace TC_Tracker {
                 Console.WriteLine("filterindex: {0}", dlg.FilterIndex);
                 Console.WriteLine("filePath: {0}", outFilePath);
 
-                NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", s_TempFileDir);
+                NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", "", s_TempFileDir);
                 if (selStep3FileFirst) {
                     fileInfo.exportFile(step3FilePath, outFilePath);
                 } else {
@@ -456,7 +459,7 @@ namespace TC_Tracker {
             step3FileDir = System.IO.Path.GetDirectoryName(dialog.FileName);
 
             var tcs = new List<Typhoon>();
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", s_TempFileDir);
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", "", s_TempFileDir);
             fileInfo.getDataFromStep3File(dialog.FileName, tcs);
 
             var resultView = new ResultWindow();
