@@ -67,6 +67,14 @@ namespace TC_Tracker {
                 RaisePropertyChanged("isNotTracking");
             }
         }
+        private bool _canStop = false;
+        public bool canStop {
+            get { return _canStop; }
+            set {
+                _canStop = value;
+                RaisePropertyChanged("canStop");
+            }
+        }
         private bool _selectedFile = false;
         public bool selectedFile {
             get { return _selectedFile; }
@@ -250,8 +258,9 @@ namespace TC_Tracker {
         /// <param name="e"></param>
         private void startTrackButton_Click(object sender, RoutedEventArgs e) {
             //startTrackButton.IsEnabled = false;
-            Console.WriteLine("stack tracking.");
+            Console.WriteLine("start tracking.");
             isNotTracking = false;
+            canStop = true;
 
             //bgWorker.RunWorkerAsync();
 
@@ -259,10 +268,9 @@ namespace TC_Tracker {
         }
 
         private void stopButtonClicked(object sender, RoutedEventArgs e) {
-            Console.WriteLine("stop!");
+            Console.WriteLine("stop requested.");
+            canStop = false;
             m_Cts.Cancel();
-            isNotTracking = true;
-            trackFinished = false;
         }
 
         private async void asyncRun() {
@@ -275,10 +283,14 @@ namespace TC_Tracker {
                 Console.WriteLine(selectedIndex);
                 NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, selectedIndex, s_TempFileDir, true);
                 fileInfo.startTracking(realTCs, m_Ct);
-                if (m_Ct.IsCancellationRequested)
+                if (m_Ct.IsCancellationRequested) {
+                    isNotTracking = true;
+                    trackFinished = false;
                     return;
+                }
                 isNotTracking = true;
                 trackFinished = true;
+                canStop = false;
             });
 
         }

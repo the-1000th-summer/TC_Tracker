@@ -9,5 +9,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <local:PrevPageBtnConverter x:Key="PrevPageBtnConverter"/>
         <local:NextPageBtnConverter x:Key="NextPageBtnConverter"/>
+        <local:StartTrackLabelConverter x:Key="StartTrackLabelConverter"/>
+        <local:StopTrackLabelConverter x:Key="StopTrackLabelConverter"/>
     </Application.Resources>
 </Application>

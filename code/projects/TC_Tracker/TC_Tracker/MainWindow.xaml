@@ -57,7 +57,7 @@
         <Label x:Name="label4" Content="z方向维度名：" HorizontalAlignment="Left" Margin="395,124,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <TextBlock x:Name="zLvNameTextBlock" HorizontalAlignment="Left" Margin="483,129,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
         <Label x:Name="label5" Content="选取第                    层数据" HorizontalAlignment="Left" Margin="395,149,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <Button x:Name="startTrackButton" Content="开始识别" HorizontalAlignment="Left" Margin="346,282,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="89" Click="startTrackButton_Click">
+        <Button x:Name="startTrackButton" Content="{Binding ElementName=mainWin, Path=isNotTracking, Converter={StaticResource StartTrackLabelConverter}}" HorizontalAlignment="Left" Margin="346,282,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="89" Click="startTrackButton_Click">
             <Button.IsEnabled>
                 <MultiBinding Converter="{StaticResource booleanAndConverter}">
                     <Binding ElementName="mainWin" Path="selectedFile" />
@@ -66,7 +66,14 @@
                 </MultiBinding>
             </Button.IsEnabled>
         </Button>
-        <Button x:Name="stopButton" Content="中止" HorizontalAlignment="Left" Margin="610,282,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-0.256,0.391" Height="23" Width="55" Click="stopButtonClicked" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking, Converter={StaticResource InverseBooleanConverter}}" />
+        <Button x:Name="stopButton" HorizontalAlignment="Left" Margin="610,282.333,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-0.256,0.391" Height="28" Width="78" Click="stopButtonClicked" IsEnabled="{Binding ElementName=mainWin, Path=canStop}" >
+            <Button.Content>
+                <MultiBinding Converter="{StaticResource StopTrackLabelConverter}">
+                    <Binding ElementName="mainWin" Path="isNotTracking" />
+                    <Binding ElementName="mainWin" Path="canStop" />
+                </MultiBinding>
+            </Button.Content>
+        </Button>
         <Button x:Name="showWebButton" Content="查看结果..." HorizontalAlignment="Left" Margin="495,355,0,0" Grid.Row="1" VerticalAlignment="Top" Click="showWebButton_Click">
             <Button.IsEnabled>
                 <MultiBinding Converter="{StaticResource booleanAndConverter}">

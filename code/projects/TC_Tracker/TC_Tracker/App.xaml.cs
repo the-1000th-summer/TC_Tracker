@@ -49,11 +49,35 @@ namespace TC_Tracker {
         }
     }
 
+    public class StartTrackLabelConverter : IValueConverter {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+            if (!(value is bool))
+                throw new InvalidOperationException("The target must be a boolean. target type: " + value.GetType().ToString());
+            return (bool)value ? "开始识别" : "识别中...";
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            throw new NotSupportedException();
+        }
+    }
+    public class StopTrackLabelConverter : IMultiValueConverter {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
+            if (!(values[0] is bool) && !(values[1] is bool))
+                throw new InvalidOperationException("The target must be a boolean. target type: " + values[0].GetType().ToString());
+            if ((bool)values[0])
+                return "中止";
+            if (!(bool)values[1])
+                return "正在中止...";
+            return "中止";
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) {
+            throw new NotSupportedException();
+        }
+    }
+
     public class NextPageBtnConverter : IMultiValueConverter {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
             return ((int)values[0] == (int)values[1]) ? false : true;
         }
-
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) {
             throw new NotSupportedException();
         }

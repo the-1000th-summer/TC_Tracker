@@ -42,7 +42,7 @@ namespace TTCore {
         
         // std::cout << a << std::endl;
         // iFile = netCDF::NcFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read)
-        checkDirAndCreate("stepFile");
+        checkDirAndCreate(Constants::STEP_FILE_NAME);
     }
 
     //Processor::Processor(netCDF::NcFile& iFile, bool isWrfoutFile, const std::string& dumpDirectory) {
@@ -615,6 +615,7 @@ namespace TTCore {
         dumpDir = boost::dll::program_location().parent_path().string();
         std::filesystem::path dumpDir(dumpDir);
         std::filesystem::path folderPath = dumpDir / folderName;
+        this->dumpDir = folderPath.string();
 
         // 文件或文件夹不存在，创建文件夹
         if (!std::filesystem::exists(folderPath)) {
@@ -626,14 +627,14 @@ namespace TTCore {
         // 存在文件，重命名原有文件，并创建新文件夹
         std::filesystem::rename(folderPath, dumpDir / (folderName+".original"));
         std::filesystem::create_directories(folderPath);
-        this->dumpDir = folderPath.string();
+        
     }
 
     void Processor::dumpStep1(const std::string ncFilePath) {
         //checkDirAndCreate("step1");
 
         std::filesystem::path stepDumpDir(dumpDir);
-        std::ofstream ofs(stepDumpDir / (std::filesystem::path(ncFilePath).stem().string() + "_step1.dat"), std::ios::binary);
+        std::ofstream ofs(stepDumpDir / ( std::filesystem::path(ncFilePath).stem().string() + "_step1.dat" ), std::ios::binary);
         boost::archive::binary_oarchive oa(ofs);
         // write class instance to archive
         std::cout << "msg from dump step1, vortex number: " << allVortexes.size() << std::endl;

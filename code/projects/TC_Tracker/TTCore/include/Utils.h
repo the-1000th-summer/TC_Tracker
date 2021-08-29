@@ -30,6 +30,7 @@ namespace TTCore {
         /// 台风在一个时次内走的最远距离，超过此距离认为是两个不同的台风
         extern double LINK_TP_MAX_DIST;
 
+        const std::string STEP_FILE_NAME = "stepFile";
         //const std::string VOR_FILE_DIR = "/mnt/e/University/TC_Tracker/data/";
         //const std::string VOR_FILE_PATH = VOR_FILE_DIR + "Vorticity_JRA-55_hourly.nc";
 
