@@ -10,39 +10,45 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="AboutWindow.xaml.cs">
+    <Compile Update="otherWindow\AboutWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="ResultWindow.xaml.cs">
+    <Compile Update="otherWindow\ParaSelWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="SettingsWindow.xaml.cs">
+    <Compile Update="otherWindow\ResultWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="TCsJsonWindow.xaml.cs">
+    <Compile Update="otherWindow\SettingsWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="VarSelector.xaml.cs">
+    <Compile Update="otherWindow\TCsJsonWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="otherWindow\VarSelector.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="AboutWindow.xaml">
+    <Page Update="otherWindow\AboutWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="ResultWindow.xaml">
+    <Page Update="otherWindow\ParaSelWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="SettingsWindow.xaml">
+    <Page Update="otherWindow\ResultWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="TCsJsonWindow.xaml">
+    <Page Update="otherWindow\SettingsWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="VarSelector.xaml">
+    <Page Update="otherWindow\TCsJsonWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="otherWindow\VarSelector.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

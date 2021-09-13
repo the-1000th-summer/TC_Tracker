@@ -34,9 +34,9 @@
             </MenuItem>
         </Menu>
         <Label x:Name="label" Content="工作文件" HorizontalAlignment="Left" Margin="28,26,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="111,30,0,0" Grid.Row="1" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="507" Height="21" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}"/>
+        <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="111,30,0,0" Grid.Row="1" Text="" TextWrapping="NoWrap" VerticalAlignment="Top" Width="507" Height="21" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}"/>
         <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="660,28,0,0" Grid.Row="1" VerticalAlignment="Top" Height="25" Width="74" Click="browseButton_Click" IsEnabled="{Binding ElementName=mainWin, Path=isNotTracking}"/>
-        <Button x:Name="selVarButton" Content="选择变量..." HorizontalAlignment="Left" Margin="166,78,0,0" Grid.Row="1" VerticalAlignment="Top" Height="27" Width="97" Click="varSelClicked" >
+        <Button x:Name="selVarButton" Content="选择变量..." HorizontalAlignment="Left" Margin="129,83.333,0,0" Grid.Row="1" VerticalAlignment="Top" Height="27" Width="97" Click="varSelClicked" >
             <Button.IsEnabled>
                 <MultiBinding Converter="{StaticResource booleanAndConverter}">
                     <Binding ElementName="mainWin" Path="selectedFile" />
@@ -45,18 +45,18 @@
                 </MultiBinding>
             </Button.IsEnabled>
         </Button>
-        <Label x:Name="timeVarLabel" Content="时间变量名：" HorizontalAlignment="Left" Margin="149,132.333,0,0" Grid.Row="1" VerticalAlignment="Top" />
-        <Label x:Name="label1" Content="纬度变量名：" HorizontalAlignment="Left" Margin="149,159.333,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <Label x:Name="label2" Content="经度变量名：" HorizontalAlignment="Left" Margin="149,189.333,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <Label x:Name="label3" Content="涡度变量名：" HorizontalAlignment="Left" Margin="149,219.333,0,0" Grid.Row="1" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotWrfoutFile}" Visibility="{Binding ElementName=mainWin, Path=isNotWrfoutFile, Converter={StaticResource BoolToVis}}" />
-        <TextBlock x:Name="timeNameTextBlock" HorizontalAlignment="Left" Margin="236,137.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top" />
-        <TextBlock x:Name="latNameTextBlock" HorizontalAlignment="Left" Margin="236,164.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
-        <TextBlock x:Name="lonNameTextBlock" HorizontalAlignment="Left" Margin="236,194.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top" />
-        <TextBlock x:Name="vorNameTextBlock" HorizontalAlignment="Left" Margin="236,224.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotWrfoutFile}" Visibility="{Binding ElementName=mainWin, Path=isNotWrfoutFile, Converter={StaticResource BoolToVis}}"/>
+        <Label x:Name="timeVarLabel" Content="时间变量名：" HorizontalAlignment="Left" Margin="112,137.333,0,0" Grid.Row="1" VerticalAlignment="Top" />
+        <Label x:Name="label1" Content="纬度变量名：" HorizontalAlignment="Left" Margin="112,164.333,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <Label x:Name="label2" Content="经度变量名：" HorizontalAlignment="Left" Margin="112,194.333,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <Label x:Name="label3" Content="涡度变量名：" HorizontalAlignment="Left" Margin="112,224.333,0,0" Grid.Row="1" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotWrfoutFile}" Visibility="{Binding ElementName=mainWin, Path=isNotWrfoutFile, Converter={StaticResource BoolToVis}}" />
+        <TextBlock x:Name="timeNameTextBlock" HorizontalAlignment="Left" Margin="199,142.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top" />
+        <TextBlock x:Name="latNameTextBlock" HorizontalAlignment="Left" Margin="199,169.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
+        <TextBlock x:Name="lonNameTextBlock" HorizontalAlignment="Left" Margin="199,199.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top" />
+        <TextBlock x:Name="vorNameTextBlock" HorizontalAlignment="Left" Margin="199,229.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top" IsEnabled="{Binding ElementName=mainWin, Path=isNotWrfoutFile}" Visibility="{Binding ElementName=mainWin, Path=isNotWrfoutFile, Converter={StaticResource BoolToVis}}"/>
 
-        <Label x:Name="label4" Content="z方向维度名：" HorizontalAlignment="Left" Margin="395,124,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <TextBlock x:Name="zLvNameTextBlock" HorizontalAlignment="Left" Margin="483,129,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
-        <Label x:Name="label5" Content="选取第                    层数据" HorizontalAlignment="Left" Margin="395,149,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <Label x:Name="label4" Content="z方向维度名：" HorizontalAlignment="Left" Margin="313,136.333,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <TextBlock x:Name="zLvNameTextBlock" HorizontalAlignment="Left" Margin="401,142.333,0,0" Grid.Row="1" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
+        <Label x:Name="label5" Content="选取第                    层数据" HorizontalAlignment="Left" Margin="313,161.333,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Button x:Name="startTrackButton" Content="{Binding ElementName=mainWin, Path=isNotTracking, Converter={StaticResource StartTrackLabelConverter}}" HorizontalAlignment="Left" Margin="346,282,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="89" Click="startTrackButton_Click">
             <Button.IsEnabled>
                 <MultiBinding Converter="{StaticResource booleanAndConverter}">
@@ -96,7 +96,7 @@
         <Button x:Name="step3Button" Content="startFromStep3" HorizontalAlignment="Left" Margin="215,328,0,0" Grid.Row="1" VerticalAlignment="Top" Height="34" Width="102" Click="step3Button_Click" IsEnabled="False" />
         <CheckBox x:Name="wrfoutCheckBox" Content="wrfout文件" HorizontalAlignment="Left" Margin="656,67,0,0" Grid.Row="1" VerticalAlignment="Top" IsEnabled="False" IsThreeState="False" IsChecked="{Binding ElementName=mainWin, Path=isNotWrfoutFile, Converter={StaticResource InverseBooleanConverter}}" />
 
-        <ComboBox x:Name="zLvComboBox" HorizontalAlignment="Left" Margin="441,152,0,0" Grid.Row="1" VerticalAlignment="Top" Width="60" Height="20">
+        <ComboBox x:Name="zLvComboBox" HorizontalAlignment="Left" Margin="359,164.333,0,0" Grid.Row="1" VerticalAlignment="Top" Width="60" Height="20">
             <ComboBox.IsEnabled>
                 <MultiBinding Converter="{StaticResource booleanAndConverter}">
                     <Binding ElementName="mainWin" Path="selectedFile" />
@@ -106,6 +106,7 @@
                 </MultiBinding>
             </ComboBox.IsEnabled>
         </ComboBox>
+        <Button x:Name="button1" Content="Button" HorizontalAlignment="Left" Margin="570,185.333,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Click="button1_Click"/>
 
 
     </Grid>

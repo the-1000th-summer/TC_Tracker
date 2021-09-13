@@ -20,7 +20,7 @@
 namespace TTCore {
 
     float Constants::RECURSION_MIN_ReVOR = 30e-5;
-    float Constants::HAS_TP_MIN_ReVOR = 100e-5;
+    //float Constants::HAS_TP_MIN_ReVOR = 100e-5;
     double Constants::LINK_TP_MAX_DIST = 56.67;
 
     bool UtilFunc::ifFileExists (const std::string& name) {

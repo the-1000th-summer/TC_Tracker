@@ -82,5 +82,17 @@ namespace TC_Tracker.Properties {
                 this["jsonFExportDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public float HTMR {
+            get {
+                return ((float)(this["HTMR"]));
+            }
+            set {
+                this["HTMR"] = value;
+            }
+        }
     }
 }

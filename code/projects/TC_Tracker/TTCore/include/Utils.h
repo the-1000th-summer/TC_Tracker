@@ -17,7 +17,7 @@ namespace TTCore {
         /// 一天中最多会出现的涡旋数量
         constexpr int TODAY_MAX_TP_NUM = 5;
         /// 查看相对涡度场时认为可能有台风的最小相对涡度值
-        extern float HAS_TP_MIN_ReVOR;
+        //extern float HAS_TP_MIN_ReVOR;
         //constexpr float HAS_TP_MIN_ReVOR = 8e-5;
         /// 递归找出“台风”包含的所有空间点，如果点数少于这个值则认为这不是台风
         constexpr int TP_MIN_PTS = 4;

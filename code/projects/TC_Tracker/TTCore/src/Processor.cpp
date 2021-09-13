@@ -72,6 +72,9 @@ namespace TTCore {
         
     }
 
+    /// 此方法计算wrfout文件的相对涡度
+    /// @param[in] inFile nc文件
+    /// @param[out] rv 存储相对涡度的变量
     void Processor::calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv) {
         size_t nt = inFile->getDim("Time").getSize();
         size_t ny = inFile->getDim("south_north").getSize();
@@ -82,10 +85,16 @@ namespace TTCore {
         auto msfm = ThreeDArray(nt, ny, nx);
         inFile->getVar("MAPFAC_M").getVar(msfm.get());
         auto u = ThreeDArray(nt, ny, nx + 1), msfu = ThreeDArray(nt, ny, nx + 1);
-        inFile->getVar("U").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny,nx + 1 }, u.get());
-        inFile->getVar("MAPFAC_U").getVar(msfu.get());
         auto v = ThreeDArray(nt, ny + 1, nx), msfv = ThreeDArray(nt, ny + 1, nx);
-        inFile->getVar("V").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny + 1,nx }, v.get());
+        if (zLevelIndex == -1) {
+            inFile->getVar("U").getVar({ 0,0,0 }, { nt,ny,nx + 1 }, u.get());
+            inFile->getVar("V").getVar({ 0,0,0 }, { nt,ny + 1,nx }, v.get());
+        } else {
+            inFile->getVar("U").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny,nx + 1 }, u.get());
+            inFile->getVar("V").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny + 1,nx }, v.get());
+        }
+        
+        inFile->getVar("MAPFAC_U").getVar(msfu.get());
         inFile->getVar("MAPFAC_V").getVar(msfv.get());
 
         for (int k = 0; k < nt; ++k) {
@@ -141,7 +150,9 @@ namespace TTCore {
             iiFile->getVar(vorVarName).getVar(vorField.get());
         }
         Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue());
-        Constants::HAS_TP_MIN_ReVOR = isWrfoutFile ? 100e-5 : 8e-5;
+        //Constants::HAS_TP_MIN_ReVOR = isWrfoutFile ? 100e-5 : 8e-5;
+
+
         std::cout << "RECURSION_MIN_ReVOR: " << Constants::RECURSION_MIN_ReVOR << std::endl;
         int itsPerCheck = timeLength / 20;
         for (unsigned long timeIndex = startIndexInFile; timeIndex < timeLength; ++timeIndex) {
@@ -375,6 +386,7 @@ namespace TTCore {
         std::cout << "msg from getRealTC, realTC number" << realTCs.size() << std::endl;
     }
 
+    /// 第三步：移除噪声
     void Processor::removeNoise() {
         int realTCsNum = realTCs.size();
         /// 需移除的气旋的index的set（会自动按升序排列）
@@ -528,6 +540,9 @@ namespace TTCore {
         return surroundingCells;
     }
 
+    /// 计算偏心率（未实现wrfout文件的偏心率计算）
+    /// @param vortexCellsIndex 表示涡旋的cells的index
+    /// @return 偏心率
     float Processor::get_e(std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex) {
         std::vector<std::pair<int, int>> vortexCellsIndex_v(vortexCellsIndex.begin(), vortexCellsIndex.end());
         auto distMax = UtilFunc::getMaxDistance(vortexCellsIndex_v);

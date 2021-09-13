@@ -18,6 +18,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 using myCLI;
 using System.Runtime.InteropServices;
+using TC_Tracker.otherWindow;
 
 namespace TC_Tracker {
     /// <summary>
@@ -481,6 +482,12 @@ namespace TC_Tracker {
             resultView.tcsData = tcs;
             resultView.Owner = this;
             resultView.ShowDialog();
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e) {
+            var paraSelWin = new ParaSelWindow();
+            paraSelWin.Owner = this;
+            paraSelWin.ShowDialog();
         }
     }
 }
