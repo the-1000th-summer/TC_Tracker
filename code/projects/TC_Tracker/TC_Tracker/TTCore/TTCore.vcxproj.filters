@@ -19,56 +19,53 @@
     <Filter Include="源文件\Calculator">
       <UniqueIdentifier>{71a33de1-2cc4-48b1-8130-cd0adecdf2a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\3rdPartyLib">
+      <UniqueIdentifier>{b5bce0d4-a167-4efb-804c-ea6f20a55443}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Entity.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Core.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\multiArray.h">
+    <ClInclude Include="..\..\core\include\multiArray.h">
       <Filter>头文件\Calculator</Filter>
     </ClInclude>
-    <ClInclude Include="include\Processor.h">
+    <ClInclude Include="..\..\core\include\Processor.h">
       <Filter>头文件\Calculator</Filter>
     </ClInclude>
-    <ClInclude Include="include\TC1Time.h">
+    <ClInclude Include="..\..\core\include\TC1Time.h">
       <Filter>头文件\Calculator</Filter>
     </ClInclude>
-    <ClInclude Include="include\Typhoon.h">
+    <ClInclude Include="..\..\core\include\Typhoon.h">
       <Filter>头文件\Calculator</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utils.h">
+    <ClInclude Include="..\..\core\include\Utils.h">
       <Filter>头文件\Calculator</Filter>
     </ClInclude>
-    <ClInclude Include="include\date.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\..\core\include\date.h">
+      <Filter>头文件\3rdPartyLib</Filter>
     </ClInclude>
-    <ClInclude Include="NCFileInfo.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\..\core\include\json.hpp">
+      <Filter>头文件\3rdPartyLib</Filter>
     </ClInclude>
-    <ClInclude Include="include\json.hpp">
+    <ClInclude Include="..\..\core\include\NCFileInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Processor.cpp">
+    <ClCompile Include="..\..\core\src\Processor.cpp">
       <Filter>源文件\Calculator</Filter>
     </ClCompile>
-    <ClCompile Include="src\TC1Time.cpp">
+    <ClCompile Include="..\..\core\src\TC1Time.cpp">
       <Filter>源文件\Calculator</Filter>
     </ClCompile>
-    <ClCompile Include="src\Typhoon.cpp">
+    <ClCompile Include="..\..\core\src\Typhoon.cpp">
       <Filter>源文件\Calculator</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utils.cpp">
+    <ClCompile Include="..\..\core\src\Utils.cpp">
       <Filter>源文件\Calculator</Filter>
     </ClCompile>
-    <ClCompile Include="NCFileInfo.cpp">
+    <ClCompile Include="..\..\core\src\NCFileInfo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

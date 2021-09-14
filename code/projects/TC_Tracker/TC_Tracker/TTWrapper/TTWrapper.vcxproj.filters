@@ -21,9 +21,6 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ManagedObject.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -36,9 +33,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="AssemblyInfo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Entity.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="NCFileInfo.cpp">

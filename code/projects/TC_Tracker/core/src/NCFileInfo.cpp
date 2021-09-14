@@ -8,10 +8,10 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include "include/json.hpp"
+#include "json.hpp"
 #include "NCFileInfo.h"
 #include "Processor.h"
-#include "include/Typhoon.h"
+#include "Typhoon.h"
 
 namespace TTCore {
     NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {

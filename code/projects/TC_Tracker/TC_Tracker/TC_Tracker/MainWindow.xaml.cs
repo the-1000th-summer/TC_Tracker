@@ -136,8 +136,6 @@ namespace TC_Tracker {
             Properties.Settings.Default.isRunning = false;
             Properties.Settings.Default.Save();
 
-            Entity e = new Entity("The Wallman", 20, 35);
-            e.Move(5, -10);
             //label.Content = "sdf";
             //label.Content = e.XPosition + " " + e.YPosition;
             //Console.WriteLine(e.XPosition + " " + e.YPosition);

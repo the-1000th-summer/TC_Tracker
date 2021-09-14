@@ -1,6 +1,6 @@
 #include <vector>
-#include "NCFileInfo.h"
 #include <netcdf>
+#include "NCFileInfo.h"
 
 using namespace System::Collections::Generic;
 

@@ -82,12 +82,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\VisualStudio\cxxLib\boost_1_76_0;$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\VisualStudio\cxxLib\boost_1_76_0;$(SolutionDir)..\core\include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\VisualStudio\cxxLib\boost_1_76_0;$(ProjectDir)include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\VisualStudio\cxxLib\boost_1_76_0;$(SolutionDir)..\core\include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\VisualStudio\cxxLib\boost_1_76_0\stage\lib;D:\netCDF4\netCDF4_C\real\netCDF 4.8.0\lib;E:\p_learn\CSharpLearn\TC_Tracker\project\genNCXXLib\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -167,24 +167,22 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\core\include\date.h" />
+    <ClInclude Include="..\..\core\include\json.hpp" />
+    <ClInclude Include="..\..\core\include\multiArray.h" />
+    <ClInclude Include="..\..\core\include\NCFileInfo.h" />
+    <ClInclude Include="..\..\core\include\Processor.h" />
+    <ClInclude Include="..\..\core\include\TC1Time.h" />
+    <ClInclude Include="..\..\core\include\Typhoon.h" />
+    <ClInclude Include="..\..\core\include\Utils.h" />
     <ClInclude Include="Core.h" />
-    <ClInclude Include="Entity.h" />
-    <ClInclude Include="include\json.hpp" />
-    <ClInclude Include="NCFileInfo.h" />
-    <ClInclude Include="include\date.h" />
-    <ClInclude Include="include\multiArray.h" />
-    <ClInclude Include="include\Processor.h" />
-    <ClInclude Include="include\TC1Time.h" />
-    <ClInclude Include="include\Typhoon.h" />
-    <ClInclude Include="include\Utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="NCFileInfo.cpp" />
-    <ClCompile Include="src\Processor.cpp" />
-    <ClCompile Include="src\TC1Time.cpp" />
-    <ClCompile Include="src\Typhoon.cpp" />
-    <ClCompile Include="src\Utils.cpp" />
+    <ClCompile Include="..\..\core\src\NCFileInfo.cpp" />
+    <ClCompile Include="..\..\core\src\Processor.cpp" />
+    <ClCompile Include="..\..\core\src\TC1Time.cpp" />
+    <ClCompile Include="..\..\core\src\Typhoon.cpp" />
+    <ClCompile Include="..\..\core\src\Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
