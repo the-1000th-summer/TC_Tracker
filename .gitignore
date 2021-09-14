@@ -1,5 +1,7 @@
 # .gitignore
 /.gitignore
+# .DS_Store
+.DS_Store
 # build
 /code/pureCpp/build
 /code/pythonScripts/vorticity/cxxVer/build
