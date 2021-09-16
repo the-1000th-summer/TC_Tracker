@@ -5,6 +5,7 @@
 # build
 /code/pureCpp/build
 /code/pythonScripts/vorticity/cxxVer/build
+/code/scripts/myMap2BoostBin/build
 # cache
 .cache
 # vscode

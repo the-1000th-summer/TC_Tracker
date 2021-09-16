@@ -1,4 +1,4 @@
-﻿
+
 #include <cmath>
 #include <cstdio>
 #include <iostream>
@@ -707,7 +707,7 @@ namespace TTCore {
     void Processor::getLandPolygons() {
         auto exeDirStr = boost::dll::program_location().parent_path().string();
         std::filesystem::path exeDir(exeDirStr);
-        std::ifstream ifs(exeDir / "data\\myMap.dat", std::ios::binary);
+        std::ifstream ifs(exeDir / "data" / "myMap.dat", std::ios::binary);
         boost::archive::binary_iarchive ia(ifs);
         ia >> landPolygons;
     }
