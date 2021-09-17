@@ -610,8 +610,8 @@ namespace TTCore {
     }
 
     /// 此函数消除相对涡度大值中心，为识别多个台风服务，替换为1e-6
-    /// @param[inout] vorField 涡度场（2d array）
-    /// @param[vortexCellsIndex] 涡旋包含的点的index
+    /// @param[in,out] vorField 涡度场（2d array）
+    /// @param[out] vortexCellsIndex 涡旋包含的点的index
     inline void Processor::removeVortex(ThreeDArray &vorField, int timeIndex, std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex) {
         for (auto &i : vortexCellsIndex) {
             vorField(timeIndex, i.first, i.second) = 1e-6;

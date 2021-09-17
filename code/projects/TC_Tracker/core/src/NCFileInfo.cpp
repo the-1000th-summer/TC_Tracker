@@ -28,7 +28,7 @@ namespace TTCore {
             //std::cout << e.what() << std::endl;
             isFileValid = false;
             fileValidInfo = e.what();
-            //iiFile->close();   // ÎÄ¼þ¸ù±¾Ã»±»´ò¿ª
+            //iiFile->close();   // ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½
             return;
             //return {false, e.what()};
         }
@@ -163,6 +163,11 @@ namespace TTCore {
     }
     void NCFileInfo::exportFile(const std::string& outFilePath) {
         exportFile((std::filesystem::path(dumpDir) / (std::filesystem::path(ncFilePath).stem().string() + "_step3.dat")).string(), outFilePath);
+    }
+
+    /// å°†ç»“æžœè¾“å‡ºä¸ºnetCDFæ–‡ä»¶ï¼ˆæ ‡å‡†ï¼šCF Conventionï¼‰
+    void NCFileInfo::exportFile_nc(const std::string &oNcFilePath) {
+        
     }
 
     void NCFileInfo::getDataFromStep3File(const std::string& inFilePath, std::vector<Typhoon>& tcs) {

@@ -79,6 +79,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     }
     handleInOutFile(allFilesName);
     
+    /// （无用的变量，因为cli直接Ctrl+C就可终止程序）
     bool isCanceled = false;
     auto fileInfo = TTCore::NCFileInfo("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrfout_d01_2016-10-19_00_00_00_persist_minForVor.nc", true, "XTIME", "XLAT", "XLONG", "", 0, ".");
     
