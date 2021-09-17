@@ -81,10 +81,12 @@ void tryCXXOPTS(int argc, char * argv[]) {
     
     /// （无用的变量，因为cli直接Ctrl+C就可终止程序）
     bool isCanceled = false;
-    auto fileInfo = TTCore::NCFileInfo("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrfout_d01_2016-10-19_00_00_00_persist_minForVor.nc", true, "XTIME", "XLAT", "XLONG", "", 0, ".");
+    std::string ncFileDir = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/";
+    auto fileInfo = TTCore::NCFileInfo((ncFileDir+"wrfout_d01_2016-10-19_00_00_00_persist_minForVor.nc").c_str(), true, "XTIME", "XLAT", "XLONG", "", 0, ".");
     
     std::vector<TTCore::Typhoon> tcs{};
     fileInfo.startTracking(tcs, &isCanceled);
+    fileInfo.exportFile_nc(tcs, ncFileDir+"minForVor_track.nc");
     std::cout << "end of tracking" << std::endl;
 }
 

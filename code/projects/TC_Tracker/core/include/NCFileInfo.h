@@ -35,7 +35,7 @@ namespace TTCore {
 
         void exportFile(const std::string &inFilePath, const std::string &outFilePath);
         void exportFile(const std::string &outFilePath);
-        void exportFile_nc(const std::string &oNcFilePath);
+        void exportFile_nc(const std::vector<TTCore::Typhoon> &tcs, const std::string &oNcFilePath);
 
         void getDataFromStep3File(const std::string& inFilePath, std::vector<Typhoon>& tcs);
     //private:
