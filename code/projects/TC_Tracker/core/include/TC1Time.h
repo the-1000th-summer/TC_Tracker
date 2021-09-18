@@ -33,6 +33,14 @@ public:
 private:
     std::string timeUnits;
     double timeInterval;
+    
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar & vortexes;
+        ar & timeUnits;
+        ar & timeInterval;
+    }
 };
 inline size_t Vortexes::size() const {
     return vortexes.size();

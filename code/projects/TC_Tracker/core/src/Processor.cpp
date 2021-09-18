@@ -27,9 +27,9 @@
 
 namespace TTCore {
 
-    Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& timeVName, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory), vortexes(initVortexes()) {
+    Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& timeVName, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory), iiFile(&iFile), vortexes(initVortexes()) {
         
-        iiFile = &iFile;
+//        iiFile = &iFile;
         initVortexes();
         vortexes = Vortexes("df", 4);
         getDimLength();
@@ -62,7 +62,7 @@ namespace TTCore {
     Vortexes Processor::initVortexes() {
         std::string timeUnits;
         auto timeVar = iiFile->getVar(timeVarName);
-        timeVar.getAtt(timeUnits);
+        timeVar.getAtt("units").getValues(timeUnits);
 //        vortexes = Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
         return Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
     }

@@ -62,4 +62,3 @@ inline std::vector<Typhoon>::const_iterator TCs::cend() const {
 }
 
 }
-

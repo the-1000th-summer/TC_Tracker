@@ -2,6 +2,8 @@
 /.gitignore
 # .DS_Store
 .DS_Store
+# Xcode user data
+xcuserdata/
 # build
 /code/pureCpp/build
 /code/pythonScripts/vorticity/cxxVer/build

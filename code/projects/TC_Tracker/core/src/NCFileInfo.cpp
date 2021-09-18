@@ -263,7 +263,7 @@ namespace TTCore {
         }
         
         // 写入变量属性
-        timeVar.putAtt("units", "minutes since 2016-10-19 00:00:00");
+        timeVar.putAtt("units", tcs.getTimeUnits());
         latVar.putAtt("units", "degrees_north");
         lonVar.putAtt("units", "degrees_east");
         

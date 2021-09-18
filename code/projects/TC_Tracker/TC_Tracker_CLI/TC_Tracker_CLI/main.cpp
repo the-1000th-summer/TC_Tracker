@@ -10,6 +10,7 @@
 #include <boost/program_options.hpp>
 #include "cxxopts.hpp"
 #include "NCFileInfo.h"
+#include "Typhoon.h"
 
 namespace bpo = boost::program_options;
 
@@ -87,7 +88,9 @@ void tryCXXOPTS(int argc, char * argv[]) {
     std::vector<TTCore::Typhoon> tcs{};
     fileInfo.startTracking(tcs, &isCanceled);
 //    fileInfo.exportFile_nc(tcs, ncFileDir+"minForVor_track.nc");
-    fileInfo.exportFile_nc_compact(tcs, ncFileDir+"minForVor_track_compact.nc");
+    auto theTCs = TTCore::TCs(tcs, "minutes since 2016-10-19 00:00:00", 60);
+    
+    fileInfo.exportFile_nc_compact(theTCs, ncFileDir+"minForVor_track_compact.nc");
     std::cout << "end of tracking" << std::endl;
 }
 
