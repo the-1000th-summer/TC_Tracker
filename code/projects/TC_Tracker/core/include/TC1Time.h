@@ -27,6 +27,8 @@ public:
     std::vector<std::vector<TC1Time>> vortexes{};
     
 //    void push_back(const )
+    inline std::string getTimeUnits() const;
+    inline double getTimeInterval() const;
     inline size_t size() const;
     inline void clearVortexData();
     inline std::vector<TC1Time> &operator[](size_t i);
@@ -42,6 +44,12 @@ private:
         ar & timeInterval;
     }
 };
+inline std::string Vortexes::getTimeUnits() const {
+    return timeUnits;
+}
+inline double Vortexes::getTimeInterval() const {
+    return timeInterval;
+}
 inline size_t Vortexes::size() const {
     return vortexes.size();
 }

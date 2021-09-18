@@ -85,12 +85,13 @@ void tryCXXOPTS(int argc, char * argv[]) {
     std::string ncFileDir = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/";
     auto fileInfo = TTCore::NCFileInfo((ncFileDir+"wrfout_d01_2016-10-19_00_00_00_persist_minForVor.nc").c_str(), true, "XTIME", "XLAT", "XLONG", "", 0, ".");
     
-    std::vector<TTCore::Typhoon> tcs{};
+//    std::vector<TTCore::Typhoon> tcs{};
+    TTCore::TCs tcs({},"",0);
     fileInfo.startTracking(tcs, &isCanceled);
 //    fileInfo.exportFile_nc(tcs, ncFileDir+"minForVor_track.nc");
-    auto theTCs = TTCore::TCs(tcs, "minutes since 2016-10-19 00:00:00", 60);
+//    auto theTCs = TTCore::TCs(tcs, "minutes since 2016-10-19 00:00:00", 60);
     
-    fileInfo.exportFile_nc_compact(theTCs, ncFileDir+"minForVor_track_compact.nc");
+    fileInfo.exportFile_nc_compact(tcs, ncFileDir+"minForVor_track_compact.nc");
     std::cout << "end of tracking" << std::endl;
 }
 

@@ -92,7 +92,7 @@ namespace TTCore {
         }
     }
 
-    void NCFileInfo::startTracking(std::vector<Typhoon> &tcs, bool* isCanceled) {
+    void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled) {
         
         netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
 
@@ -108,7 +108,9 @@ namespace TTCore {
         p.removeNoise();
         p.dumpStep3(ncFilePath);
 
-        p.copyRealTCs(tcs);
+        
+//        p.copyRealTCs(tcs);
+        p.copyTCs(tcs);
     }
 
     void NCFileInfo::startFromStep2(std::vector<Typhoon>& tcs) {

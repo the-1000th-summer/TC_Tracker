@@ -30,8 +30,7 @@ namespace TTCore {
     Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& timeVName, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory), iiFile(&iFile), vortexes(initVortexes()) {
         
 //        iiFile = &iFile;
-        initVortexes();
-        vortexes = Vortexes("df", 4);
+//        initVortexes();
         getDimLength();
         if (isWrfoutFile) {
             latArr2D = TwoDArray(latGridNum, lonGridNum);
@@ -663,7 +662,8 @@ namespace TTCore {
         boost::archive::binary_oarchive oa(ofs);
         // write class instance to archive
         std::cout << "msg from dump step1, vortex number: " << vortexes.size() << std::endl;
-        oa << hasTC_timeIndex << vortexes;
+//        oa << hasTC_timeIndex << vortexes;
+        oa << vortexes;
     }
 
     void Processor::dumpStep2(const std::string ncFilePath) {
@@ -697,7 +697,8 @@ namespace TTCore {
         boost::archive::binary_iarchive ia(ifs);
 
         vortexes.clearVortexData();
-        ia >> hasTC_timeIndex >> vortexes;
+//        ia >> hasTC_timeIndex >> vortexes;
+        ia >> vortexes;
     }
 
     void Processor::getStep2DataFromFile(const std::string& filePath) {
@@ -712,6 +713,10 @@ namespace TTCore {
         tcs = realTCs;
         std::cout << "msg from copy, realTCs number: " << tcs.size() << std::endl;
         std::cout << "copy tcs completed." << std::endl;
+    }
+
+    void Processor::copyTCs(TCs &tcs) {
+        tcs = TCs(realTCs, vortexes.getTimeUnits(), vortexes.getTimeInterval());
     }
 
     void Processor::getLandPolygons() {

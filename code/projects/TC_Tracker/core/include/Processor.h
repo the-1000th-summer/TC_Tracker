@@ -39,6 +39,7 @@ public:
     void getStep1DataFromFile(const std::string &filePath);
     void getStep2DataFromFile(const std::string &filePath);
     void copyRealTCs(std::vector<Typhoon> &tcs);
+    void copyTCs(TCs &tcs);
     
 private:
     bool* isCanceled;
