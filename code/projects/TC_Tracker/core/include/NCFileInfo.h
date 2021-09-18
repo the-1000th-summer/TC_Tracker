@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-//#include <netcdf>
+#include <netcdf>
 #include "Typhoon.h"
 
 namespace TTCore {
@@ -36,9 +36,11 @@ namespace TTCore {
         void exportFile(const std::string &inFilePath, const std::string &outFilePath);
         void exportFile(const std::string &outFilePath);
         void exportFile_nc(const std::vector<TTCore::Typhoon> &tcs, const std::string &oNcFilePath);
-
+        void exportFile_nc_compact(const TCs &tcs, const std::string &oNcFilePath);
+        
         void getDataFromStep3File(const std::string& inFilePath, std::vector<Typhoon>& tcs);
-    //private:
+    private:
+        void appendHistoryInfo(netCDF::NcFile &ncFile);
     //    netCDF::NcFile *iiFile = nullptr;
     };
 }

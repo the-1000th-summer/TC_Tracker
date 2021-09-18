@@ -35,6 +35,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		792CD4E626F61A3B0036E762 /* multiArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multiArray.h; path = ../../core/include/multiArray.h; sourceTree = "<group>"; };
 		7957EA6B26F3980400305982 /* myMap.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = myMap.dat; path = ../../../../data/myMap/myMap.dat; sourceTree = "<group>"; };
 		79DB6D4526F0A3530097DCC2 /* TC_Tracker_CLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TC_Tracker_CLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		79DB6D4826F0A3530097DCC2 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -72,6 +73,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		792CD4E326F5D2640036E762 /* 3rdPartyLib */ = {
+			isa = PBXGroup;
+			children = (
+				79DB6D5D26F0A7200097DCC2 /* cxxopts.hpp */,
+			);
+			name = 3rdPartyLib;
+			sourceTree = "<group>";
+		};
 		79DB6D3C26F0A3530097DCC2 = {
 			isa = PBXGroup;
 			children = (
@@ -103,9 +112,9 @@
 		79DB6D4F26F0A5EC0097DCC2 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				792CD4E326F5D2640036E762 /* 3rdPartyLib */,
 				79F9D43B26F374F900F75059 /* Calculator */,
 				79F9D44026F37B0200F75059 /* NCFileInfo.h */,
-				79DB6D5D26F0A7200097DCC2 /* cxxopts.hpp */,
 			);
 			name = include;
 			sourceTree = "<group>";
@@ -135,9 +144,10 @@
 			isa = PBXGroup;
 			children = (
 				79DB6D5326F0A6540097DCC2 /* Processor.h */,
+				79DB6D5126F0A6540097DCC2 /* Utils.h */,
+				792CD4E626F61A3B0036E762 /* multiArray.h */,
 				79DB6D5226F0A6540097DCC2 /* TC1Time.h */,
 				79DB6D5026F0A6540097DCC2 /* Typhoon.h */,
-				79DB6D5126F0A6540097DCC2 /* Utils.h */,
 			);
 			name = Calculator;
 			sourceTree = "<group>";

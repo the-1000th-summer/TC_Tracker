@@ -81,6 +81,16 @@ namespace TTCore {
         std::cout << timeUnits << std::endl;
     }
 
+    std::string UtilFunc::currentDateTime() {
+        time_t     now = time(0);
+        struct tm  tstruct;
+        char       buf[80];
+        tstruct = *localtime(&now);
+
+        strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+        return buf;
+    }
+
     void UtilFunc::getLatLonData(netCDF::NcFile *iFile, const std::string& latVarName, const std::string& lonVarName, float *latArray, float *lonArray) {
         iFile->getVar(latVarName).getVar(latArray);
         iFile->getVar(lonVarName).getVar(lonArray);
@@ -111,12 +121,16 @@ namespace TTCore {
         iFile->getVar("Vorticity").getVar(vor);
     }
 
-    void UtilFunc::modifyMaxDist(netCDF::NcFile* iFile, const std::string &timeVarName) {
-        auto timeVar = iFile->getVar(timeVarName);
+    double UtilFunc::getTimeInterval(netCDF::NcVar &timeVar) {
         double firstValue, secondValue;
         timeVar.getVar({0}, {1}, &firstValue);
         timeVar.getVar({1}, {1}, &secondValue);
-        Constants::LINK_TP_MAX_DIST *= (secondValue - firstValue);
+        return (secondValue - firstValue);
+    }
+
+    void UtilFunc::modifyMaxDist(netCDF::NcFile* iFile, const std::string &timeVarName) {
+        auto timeVar = iFile->getVar(timeVarName);
+        Constants::LINK_TP_MAX_DIST *= UtilFunc::getTimeInterval(timeVar);
         std::string timeUnits;
         timeVar.getAtt("units").getValues(timeUnits);
         std::string timeUnitLen = timeUnits.substr(0, timeUnits.find(" "));

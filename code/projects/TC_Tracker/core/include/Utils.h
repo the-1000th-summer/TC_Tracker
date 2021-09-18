@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <cmath>
 #include <ctime>
@@ -47,12 +47,14 @@ namespace TTCore {
         bool ifFileExists (const std::string& name);
         std::time_t getEpochTime(const std::string& dateTime, const std::string& dateTimeFormat="%Y-%m-%dT%H:%M:%SZ");
         void getTimeData(netCDF::NcFile &iFile);
+        std::string currentDateTime();
         void num2Date(double timeNum, tm &dateTimeTm, std::string timeUnits);
         void num2Date(double timeNum[], std::string timeUnits);
         void getLatLonData(netCDF::NcFile *iFile, const std::string& latVarName, const std::string& lonVarName, float *latArray, float *lonArray);
         void getLatLonData(netCDF::NcFile *iFile, const std::string& latVarName, const std::string& lonVarName, std::vector<float> &latVec, std::vector<float> &lonVec);
         void getLatLonData2d(netCDF::NcFile *iFile, unsigned long latGridNum, unsigned long lonGridNum, float* latArray2d, float* lonArray2d);
         void getVorField(netCDF::NcFile *iFile, float *vor);
+        double getTimeInterval(netCDF::NcVar &timeVar);
         void modifyMaxDist(netCDF::NcFile *iFile, const std::string &timeVarName);
 
         // std::pair<std::pair<int, int>, float> max_element_2d(float vorField[Constants::latGridNum][Constants::lonGridNum]);

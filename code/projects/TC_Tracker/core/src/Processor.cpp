@@ -27,8 +27,11 @@
 
 namespace TTCore {
 
-    Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& timeVName, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {
+    Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& timeVName, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory), vortexes(initVortexes()) {
+        
         iiFile = &iFile;
+        initVortexes();
+        vortexes = Vortexes("df", 4);
         getDimLength();
         if (isWrfoutFile) {
             latArr2D = TwoDArray(latGridNum, lonGridNum);
@@ -56,6 +59,13 @@ namespace TTCore {
         iiFile = nullptr;
     }
 
+    Vortexes Processor::initVortexes() {
+        std::string timeUnits;
+        auto timeVar = iiFile->getVar(timeVarName);
+        timeVar.getAtt(timeUnits);
+//        vortexes = Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
+        return Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
+    }
 
     /// 此方法找出文件的各维度的长度
     void Processor::getDimLength() {
@@ -140,7 +150,7 @@ namespace TTCore {
         /// startYear的1月1日0时时次在文件中的index
         int startIndexInFile = 0;
         /// endYear的12月31日0时时次在文件中的index
-        int endIndexInFile = 58436;
+//        int endIndexInFile = 58436;
 
         auto vorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
 
@@ -212,7 +222,7 @@ namespace TTCore {
             } else {             // 当前时次有气旋
                 /// 当前时次的涡旋vector
                 //auto currentTimeVortexes = allVortexes[hasVortex_notHandledYetIndex];
-                auto currentTimeVortexes = allVortexes[timeIndex];
+                auto currentTimeVortexes = vortexes[timeIndex];
                 /// 当前时次的涡旋个数
                 int currentTimeTCNum = currentTimeVortexes.size();
                 //++hasVortex_notHandledYetIndex;
@@ -480,7 +490,7 @@ namespace TTCore {
             vortexesThisTime.push_back(TC1Time{maxVorCell.first, vortexCenterLatLon});
             removeVortex(vorField, timeIndex, allCellsIndex);
         }
-        allVortexes.push_back(vortexesThisTime);
+        vortexes.vortexes.push_back(vortexesThisTime);
         return tpNum;
 
     }
@@ -652,8 +662,8 @@ namespace TTCore {
         std::ofstream ofs(stepDumpDir / ( std::filesystem::path(ncFilePath).stem().string() + "_step1.dat" ), std::ios::binary);
         boost::archive::binary_oarchive oa(ofs);
         // write class instance to archive
-        std::cout << "msg from dump step1, vortex number: " << allVortexes.size() << std::endl;
-        oa << hasTC_timeIndex << allVortexes;
+        std::cout << "msg from dump step1, vortex number: " << vortexes.size() << std::endl;
+        oa << hasTC_timeIndex << vortexes;
     }
 
     void Processor::dumpStep2(const std::string ncFilePath) {
@@ -686,8 +696,8 @@ namespace TTCore {
         std::ifstream ifs(filePath, std::ios::binary);
         boost::archive::binary_iarchive ia(ifs);
 
-        allVortexes.clear();
-        ia >> hasTC_timeIndex >> allVortexes;
+        vortexes.clearVortexData();
+        ia >> hasTC_timeIndex >> vortexes;
     }
 
     void Processor::getStep2DataFromFile(const std::string& filePath) {

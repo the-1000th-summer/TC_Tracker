@@ -86,7 +86,8 @@ void tryCXXOPTS(int argc, char * argv[]) {
     
     std::vector<TTCore::Typhoon> tcs{};
     fileInfo.startTracking(tcs, &isCanceled);
-    fileInfo.exportFile_nc(tcs, ncFileDir+"minForVor_track.nc");
+//    fileInfo.exportFile_nc(tcs, ncFileDir+"minForVor_track.nc");
+    fileInfo.exportFile_nc_compact(tcs, ncFileDir+"minForVor_track_compact.nc");
     std::cout << "end of tracking" << std::endl;
 }
 

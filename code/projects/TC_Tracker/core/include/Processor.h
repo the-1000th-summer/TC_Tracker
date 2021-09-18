@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <netcdf>
 #include <string>
@@ -13,60 +13,63 @@
 
 namespace TTCore {
 
-    class Processor {
-    public:
-        Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &timeVName="", const std::string & latVName="", const std::string & lonVName="", const std::string & vorVName="", int zLevelIndex = -1, const std::string & dumpDirectory = "");
-
-        //Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
-        ~Processor();
-        void getDimLength();
-        void calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv);
-        void recognizeTyphoon();
-        void getRealTC();
-        void removeNoise();
-        int getVortexNum1Time(ThreeDArray &vorField, int timeIndex, int TCNum_prevTime);
-        void getVortexCellsIndex(ThreeDArray &vorField, int timeIndex, std::pair<int, int> maxValIndex, std::unordered_set<std::pair<int, int>, pair_hash> &allCells);
-        std::unordered_set<std::pair<int, int>, pair_hash> getSurroundingCellsIndex(std::pair<int, int> cellIndex);
-        float get_e(std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex);
-        std::pair<float, float> getMinorAxisLen(const std::vector<std::pair<int, int>> &cellsIndex, const std::pair<float, float> &centerLatLon, float minorAxisK, const float gridRatio, const float A);
-
-        inline void removeVortex(ThreeDArray &vorField, int timeIndex, std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex);
-
-        void dumpStep1(const std::string ncFilePath);
-        void dumpStep2(const std::string ncFilePath);
-        void dumpStep3(const std::string ncFilePath);
-        void getStep1DataFromFile(const std::string &filePath);
-        void getStep2DataFromFile(const std::string &filePath);
-        void copyRealTCs(std::vector<Typhoon> &tcs);
+class Processor {
+public:
+    Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &timeVName="", const std::string & latVName="", const std::string & lonVName="", const std::string & vorVName="", int zLevelIndex = -1, const std::string & dumpDirectory = "");
     
-    private:
-        bool* isCanceled;
-        netCDF::NcFile *iiFile;
-        std::string timeVarName;
-        std::string latVarName;
-        std::string lonVarName;
-        std::string vorVarName;
-        int zLevelIndex = -1;
-        std::string dumpDir;
-        unsigned long timeLength = 0;
-        unsigned long latGridNum = 0;
-        unsigned long lonGridNum = 0;
-        bool isWrfoutFile = false;
-        
-        std::unique_ptr<float[]> latArr, lonArr;
-        TwoDArray latArr2D = TwoDArray(0,0), lonArr2D = TwoDArray(0,0);
-        /// 记录所有有台风的日期的数组（从基准日期起算的时次数）
-        std::vector<int> hasTC_timeIndex{};
-        std::vector<std::vector<TC1Time>> allVortexes{};
-        std::vector<Typhoon> realTCs{};
-        std::vector<std::vector<std::pair<float, float>>> landPolygons;
+    //Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
+    ~Processor();
+    Vortexes initVortexes();
+    void getDimLength();
+    void calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv);
+    void recognizeTyphoon();
+    void getRealTC();
+    void removeNoise();
+    int getVortexNum1Time(ThreeDArray &vorField, int timeIndex, int TCNum_prevTime);
+    void getVortexCellsIndex(ThreeDArray &vorField, int timeIndex, std::pair<int, int> maxValIndex, std::unordered_set<std::pair<int, int>, pair_hash> &allCells);
+    std::unordered_set<std::pair<int, int>, pair_hash> getSurroundingCellsIndex(std::pair<int, int> cellIndex);
+    float get_e(std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex);
+    std::pair<float, float> getMinorAxisLen(const std::vector<std::pair<int, int>> &cellsIndex, const std::pair<float, float> &centerLatLon, float minorAxisK, const float gridRatio, const float A);
+    
+    inline void removeVortex(ThreeDArray &vorField, int timeIndex, std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex);
+    
+    void dumpStep1(const std::string ncFilePath);
+    void dumpStep2(const std::string ncFilePath);
+    void dumpStep3(const std::string ncFilePath);
+    void getStep1DataFromFile(const std::string &filePath);
+    void getStep2DataFromFile(const std::string &filePath);
+    void copyRealTCs(std::vector<Typhoon> &tcs);
+    
+private:
+    bool* isCanceled;
+    netCDF::NcFile *iiFile;
+    std::string timeVarName;
+    std::string latVarName;
+    std::string lonVarName;
+    std::string vorVarName;
+    int zLevelIndex = -1;
+    std::string dumpDir;
+    unsigned long timeLength = 0;
+    unsigned long latGridNum = 0;
+    unsigned long lonGridNum = 0;
+    bool isWrfoutFile = false;
+    
+    std::unique_ptr<float[]> latArr, lonArr;
+    TwoDArray latArr2D = TwoDArray(0,0), lonArr2D = TwoDArray(0,0);
+    /// 记录所有有台风的日期的数组（从基准日期起算的时次数）
+    std::vector<int> hasTC_timeIndex{};
+//    std::vector<std::vector<TC1Time>> allVortexes{};
+    Vortexes vortexes;
+    std::vector<Typhoon> realTCs{};
+//    TCs tcs;
+    std::vector<std::vector<std::pair<float, float>>> landPolygons;
+    
+    void checkDirAndCreate(const std::string &folderName);
+    void getLandPolygons();
+    bool pnpoly(const std::vector<std::pair<float, float>>& polygon, float testLat, float testLon);
+    bool pnpolys(float testLat, float testLon);
+};
 
-        void checkDirAndCreate(const std::string &folderName);
-        void getLandPolygons();
-        bool pnpoly(const std::vector<std::pair<float, float>>& polygon, float testLat, float testLon);
-        bool pnpolys(float testLat, float testLon);
-    };
-
-    //void to_json(json& j, const TC1Time& r);
+//void to_json(json& j, const TC1Time& r);
 
 }

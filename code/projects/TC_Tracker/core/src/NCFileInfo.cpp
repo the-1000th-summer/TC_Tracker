@@ -28,7 +28,7 @@ namespace TTCore {
             //std::cout << e.what() << std::endl;
             isFileValid = false;
             fileValidInfo = e.what();
-            //iiFile->close();   // �ļ�����û����
+            //iiFile->close();
             return;
             //return {false, e.what()};
         }
@@ -101,7 +101,7 @@ namespace TTCore {
         p.recognizeTyphoon();
         if (*isCanceled) return;
         p.dumpStep1(ncFilePath);
-        std::cout << "finish dump step1." << std::endl;
+
         p.getRealTC();
         p.dumpStep2(ncFilePath);
 
@@ -183,12 +183,13 @@ namespace TTCore {
         auto lonVar = outFile.addVar("lon", netCDF::NcType::nc_FLOAT, {stormDim, timeDim});
         auto serialNoVar = outFile.addVar("serialNo", netCDF::NcType::nc_SHORT, {stormDim, timeDim});
         
+        // 准备数据
         auto timeData = std::make_unique<float[]>(stormDimSize * timeDimSize);
         auto latData = std::make_unique<float[]>(stormDimSize * timeDimSize);
         auto lonData = std::make_unique<float[]>(stormDimSize * timeDimSize);
         auto serialNoData = std::make_unique<float[]>(stormDimSize * timeDimSize);
         
-        int tc_i = 0;
+        size_t tc_i = 0;
         for (auto const &tc : tcs) {
             std::iota(timeData.get()+timeDimSize*tc_i, timeData.get()+timeDimSize*tc_i+tc.geoCenters.size(), tc.startTimeIndex);
             std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), latData.get()+timeDimSize*tc_i, [](const std::pair<float, float> &geoCenter){return geoCenter.first;});
@@ -202,7 +203,6 @@ namespace TTCore {
             ++tc_i;
         }
         
-        
         // 写入变量属性
         timeVar.putAtt("units", "minutes since 2016-10-19 00:00:00");
         latVar.putAtt("units", "degrees_north");
@@ -214,8 +214,9 @@ namespace TTCore {
         lonVar.putAtt("_FillValue", netCDF::NcType::nc_FLOAT, -9999.0);
         serialNoVar.putAtt("_FillValue", netCDF::NcType::nc_SHORT, -9999);
         // 写入全局属性
+        appendHistoryInfo(outFile);
         outFile.putAtt("featureType", "trajectory");
-        
+        // 写入数据
         timeVar.putVar(timeData.get());
         latVar.putVar(latData.get());
         lonVar.putVar(lonData.get());
@@ -224,6 +225,69 @@ namespace TTCore {
         outFile.close();
         
     }
+
+    void NCFileInfo::exportFile_nc_compact(const TCs &tcs, const std::string &oNcFilePath) {
+        netCDF::NcFile outFile(oNcFilePath, netCDF::NcFile::replace);
+        std::vector<int> tcsAge{};
+        std::transform(tcs.cbegin(), tcs.cend(), std::back_inserter(tcsAge), [](const Typhoon& tc){return tc.maxVorCells.size();});
+        
+        
+        // 创建维度
+        auto stormDimSize = tcs.size();
+        int timeDimSize = std::accumulate(tcsAge.begin(), tcsAge.end(), 0);
+        
+        auto stormDim = outFile.addDim("storm", stormDimSize);
+        auto timeDim = outFile.addDim("date_time", timeDimSize);
+        
+        // 创建变量
+        auto rowSizeVar = outFile.addVar("rowSize", netCDF::NcType::nc_INT, {stormDim});
+        auto timeVar = outFile.addVar("time", netCDF::NcType::nc_DOUBLE, {timeDim});
+        auto latVar = outFile.addVar("lat", netCDF::NcType::nc_FLOAT, {timeDim});
+        auto lonVar = outFile.addVar("lon", netCDF::NcType::nc_FLOAT, {timeDim});
+        auto serialNoVar = outFile.addVar("serialNo", netCDF::NcType::nc_SHORT, {timeDim});
+        
+        // 准备数据
+        auto timeData = std::make_unique<float[]>(timeDimSize);
+        auto latData = std::make_unique<float[]>(timeDimSize);
+        auto lonData = std::make_unique<float[]>(timeDimSize);
+        auto serialNoData = std::make_unique<float[]>(timeDimSize);
+        
+        size_t tc_i = 0, pastTimeLen = 0;
+        for (auto const &tc : tcs.tcs) {
+            std::iota(timeData.get()+pastTimeLen, timeData.get()+pastTimeLen+tc.geoCenters.size(), tc.startTimeIndex);
+            std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), latData.get()+pastTimeLen, [](const std::pair<float, float> &geoCenter){return geoCenter.first;});
+            std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), lonData.get()+pastTimeLen, [](const std::pair<float, float> &geoCenter){return geoCenter.second;});
+            std::fill(serialNoData.get()+pastTimeLen, serialNoData.get()+pastTimeLen+tc.geoCenters.size(), tc.serialNo);
+            pastTimeLen += tc.geoCenters.size();
+            ++tc_i;
+        }
+        
+        // 写入变量属性
+        timeVar.putAtt("units", "minutes since 2016-10-19 00:00:00");
+        latVar.putAtt("units", "degrees_north");
+        lonVar.putAtt("units", "degrees_east");
+        
+        serialNoVar.putAtt("coordinates", "time lon lat");
+        // 写入全局属性
+        appendHistoryInfo(outFile);
+        outFile.putAtt("featureType", "trajectory");
+        
+        // 写入数据
+        // https://stackoverflow.com/questions/2923272/how-to-convert-vector-to-array
+        rowSizeVar.putVar(&tcsAge[0]);         // vector储存的数据是内存连续的，这么做以避免数据拷贝
+        timeVar.putVar(timeData.get());
+        latVar.putVar(latData.get());
+        lonVar.putVar(lonData.get());
+        serialNoVar.putVar(serialNoData.get());
+        
+        outFile.close();
+    }
+
+    void NCFileInfo::appendHistoryInfo(netCDF::NcFile &ncFile) {
+        ncFile.putAtt("history", UtilFunc::currentDateTime());
+    }
+
+    
 
     void NCFileInfo::getDataFromStep3File(const std::string& inFilePath, std::vector<Typhoon>& tcs) {
         std::ifstream ifs(inFilePath, std::ios::binary);
