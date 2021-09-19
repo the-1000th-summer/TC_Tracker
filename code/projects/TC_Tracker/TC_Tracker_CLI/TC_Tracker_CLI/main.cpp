@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <netcdf>
+#include <filesystem>
 #include <boost/program_options.hpp>
 #include "cxxopts.hpp"
 #include "NCFileInfo.h"
@@ -48,11 +49,15 @@ inline void handleInOutFile(const std::vector<std::string> &fileNames) {
 
 
 void tryCXXOPTS(int argc, char * argv[]) {
+    auto exePath = std::filesystem::weakly_canonical(std::filesystem::path(argv[0])).parent_path();
+
     cxxopts::Options options("TC_Tracker", "TC_Tracker: Tropical Cyclone tracking program");
     options.add_options()
     ("h,help", "Display available options") // a bool parameter
     ("v,version", "Print version information")
+    ("z,z-lv-index", "Specify the index of z level", cxxopts::value<int>())
     ("t,no-temp-files", "Do not export temp files", cxxopts::value<bool>()->default_value("true"))
+    ("p,temp-files-dir", "Set directory of temp files", cxxopts::value<std::string>()->default_value(exePath))
     ;
     // hidden options
     options.add_options("hiddenOpts")
@@ -61,37 +66,63 @@ void tryCXXOPTS(int argc, char * argv[]) {
     options.parse_positional({"inOutFiles"});
     options.positional_help("input.nc output.nc");
     // 解析
-    auto result = options.parse(argc, argv);
+    std::unique_ptr<cxxopts::ParseResult> result;
+    
+    try {
+        result = std::make_unique<cxxopts::ParseResult>(options.parse(argc, argv));
+    } catch (cxxopts::OptionParseException &e) {
+        abortWithMsg(e.what());
+    } catch (std::exception &e) {
+        abortWithMsg("Unhandled exception!\nException message:\n"+std::string(e.what()));
+    }
+
 //    handleHelpAndVersion(result);
-    if (result.count("help")) {
+    if (result->count("help")) {
         std::cout << options.help({""}) << std::endl;
         exit(0);
     }
-    if (result.count("version")) {
+    if (result->count("version")) {
         std::cout << "TC_Tracker_CLI v0.1" << std::endl;
         exit(0);
     }
     // 处理输入输出文件
     std::vector<std::string> allFilesName{};
     try {
-        allFilesName = result["inOutFiles"].as<std::vector<std::string>>();
+        allFilesName = (*result)["inOutFiles"].as<std::vector<std::string>>();
     } catch (std::domain_error) {         // 没有positional arguments
         abortWithMsg("Please specify input and output files!");
     }
     handleInOutFile(allFilesName);
     
+    /// 将positional arguments全部转换为绝对路径
+    std::vector<std::string> allFilesPath{};
+    std::transform(allFilesName.cbegin(), allFilesName.cend(), std::back_inserter(allFilesPath), [](const std::string &fileName) {
+        std::filesystem::path inFileName(fileName);
+        return inFileName.is_relative() ? std::filesystem::current_path() / inFileName : inFileName;
+    });
+    
+    /// 检查是否为wrfout文件
+    auto fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str());
+    std::string exceptionInfo;
+    bool isWrfoutFile = fileInfo.checkIsWrfoutFile(exceptionInfo);
+    std::cout << "Input file is " << (isWrfoutFile ? "" : "NOT ") << "wrfout file." << std::endl;
+    VarNames varNames;
+    if (isWrfoutFile) {
+        varNames = VarNames("XTIME","XLAT","XLONG","vorName");
+    } else {
+        std::cout << exceptionInfo << std::endl;
+        varNames.checkVarNames();
+    }
+
+    fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, 0, (*result)["p"].as<std::string>().c_str());
+    TTCore::TCs tcs;
+    
     /// （无用的变量，因为cli直接Ctrl+C就可终止程序）
     bool isCanceled = false;
-    std::string ncFileDir = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/";
-    auto fileInfo = TTCore::NCFileInfo((ncFileDir+"wrfout_d01_2016-10-19_00_00_00_persist_minForVor.nc").c_str(), true, "XTIME", "XLAT", "XLONG", "", 0, ".");
-    
-//    std::vector<TTCore::Typhoon> tcs{};
-    TTCore::TCs tcs;
     fileInfo.startTracking(tcs, &isCanceled);
-//    fileInfo.exportFile_nc(tcs, ncFileDir+"minForVor_track.nc");
-//    auto theTCs = TTCore::TCs(tcs, "minutes since 2016-10-19 00:00:00", 60);
+//    fileInfo.exportFile_nc(tcs, allFilesPath.back());
+    fileInfo.exportFile_nc_compact(tcs, allFilesPath.back());
     
-    fileInfo.exportFile_nc_compact(tcs, ncFileDir+"minForVor_track_compact.nc");
     std::cout << "end of tracking" << std::endl;
 }
 

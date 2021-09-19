@@ -52,12 +52,16 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "df"
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrfout_d01_2016-10-19_00_00_00_persist_minForVor.nc"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "dsf"
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/minForVor_track_compact.nc"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-u"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>

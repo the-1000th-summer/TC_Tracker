@@ -14,10 +14,11 @@
 #include "Typhoon.h"
 
 namespace TTCore {
-NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {
-}
-NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, int zLevelIndex, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {
-}
+//NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {}
+NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const VarNames &varNames, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), dumpDir(dumpDirectory) {}
+//NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, int zLevelIndex, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {}
+NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, const char *dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {}
+NCFileInfo::NCFileInfo(const char* filePath) : ncFilePath(filePath) {}
 
 void NCFileInfo::checkFileValid() {
     try {
@@ -37,7 +38,7 @@ void NCFileInfo::checkFileValid() {
 
 int NCFileInfo::getZLvDimLenName(std::string& zLvDimName) {
     netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-    auto uVar = f.getVar(isWrfoutFile ? "U" : vorVarName);
+    auto uVar = f.getVar(isWrfoutFile ? "U" : varNames.vorVarName);
     if (uVar.getDimCount() != 4)
         return 0;
     zLvDimName = uVar.getDim(1).getName();
@@ -70,7 +71,7 @@ bool NCFileInfo::checkIsWrfoutFile(std::string& exceptionInfo) {
 
 void NCFileInfo::getLatLonData(std::vector<float>& latData, std::vector<float>& lonData) {
     netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-    UtilFunc::getLatLonData(&f, latVarName, lonVarName, latData, lonData);
+    UtilFunc::getLatLonData(&f, varNames.latVarName, varNames.lonVarName, latData, lonData);
 }
 
 void NCFileInfo::getVarsName(std::vector<std::string> &varsName) {
@@ -96,7 +97,7 @@ void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled) {
     
     netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
     
-    Processor p(isCanceled, f, isWrfoutFile, timeVarName, latVarName, lonVarName, vorVarName, zLevelIndex, dumpDir);
+    Processor p(isCanceled, f, isWrfoutFile, varNames, zLevelIndex, dumpDir);
     
     p.recognizeTyphoon();
     if (*isCanceled) return;
@@ -168,7 +169,7 @@ void NCFileInfo::exportFile(const std::string& outFilePath) {
 }
 
 /// 将结果输出为netCDF文件（标准：CF Convention）
-void NCFileInfo::exportFile_nc(const std::vector<TTCore::Typhoon> &tcs, const std::string &oNcFilePath) {
+void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath) {
     netCDF::NcFile outFile(oNcFilePath, netCDF::NcFile::replace);
     std::vector<int> tcsAge{};
     std::transform(tcs.cbegin(), tcs.cend(), std::back_inserter(tcsAge), [](const Typhoon& tc){return tc.maxVorCells.size();});
@@ -192,7 +193,7 @@ void NCFileInfo::exportFile_nc(const std::vector<TTCore::Typhoon> &tcs, const st
     auto serialNoData = std::make_unique<float[]>(stormDimSize * timeDimSize);
     
     size_t tc_i = 0;
-    for (auto const &tc : tcs) {
+    for (auto const &tc : tcs.getTcs()) {
         std::iota(timeData.get()+timeDimSize*tc_i, timeData.get()+timeDimSize*tc_i+tc.geoCenters.size(), tc.startTimeIndex);
         std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), latData.get()+timeDimSize*tc_i, [](const std::pair<float, float> &geoCenter){return geoCenter.first;});
         std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), lonData.get()+timeDimSize*tc_i, [](const std::pair<float, float> &geoCenter){return geoCenter.second;});

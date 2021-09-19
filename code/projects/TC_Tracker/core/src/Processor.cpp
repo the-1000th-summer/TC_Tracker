@@ -27,7 +27,7 @@
 
 namespace TTCore {
 
-Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& timeVName, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory), iiFile(&iFile), tcInfo(getTCInfo()) {
+Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory), iiFile(&iFile), tcInfo(getTCInfo()) {
     
 
     getDimLength();
@@ -38,7 +38,7 @@ Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile,
     } else {
         latArr = std::make_unique<float[]>(latGridNum);
         lonArr = std::make_unique<float[]>(lonGridNum);
-        UtilFunc::getLatLonData(iiFile, latVarName, lonVarName, latArr.get(), lonArr.get());
+        UtilFunc::getLatLonData(iiFile, varNames.latVarName, varNames.lonVarName, latArr.get(), lonArr.get());
     }
     
     // std::cout << a << std::endl;
@@ -59,7 +59,7 @@ Processor::~Processor() {
 
 TCInfo Processor::getTCInfo() {
     std::string timeUnits;
-    auto timeVar = iiFile->getVar(timeVarName);
+    auto timeVar = iiFile->getVar(varNames.timeVarName);
     timeVar.getAtt("units").getValues(timeUnits);
     return TCInfo(timeUnits, UtilFunc::getTimeInterval(timeVar));
     //        vortexes = Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
@@ -69,7 +69,7 @@ TCInfo Processor::getTCInfo() {
 /// 此方法找出文件的各维度的长度
 void Processor::getDimLength() {
     if (!isWrfoutFile) {
-        auto vorVar = iiFile->getVar(vorVarName);
+        auto vorVar = iiFile->getVar(varNames.vorVarName);
         timeLength = vorVar.getDim(0).getSize();
         latGridNum = vorVar.getDim(1).getSize();
         lonGridNum = vorVar.getDim(2).getSize();
@@ -156,7 +156,7 @@ void Processor::recognizeTyphoon() {
     if (isWrfoutFile) {
         calcRelativeVorField(iiFile, vorField);
     } else {
-        iiFile->getVar(vorVarName).getVar(vorField.get());
+        iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
     }
     Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue());
     //Constants::HAS_TP_MIN_ReVOR = isWrfoutFile ? 100e-5 : 8e-5;
@@ -190,7 +190,7 @@ void Processor::recognizeTyphoon() {
 /// 第二步：跟踪第一步生成的每个时次的气旋，生成真正的气旋对象。
 void Processor::getRealTC() {
     std::cout << "开始跟踪" << std::endl;
-    UtilFunc::modifyMaxDist(iiFile, isWrfoutFile ? "XTIME" : timeVarName);
+    UtilFunc::modifyMaxDist(iiFile, isWrfoutFile ? "XTIME" : varNames.timeVarName);
     
     /// 当前时次和前一时次是否有气旋
     bool hasTCCurrentTime = false, hasTCPrevTime = false;
