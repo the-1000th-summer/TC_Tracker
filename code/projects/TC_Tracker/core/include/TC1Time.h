@@ -4,6 +4,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/utility.hpp>
+#include "TCInfo.h"
 
 namespace TTCore {
 class TC1Time {
@@ -23,41 +24,26 @@ private:
 
 class Vortexes {
 public:
-    Vortexes(const std::string &timeUnits, double timeInterval) : timeUnits(timeUnits), timeInterval(timeInterval) {}
-    std::vector<std::vector<TC1Time>> vortexes{};
+//    Vortexes(const std::vector<std::vector<TC1Time>> &vortexes, const std::string &timeUnits, double timeInterval) : vortexes(vortexes), tcInfo(timeUnits, timeInterval) {}
+    Vortexes(const std::vector<std::vector<TC1Time>> &vortexes, TCInfo &tcInfo) : vortexes(vortexes), tcInfo(tcInfo) {}
+    Vortexes() : tcInfo("", 0) {}
+    
     
 //    void push_back(const )
-    inline std::string getTimeUnits() const;
-    inline double getTimeInterval() const;
-    inline size_t size() const;
-    inline void clearVortexData();
-    inline std::vector<TC1Time> &operator[](size_t i);
+    inline std::vector<std::vector<TC1Time>> getVortexes() const { return vortexes; }
+    inline TCInfo getTcInfo() const { return tcInfo; }
+    inline size_t size() const { return vortexes.size(); }
+    inline void clearVortexData() { vortexes.clear(); }
+    inline std::vector<TC1Time> &operator[](size_t i) { return vortexes[i]; };
 private:
-    std::string timeUnits;
-    double timeInterval;
-    
+    std::vector<std::vector<TC1Time>> vortexes{};
+    TCInfo tcInfo;
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar & vortexes;
-        ar & timeUnits;
-        ar & timeInterval;
+        ar & tcInfo;
     }
 };
-inline std::string Vortexes::getTimeUnits() const {
-    return timeUnits;
-}
-inline double Vortexes::getTimeInterval() const {
-    return timeInterval;
-}
-inline size_t Vortexes::size() const {
-    return vortexes.size();
-}
-inline void Vortexes::clearVortexData() {
-    vortexes.clear();
-}
-inline std::vector<TC1Time> &Vortexes::operator[](size_t i) {
-    return vortexes[i];
-}
 
 }

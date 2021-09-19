@@ -255,7 +255,7 @@ void NCFileInfo::exportFile_nc_compact(const TCs &tcs, const std::string &oNcFil
     auto serialNoData = std::make_unique<float[]>(timeDimSize);
     
     size_t tc_i = 0, pastTimeLen = 0;
-    for (auto const &tc : tcs.tcs) {
+    for (auto const &tc : tcs.getTcs()) {
         std::iota(timeData.get()+pastTimeLen, timeData.get()+pastTimeLen+tc.geoCenters.size(), tc.startTimeIndex);
         std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), latData.get()+pastTimeLen, [](const std::pair<float, float> &geoCenter){return geoCenter.first;});
         std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), lonData.get()+pastTimeLen, [](const std::pair<float, float> &geoCenter){return geoCenter.second;});

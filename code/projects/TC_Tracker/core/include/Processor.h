@@ -19,7 +19,7 @@ public:
     
     //Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
     ~Processor();
-    Vortexes initVortexes();
+    TCInfo getTCInfo();
     void getDimLength();
     void calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv);
     void recognizeTyphoon();
@@ -59,8 +59,9 @@ private:
     TwoDArray latArr2D = TwoDArray(0,0), lonArr2D = TwoDArray(0,0);
     /// 记录所有有台风的日期的数组（从基准日期起算的时次数）
     std::vector<int> hasTC_timeIndex{};
-//    std::vector<std::vector<TC1Time>> allVortexes{};
-    Vortexes vortexes;
+    TCInfo tcInfo;
+    std::vector<std::vector<TC1Time>> allVortexes{};
+//    Vortexes vortexes;
     std::vector<Typhoon> realTCs{};
 //    TCs tcs;
     std::vector<std::vector<std::pair<float, float>>> landPolygons;

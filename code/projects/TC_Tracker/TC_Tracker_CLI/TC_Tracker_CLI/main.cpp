@@ -86,7 +86,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     auto fileInfo = TTCore::NCFileInfo((ncFileDir+"wrfout_d01_2016-10-19_00_00_00_persist_minForVor.nc").c_str(), true, "XTIME", "XLAT", "XLONG", "", 0, ".");
     
 //    std::vector<TTCore::Typhoon> tcs{};
-    TTCore::TCs tcs({},"",0);
+    TTCore::TCs tcs;
     fileInfo.startTracking(tcs, &isCanceled);
 //    fileInfo.exportFile_nc(tcs, ncFileDir+"minForVor_track.nc");
 //    auto theTCs = TTCore::TCs(tcs, "minutes since 2016-10-19 00:00:00", 60);

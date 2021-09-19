@@ -27,10 +27,9 @@
 
 namespace TTCore {
 
-Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& timeVName, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory), iiFile(&iFile), vortexes(initVortexes()) {
+Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& timeVName, const std::string& latVName, const std::string& lonVName, const std::string& vorVName, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory), iiFile(&iFile), tcInfo(getTCInfo()) {
     
-    //        iiFile = &iFile;
-    //        initVortexes();
+
     getDimLength();
     if (isWrfoutFile) {
         latArr2D = TwoDArray(latGridNum, lonGridNum);
@@ -58,12 +57,13 @@ Processor::~Processor() {
     iiFile = nullptr;
 }
 
-Vortexes Processor::initVortexes() {
+TCInfo Processor::getTCInfo() {
     std::string timeUnits;
     auto timeVar = iiFile->getVar(timeVarName);
     timeVar.getAtt("units").getValues(timeUnits);
+    return TCInfo(timeUnits, UtilFunc::getTimeInterval(timeVar));
     //        vortexes = Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
-    return Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
+//    return Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
 }
 
 /// 此方法找出文件的各维度的长度
@@ -221,7 +221,7 @@ void Processor::getRealTC() {
         } else {             // 当前时次有气旋
             /// 当前时次的涡旋vector
             //auto currentTimeVortexes = allVortexes[hasVortex_notHandledYetIndex];
-            auto currentTimeVortexes = vortexes[timeIndex];
+            auto currentTimeVortexes = allVortexes[timeIndex];
             /// 当前时次的涡旋个数
             int currentTimeTCNum = currentTimeVortexes.size();
             //++hasVortex_notHandledYetIndex;
@@ -489,7 +489,7 @@ int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex, int TCNum
         vortexesThisTime.push_back(TC1Time{maxVorCell.first, vortexCenterLatLon});
         removeVortex(vorField, timeIndex, allCellsIndex);
     }
-    vortexes.vortexes.push_back(vortexesThisTime);
+    allVortexes.push_back(vortexesThisTime);
     return tpNum;
     
 }
@@ -661,8 +661,9 @@ void Processor::dumpStep1(const std::string ncFilePath) {
     std::ofstream ofs(stepDumpDir / ( std::filesystem::path(ncFilePath).stem().string() + "_step1.dat" ), std::ios::binary);
     boost::archive::binary_oarchive oa(ofs);
     // write class instance to archive
-    std::cout << "msg from dump step1, vortex number: " << vortexes.size() << std::endl;
+    std::cout << "msg from dump step1, vortex number: " << allVortexes.size() << std::endl;
     //        oa << hasTC_timeIndex << vortexes;
+    Vortexes vortexes(allVortexes, tcInfo);
     oa << vortexes;
 }
 
@@ -671,7 +672,8 @@ void Processor::dumpStep2(const std::string ncFilePath) {
     std::filesystem::path stepDumpDir(dumpDir);
     std::ofstream ofs(stepDumpDir / (std::filesystem::path(ncFilePath).stem().string() + "_step2.dat"), std::ios::binary);
     boost::archive::binary_oarchive oa(ofs);
-    oa << realTCs;
+    TCs tcs(realTCs, tcInfo);
+    oa << tcs;
     
     //getLandPolygons();
     //std::cout << "test" << std::endl;
@@ -689,16 +691,20 @@ void Processor::dumpStep3(const std::string ncFilePath) {
     std::filesystem::path stepDumpDir(dumpDir);
     std::ofstream ofs(stepDumpDir / (std::filesystem::path(ncFilePath).stem().string() + "_step3.dat"), std::ios::binary);
     boost::archive::binary_oarchive oa(ofs);
-    oa << realTCs;
+    TCs tcs(realTCs, tcInfo);
+    oa << tcs;
 }
 
 void Processor::getStep1DataFromFile(const std::string& filePath) {
     std::ifstream ifs(filePath, std::ios::binary);
     boost::archive::binary_iarchive ia(ifs);
     
-    vortexes.clearVortexData();
+    allVortexes.clear();
     //        ia >> hasTC_timeIndex >> vortexes;
+    Vortexes vortexes;
     ia >> vortexes;
+    allVortexes = vortexes.getVortexes();
+    tcInfo = vortexes.getTcInfo();
 }
 
 void Processor::getStep2DataFromFile(const std::string& filePath) {
@@ -706,7 +712,11 @@ void Processor::getStep2DataFromFile(const std::string& filePath) {
     boost::archive::binary_iarchive ia(ifs);
     
     realTCs.clear();
-    ia >> realTCs;
+    TCs tcs;
+    ia >> tcs;
+    realTCs = tcs.getTcs();
+    tcInfo = tcs.getTcInfo();
+
 }
 
 void Processor::copyRealTCs(std::vector<Typhoon>& tcs) {
@@ -716,7 +726,7 @@ void Processor::copyRealTCs(std::vector<Typhoon>& tcs) {
 }
 
 void Processor::copyTCs(TCs &tcs) {
-    tcs = TCs(realTCs, vortexes.getTimeUnits(), vortexes.getTimeInterval());
+    tcs = TCs(realTCs, tcInfo);
 }
 
 void Processor::getLandPolygons() {
