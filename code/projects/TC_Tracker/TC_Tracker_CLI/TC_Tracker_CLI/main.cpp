@@ -8,7 +8,7 @@
 #include <iostream>
 #include <netcdf>
 #include <filesystem>
-#include <numeric>
+//#include <numeric>
 #include <boost/program_options.hpp>
 #include "cxxopts.hpp"
 #include "NCFileInfo.h"
@@ -46,19 +46,87 @@ std::string joinStrings(const std::vector<std::string> &strVec, const char *deli
 
 /// 处理输入输出的文件名，并打印文件名信息
 /// vector的最后一个元素视为输出文件，其他元素视为输入文件
-inline void handleInOutFile(const std::vector<std::string> &fileNames) {
-    if (fileNames.size() == 1) {
+std::vector<std::string> handleInOutFile(cxxopts::ParseResult *result) {
+    std::vector<std::string> allFilesName{};
+    try {
+        allFilesName = (*result)["inOutFiles"].as<std::vector<std::string>>();
+    } catch (std::domain_error) {         // 没有positional arguments
+        abortWithMsg("Please specify input and output files!");
+    }
+    
+    if (allFilesName.size() == 1) {
         abortWithMsg("Please specify output file name!");
     }
     std::cout << "TC_Tracker start..." << std::endl;
     std::cout << "Input file(s):" << std::endl;
-    for (int i = 0; i < fileNames.size()-1; ++i) {
-        std::cout << "  " << fileNames[i] << std::endl;
+    for (int i = 0; i < allFilesName.size()-1; ++i) {
+        std::cout << "  " << allFilesName[i] << std::endl;
     }
-    std::cout << "Output file:\n  " << fileNames.back() << std::endl;
+    std::cout << "Output file:\n  " << allFilesName.back() << std::endl;
+    
+    /// 将positional arguments全部转换为绝对路径
+    std::vector<std::string> allFilesPath{};
+    std::transform(allFilesName.cbegin(), allFilesName.cend(), std::back_inserter(allFilesPath), [](const std::string &fileName) {
+        std::filesystem::path inFileName(fileName);
+        return inFileName.is_relative() ? std::filesystem::current_path() / inFileName : inFileName;
+    });
+    return allFilesPath;
 }
 
+bool checkIsWrfoutFile(const std::string &inFilePath) {
+    auto fileInfo = TTCore::NCFileInfo(inFilePath.c_str());
+    std::string exceptionInfo;
+    bool isWrfoutFile = fileInfo.checkIsWrfoutFile(exceptionInfo);
+    std::cout << "Input file is " << (isWrfoutFile ? "" : "NOT ") << "wrfout file." << std::endl;
+    return isWrfoutFile;
+}
 
+VarNames getVarNames(bool isWrfoutFile) {
+    VarNames varNames;
+    if (isWrfoutFile) {
+        varNames = VarNames("XTIME","XLAT","XLONG","vorName");
+    } else {
+//        std::cout << exceptionInfo << std::endl;
+        varNames.checkVarNames();
+    }
+    return varNames;
+}
+
+int handleZLvIndex(const cxxopts::ParseResult *result, const std::string &inFilePath, bool isWrfoutFile) {
+    auto fileInfo = TTCore::NCFileInfo(inFilePath.c_str());
+    fileInfo.isWrfoutFile = isWrfoutFile;
+    
+    std::string zLvDimName;
+    int zLvNum = fileInfo.getZLvDimLenName(zLvDimName);
+    if (!result->count("z"))
+        abortWithMsg("z level index not specified!\nPlease specify with option \"-z\"");
+    int zLvIndex = (*result)["z"].as<int>();
+    std::cout << "z level index (1-based): " << zLvIndex << std::endl;
+    if (!zLvNum)
+        std::cout << "No z dimension in the file." << std::endl;
+    if (zLvIndex > zLvNum)
+        abortWithMsg("Specified z level index is invalid!\nPlease specify between 1 and "+std::to_string(zLvNum));
+    
+    return zLvIndex;
+}
+
+/// 处理是否输出中间文件以及中间文件的路径
+std::pair<bool, std::string> handleTempFiles(const cxxopts::ParseResult *result) {
+    const bool noTempFiles = result->count("t") ? true : false;
+    const std::string tempFilesDir = (*result)["p"].as<std::string>();
+    std::cout << "Will " + std::string(noTempFiles ? "NOT " : "") + "export temp files." << std::endl;
+    if (noTempFiles) {
+        if (!tempFilesDir.empty())
+            std::cout << "Temp files dir specified by user is ignored." << std::endl;
+    } else {
+        if (result->count("p")) {
+            std::cout << "Temp files directory: " + tempFilesDir << std::endl;
+        } else {
+            std::cout << "Not specified temp files dir, temp files will be saved to executable file folder: " << std::endl;
+        }
+    }
+    return {noTempFiles, tempFilesDir};
+}
 
 void tryCXXOPTS(int argc, char * argv[]) {
     auto exePath = std::filesystem::weakly_canonical(std::filesystem::path(argv[0])).parent_path();
@@ -99,64 +167,14 @@ void tryCXXOPTS(int argc, char * argv[]) {
         std::cout << "TC_Tracker_CLI v0.1" << std::endl;
         exit(0);
     }
-    // 处理输入输出文件
-    std::vector<std::string> allFilesName{};
-    try {
-        allFilesName = (*result)["inOutFiles"].as<std::vector<std::string>>();
-    } catch (std::domain_error) {         // 没有positional arguments
-        abortWithMsg("Please specify input and output files!");
-    }
-    handleInOutFile(allFilesName);
-    
-    /// 将positional arguments全部转换为绝对路径
-    std::vector<std::string> allFilesPath{};
-    std::transform(allFilesName.cbegin(), allFilesName.cend(), std::back_inserter(allFilesPath), [](const std::string &fileName) {
-        std::filesystem::path inFileName(fileName);
-        return inFileName.is_relative() ? std::filesystem::current_path() / inFileName : inFileName;
-    });
-    
-    /// 检查是否为wrfout文件
-    auto fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str());
-    std::string exceptionInfo;
-    bool isWrfoutFile = fileInfo.checkIsWrfoutFile(exceptionInfo);
-    std::cout << "Input file is " << (isWrfoutFile ? "" : "NOT ") << "wrfout file." << std::endl;
-    VarNames varNames;
-    if (isWrfoutFile) {
-        varNames = VarNames("XTIME","XLAT","XLONG","vorName");
-        fileInfo.isWrfoutFile = true;
-    } else {
-        std::cout << exceptionInfo << std::endl;
-        varNames.checkVarNames();
-    }
-    
-    /// 处理z level index
-    std::string zLvDimName;
-    int zLvNum = fileInfo.getZLvDimLenName(zLvDimName);
-    if (!result->count("z"))
-        abortWithMsg("z level index not specified!\nPlease specify with option \"-z\"");
-    int zLvIndex = (*result)["z"].as<int>();
-    std::cout << "z level index (1-based): " << zLvIndex << std::endl;
-    if (!zLvNum)
-        std::cout << "No z dimension in the file." << std::endl;
-    if (zLvIndex > zLvNum)
-        abortWithMsg("Specified z level index is invalid!\nPlease specify between 1 and "+std::to_string(zLvNum));
-    
-    /// 处理是否输出中间文件
-    const bool noTempFiles = result->count("t") ? true : false;
-    const std::string tempFilesDir = (*result)["p"].as<std::string>();
-    std::cout << "Will " + std::string(noTempFiles ? "NOT " : "") + "export temp files." << std::endl;
-    if (noTempFiles) {
-        if (!tempFilesDir.empty())
-            std::cout << "Temp files dir specified by user is ignored." << std::endl;
-    } else {
-        if (result->count("p")) {
-            std::cout << "Temp files directory: " + tempFilesDir << std::endl;
-        } else {
-            std::cout << "Not specified temp files dir, temp files will be saved to executable file folder: " << std::endl;
-        }
-    }
 
-    fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, zLvIndex-1, noTempFiles, tempFilesDir.c_str());
+    auto allFilesPath = handleInOutFile(result.get());
+    bool isWrfoutFile = checkIsWrfoutFile(allFilesPath[0]);
+    auto varNames = getVarNames(isWrfoutFile);
+    int zLvIndex = handleZLvIndex(result.get(), allFilesPath[0], isWrfoutFile);
+    auto [noTempFiles, tempFilesDir] = handleTempFiles(result.get());
+    
+    auto fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, zLvIndex-1, noTempFiles, tempFilesDir.c_str());
     TTCore::TCs tcs;
     
     /// （无用的变量，因为cli直接Ctrl+C就可终止程序）
