@@ -16,7 +16,7 @@ namespace TTCore {
 class Processor {
 public:
 //    Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &timeVName="", const std::string & latVName="", const std::string & lonVName="", const std::string & vorVName="", int zLevelIndex = -1, const std::string & dumpDirectory = "");
-    Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const VarNames &varNames=VarNames(), int zLevelIndex = -1, const std::string & dumpDirectory = "");
+    Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, const std::string & dumpDirectory);
     //Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
     ~Processor();
     TCInfo getTCInfo();
@@ -45,10 +45,6 @@ private:
     bool* isCanceled;
     netCDF::NcFile *iiFile;
     VarNames varNames;
-//    std::string timeVarName;
-//    std::string latVarName;
-//    std::string lonVarName;
-//    std::string vorVarName;
     int zLevelIndex = -1;
     std::string dumpDir;
     unsigned long timeLength = 0;

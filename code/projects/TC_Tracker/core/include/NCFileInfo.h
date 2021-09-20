@@ -11,20 +11,17 @@ public:
     std::string ncFilePath;
     //const char* ncFilePath;
     VarNames varNames;
-//    std::string timeVarName;
-//    std::string latVarName;
-//    std::string lonVarName;
-//    std::string vorVarName;
     int zLevelIndex = -1;
+    bool noTempFiles = false;
     std::string dumpDir;
     bool isWrfoutFile = false;
     bool isFileValid = false;
     std::string fileValidInfo;
     
 //    NCFileInfo(const char* filePath, bool isWrfoutFile, const char *timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory);
-    NCFileInfo(const char* filePath, bool isWrfoutFile, const VarNames &varNames, const char* dumpDirectory);
+//    NCFileInfo(const char* filePath, bool isWrfoutFile, const VarNames &varNames, bool noTempFiles, const char* dumpDirectory);
 //    NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char *latVName, const char *lonVName, const char *vorVName, int zLevelIndex, const char *dumpDirectory);
-    NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, const char *dumpDirectory);
+    NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, const char *dumpDirectory);
     NCFileInfo(const char* filePath);
     void checkFileValid();
     int getZLvDimLenName(std::string &zLvDimName);
@@ -40,12 +37,12 @@ public:
     
     void exportFile(const std::string &inFilePath, const std::string &outFilePath);
     void exportFile(const std::string &outFilePath);
-    void exportFile_nc(TCs &tcs, const std::string &oNcFilePath);
-    void exportFile_nc_compact(const TCs &tcs, const std::string &oNcFilePath);
+    void exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand);
+    void exportFile_nc_compact(const TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand);
     
     void getDataFromStep3File(const std::string& inFilePath, std::vector<Typhoon>& tcs);
 private:
-    void appendHistoryInfo(netCDF::NcFile &ncFile);
+    void appendHistoryInfo(netCDF::NcFile &ncFile, const std::string &fullCommand);
     //    netCDF::NcFile *iiFile = nullptr;
 };
 }

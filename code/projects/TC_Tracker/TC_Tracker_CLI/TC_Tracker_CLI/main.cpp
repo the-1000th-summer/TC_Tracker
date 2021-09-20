@@ -8,6 +8,7 @@
 #include <iostream>
 #include <netcdf>
 #include <filesystem>
+#include <numeric>
 #include <boost/program_options.hpp>
 #include "cxxopts.hpp"
 #include "NCFileInfo.h"
@@ -27,9 +28,20 @@ namespace bpo = boost::program_options;
 //}
 
 inline void abortWithMsg(const std::string &msg) {
+    std::cout << "\nERROR!" << std::endl;
     std::cout << msg << std::endl;
-    std::cout << "Aborted." << std::endl;
+    std::cout << "Aborted.\n" << std::endl;
     exit(1);
+}
+
+std::string joinStrings(const std::vector<std::string> &strVec, const char *delimiter) {
+    std::string ret;
+    auto iter = strVec.begin(), endIter = strVec.end() - 1;
+    for (; iter != endIter; ++iter) {
+        ret += (*iter + delimiter);
+    }
+    ret += *iter;
+    return ret;
 }
 
 /// 处理输入输出的文件名，并打印文件名信息
@@ -38,7 +50,7 @@ inline void handleInOutFile(const std::vector<std::string> &fileNames) {
     if (fileNames.size() == 1) {
         abortWithMsg("Please specify output file name!");
     }
-    std::cout << "TC_Tracker start." << std::endl;
+    std::cout << "TC_Tracker start..." << std::endl;
     std::cout << "Input file(s):" << std::endl;
     for (int i = 0; i < fileNames.size()-1; ++i) {
         std::cout << "  " << fileNames[i] << std::endl;
@@ -50,13 +62,15 @@ inline void handleInOutFile(const std::vector<std::string> &fileNames) {
 
 void tryCXXOPTS(int argc, char * argv[]) {
     auto exePath = std::filesystem::weakly_canonical(std::filesystem::path(argv[0])).parent_path();
+    std::vector<std::string> argList(argv, argv + argc);   // for history
 
     cxxopts::Options options("TC_Tracker", "TC_Tracker: Tropical Cyclone tracking program");
     options.add_options()
+    ("c,compact-nc-file", "The program will output compact version of netCDF file")
     ("h,help", "Display available options") // a bool parameter
     ("v,version", "Print version information")
-    ("z,z-lv-index", "Specify the index of z level", cxxopts::value<int>())
-    ("t,no-temp-files", "Do not export temp files", cxxopts::value<bool>()->default_value("true"))
+    ("z,z-lv-index", "Specify the index of z level (1-based)", cxxopts::value<int>())
+    ("t,no-temp-files", "Do not export temp files")
     ("p,temp-files-dir", "Set directory of temp files", cxxopts::value<std::string>()->default_value(exePath))
     ;
     // hidden options
@@ -73,7 +87,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     } catch (cxxopts::OptionParseException &e) {
         abortWithMsg(e.what());
     } catch (std::exception &e) {
-        abortWithMsg("Unhandled exception!\nException message:\n"+std::string(e.what()));
+        abortWithMsg("Unhandled exception!\nException message:\n" + std::string(e.what()));
     }
 
 //    handleHelpAndVersion(result);
@@ -109,19 +123,53 @@ void tryCXXOPTS(int argc, char * argv[]) {
     VarNames varNames;
     if (isWrfoutFile) {
         varNames = VarNames("XTIME","XLAT","XLONG","vorName");
+        fileInfo.isWrfoutFile = true;
     } else {
         std::cout << exceptionInfo << std::endl;
         varNames.checkVarNames();
     }
+    
+    /// 处理z level index
+    std::string zLvDimName;
+    int zLvNum = fileInfo.getZLvDimLenName(zLvDimName);
+    if (!result->count("z"))
+        abortWithMsg("z level index not specified!\nPlease specify with option \"-z\"");
+    int zLvIndex = (*result)["z"].as<int>();
+    std::cout << "z level index (1-based): " << zLvIndex << std::endl;
+    if (!zLvNum)
+        std::cout << "No z dimension in the file." << std::endl;
+    if (zLvIndex > zLvNum)
+        abortWithMsg("Specified z level index is invalid!\nPlease specify between 1 and "+std::to_string(zLvNum));
+    
+    /// 处理是否输出中间文件
+    const bool noTempFiles = result->count("t") ? true : false;
+    const std::string tempFilesDir = (*result)["p"].as<std::string>();
+    std::cout << "Will " + std::string(noTempFiles ? "NOT " : "") + "export temp files." << std::endl;
+    if (noTempFiles) {
+        if (!tempFilesDir.empty())
+            std::cout << "Temp files dir specified by user is ignored." << std::endl;
+    } else {
+        if (result->count("p")) {
+            std::cout << "Temp files directory: " + tempFilesDir << std::endl;
+        } else {
+            std::cout << "Not specified temp files dir, temp files will be saved to executable file folder: " << std::endl;
+        }
+    }
 
-    fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, 0, (*result)["p"].as<std::string>().c_str());
+    fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, zLvIndex-1, noTempFiles, tempFilesDir.c_str());
     TTCore::TCs tcs;
     
     /// （无用的变量，因为cli直接Ctrl+C就可终止程序）
     bool isCanceled = false;
     fileInfo.startTracking(tcs, &isCanceled);
-//    fileInfo.exportFile_nc(tcs, allFilesPath.back());
-    fileInfo.exportFile_nc_compact(tcs, allFilesPath.back());
+    
+    /// 检查输出multidimensional的nc文件还是jagged array nc文件
+    std::string argStr = joinStrings(argList, " ");
+    if (result->count("c")) {
+        fileInfo.exportFile_nc_compact(tcs, allFilesPath.back(), argStr);
+    } else {
+        fileInfo.exportFile_nc(tcs, allFilesPath.back(), argStr);
+    }
     
     std::cout << "end of tracking" << std::endl;
 }

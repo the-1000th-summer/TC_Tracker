@@ -15,9 +15,9 @@
 
 namespace TTCore {
 //NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {}
-NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const VarNames &varNames, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), dumpDir(dumpDirectory) {}
+//NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const VarNames &varNames, bool noTempFiles, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), noTempFiles(noTempFiles), dumpDir(dumpDirectory) {}
 //NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, int zLevelIndex, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {}
-NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, const char *dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {}
+NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, const char *dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), noTempFiles(noTempFiles), dumpDir(dumpDirectory) {}
 NCFileInfo::NCFileInfo(const char* filePath) : ncFilePath(filePath) {}
 
 void NCFileInfo::checkFileValid() {
@@ -101,14 +101,16 @@ void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled) {
     
     p.recognizeTyphoon();
     if (*isCanceled) return;
-    p.dumpStep1(ncFilePath);
+    if (!noTempFiles)
+        p.dumpStep1(ncFilePath);
     
     p.getRealTC();
-    p.dumpStep2(ncFilePath);
+    if (!noTempFiles)
+        p.dumpStep2(ncFilePath);
     
     p.removeNoise();
-    p.dumpStep3(ncFilePath);
-    
+    if (!noTempFiles)
+        p.dumpStep3(ncFilePath);
     
     //        p.copyRealTCs(tcs);
     p.copyTCs(tcs);
@@ -169,7 +171,7 @@ void NCFileInfo::exportFile(const std::string& outFilePath) {
 }
 
 /// 将结果输出为netCDF文件（标准：CF Convention）
-void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath) {
+void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand) {
     netCDF::NcFile outFile(oNcFilePath, netCDF::NcFile::replace);
     std::vector<int> tcsAge{};
     std::transform(tcs.cbegin(), tcs.cend(), std::back_inserter(tcsAge), [](const Typhoon& tc){return tc.maxVorCells.size();});
@@ -217,7 +219,7 @@ void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath) {
     lonVar.putAtt("_FillValue", netCDF::NcType::nc_FLOAT, -9999.0);
     serialNoVar.putAtt("_FillValue", netCDF::NcType::nc_SHORT, -9999);
     // 写入全局属性
-    appendHistoryInfo(outFile);
+    appendHistoryInfo(outFile, fullCommand);
     outFile.putAtt("featureType", "trajectory");
     // 写入数据
     timeVar.putVar(timeData.get());
@@ -229,7 +231,7 @@ void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath) {
     
 }
 
-void NCFileInfo::exportFile_nc_compact(const TCs &tcs, const std::string &oNcFilePath) {
+void NCFileInfo::exportFile_nc_compact(const TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand) {
     netCDF::NcFile outFile(oNcFilePath, netCDF::NcFile::replace);
     std::vector<int> tcsAge{};
     std::transform(tcs.cbegin(), tcs.cend(), std::back_inserter(tcsAge), [](const Typhoon& tc){return tc.maxVorCells.size();});
@@ -272,7 +274,7 @@ void NCFileInfo::exportFile_nc_compact(const TCs &tcs, const std::string &oNcFil
     
     serialNoVar.putAtt("coordinates", "time lon lat");
     // 写入全局属性
-    appendHistoryInfo(outFile);
+    appendHistoryInfo(outFile, fullCommand);
     outFile.putAtt("featureType", "trajectory");
     
     // 写入数据
@@ -286,8 +288,8 @@ void NCFileInfo::exportFile_nc_compact(const TCs &tcs, const std::string &oNcFil
     outFile.close();
 }
 
-void NCFileInfo::appendHistoryInfo(netCDF::NcFile &ncFile) {
-    ncFile.putAtt("history", UtilFunc::currentDateTime());
+void NCFileInfo::appendHistoryInfo(netCDF::NcFile &ncFile, const std::string &fullCommand) {
+    ncFile.putAtt("history", UtilFunc::currentDateTime()+": "+fullCommand);
 }
 
 
