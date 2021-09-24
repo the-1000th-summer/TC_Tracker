@@ -86,6 +86,7 @@ float cellsLatAvg(const float *latArray, const std::vector<std::pair<int, int>> 
 inline float cellsLatAvg(const std::vector<std::pair<float, float>>& geoCenters);
 float cellsLonAvg(const float* lonArray, const std::vector<std::pair<int, int>>& cells);
 inline float cellsLonAvg(const std::vector<std::pair<float, float>>& geoCenters);
+
 }
 
 /// 计算两点欧氏距离
@@ -104,5 +105,7 @@ inline float UtilFunc::cellsLatAvg(const std::vector<std::pair<float, float>>& g
 inline float UtilFunc::cellsLonAvg(const std::vector<std::pair<float, float>>& geoCenters) {
     return std::accumulate(geoCenters.begin(), geoCenters.end(), 0.0f, [](auto& a, auto& b) {return a + b.second; }) / geoCenters.size();
 }
+
+
 
 }

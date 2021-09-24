@@ -13,6 +13,7 @@
 #include "cxxopts.hpp"
 #include "NCFileInfo.h"
 #include "Typhoon.h"
+#include "Utils.h"
 
 namespace bpo = boost::program_options;
 
@@ -32,6 +33,16 @@ inline void abortWithMsg(const std::string &msg) {
     std::cout << msg << std::endl;
     std::cout << "Aborted.\n" << std::endl;
     exit(1);
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> result;
+    std::stringstream ss (s);
+    std::string item;
+    while (getline (ss, item, delim)) {
+        result.push_back (item);
+    }
+    return result;
 }
 
 std::string joinStrings(const std::vector<std::string> &strVec, const char *delimiter) {
@@ -81,10 +92,15 @@ bool checkIsWrfoutFile(const std::string &inFilePath) {
     return isWrfoutFile;
 }
 
-VarNames getVarNames(bool isWrfoutFile) {
+VarNames getVarNames(const cxxopts::ParseResult *result, bool isWrfoutFile) {
+    
     VarNames varNames;
     if (isWrfoutFile) {
         varNames = VarNames("XTIME","XLAT","XLONG","vorName");
+    } else if (result->count("n")) {
+        auto varNamesVec = split((*result)["n"].as<std::string>(), ',');
+        if (varNamesVec.size() != 4) { abortWithMsg("Must specify time,lat,lon,vorticity variable names in order, and use \",\" as delimiter!"); }
+        varNames = VarNames(varNamesVec[0], varNamesVec[1], varNamesVec[2], varNamesVec[3]);
     } else {
 //        std::cout << exceptionInfo << std::endl;
         varNames.checkVarNames();
@@ -147,6 +163,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     ("v,version", "Print version information")
     ("z,z-lv-index", "Specify the index of z level (1-based)", cxxopts::value<int>())
     ("t,no-temp-files", "Do not export temp files")
+    ("n,var-names", "Set time,lat,lon,vorticity variable names. \",\" as separator.", cxxopts::value<std::string>())
     ("p,temp-files-dir", "Set directory of temp files", cxxopts::value<std::string>()->default_value(exePath))
     ;
     // hidden options
@@ -178,7 +195,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
 
     auto allFilesPath = handleInOutFile(result.get());
     bool isWrfoutFile = checkIsWrfoutFile(allFilesPath[0]);
-    auto varNames = getVarNames(isWrfoutFile);
+    auto varNames = getVarNames(result.get(), isWrfoutFile);
     int zLvIndex = handleZLvIndex(result.get(), varNames, allFilesPath[0], isWrfoutFile);
     auto [noTempFiles, tempFilesDir] = handleTempFiles(result.get());
     
