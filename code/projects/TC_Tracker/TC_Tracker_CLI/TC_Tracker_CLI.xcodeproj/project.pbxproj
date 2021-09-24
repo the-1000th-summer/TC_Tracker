@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7922B26C26FDD1B3002AE343 /* libomp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7922B26B26FDD1B3002AE343 /* libomp.a */; };
 		7957EA6C26F3980400305982 /* myMap.dat in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7957EA6B26F3980400305982 /* myMap.dat */; };
 		79DB6D4926F0A3530097DCC2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79DB6D4826F0A3530097DCC2 /* main.cpp */; };
 		79DB6D5926F0A6A70097DCC2 /* TC1Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79DB6D5526F0A6A70097DCC2 /* TC1Time.cpp */; };
@@ -36,6 +37,7 @@
 
 /* Begin PBXFileReference section */
 		790AE2B026F72FF5007A6408 /* TCInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TCInfo.h; path = ../../core/include/TCInfo.h; sourceTree = "<group>"; };
+		7922B26B26FDD1B3002AE343 /* libomp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libomp.a; path = ../../../../../../../../../../opt/homebrew/Cellar/libomp/12.0.1/lib/libomp.a; sourceTree = "<group>"; };
 		792CD4E626F61A3B0036E762 /* multiArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multiArray.h; path = ../../core/include/multiArray.h; sourceTree = "<group>"; };
 		7957EA6B26F3980400305982 /* myMap.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = myMap.dat; path = ../../../../data/myMap/myMap.dat; sourceTree = "<group>"; };
 		79DB6D4526F0A3530097DCC2 /* TC_Tracker_CLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TC_Tracker_CLI; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,6 +70,7 @@
 				79DB6D6426F0ACE30097DCC2 /* libboost_serialization.a in Frameworks */,
 				79DB6D6626F0AD4C0097DCC2 /* libboost_filesystem.a in Frameworks */,
 				79F9D43A26F3313300F75059 /* libboost_program_options.a in Frameworks */,
+				7922B26C26FDD1B3002AE343 /* libomp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,6 +157,7 @@
 		79DB6D5E26F0AC090097DCC2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7922B26B26FDD1B3002AE343 /* libomp.a */,
 				79F9D43826F32E5B00F75059 /* libboost_program_options.a */,
 				79DB6D6526F0AD4C0097DCC2 /* libboost_filesystem.a */,
 				79DB6D6326F0ACE30097DCC2 /* libboost_serialization.a */,
@@ -374,6 +378,11 @@
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/lib,
 					/opt/homebrew/Cellar/boost/1.76.0/lib,
+					/opt/homebrew/Cellar/libomp/12.0.1/lib,
+				);
+				OTHER_CFLAGS = (
+					"-Xpreprocessor",
+					"-fopenmp",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -392,6 +401,11 @@
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/lib,
 					/opt/homebrew/Cellar/boost/1.76.0/lib,
+					/opt/homebrew/Cellar/libomp/12.0.1/lib,
+				);
+				OTHER_CFLAGS = (
+					"-Xpreprocessor",
+					"-fopenmp",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

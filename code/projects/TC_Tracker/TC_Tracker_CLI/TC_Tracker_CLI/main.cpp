@@ -92,20 +92,28 @@ VarNames getVarNames(bool isWrfoutFile) {
     return varNames;
 }
 
-int handleZLvIndex(const cxxopts::ParseResult *result, const std::string &inFilePath, bool isWrfoutFile) {
-    auto fileInfo = TTCore::NCFileInfo(inFilePath.c_str());
+int handleZLvIndex(const cxxopts::ParseResult *result, const VarNames &varNames, const std::string &inFilePath, bool isWrfoutFile) {
+    auto fileInfo = TTCore::NCFileInfo(inFilePath.c_str(), varNames);
     fileInfo.isWrfoutFile = isWrfoutFile;
     
     std::string zLvDimName;
     int zLvNum = fileInfo.getZLvDimLenName(zLvDimName);
+    
+    if (!zLvNum) {
+        std::cout << "No z dimension in the file." << std::endl;
+        return -1;
+    }
+    if (result->count("z") == 1) {
+        std::cout << "Only one z level in file. Use it." << std::endl;
+        return 0;
+    }
     if (!result->count("z"))
         abortWithMsg("z level index not specified!\nPlease specify with option \"-z\"");
+    
     int zLvIndex = (*result)["z"].as<int>();
-    std::cout << "z level index (1-based): " << zLvIndex << std::endl;
-    if (!zLvNum)
-        std::cout << "No z dimension in the file." << std::endl;
-    if (zLvIndex > zLvNum)
-        abortWithMsg("Specified z level index is invalid!\nPlease specify between 1 and "+std::to_string(zLvNum));
+    std::cout << "z level index (0-based): " << zLvIndex << std::endl;
+    if (zLvIndex > zLvNum-1)
+        abortWithMsg("Specified z level index is invalid!\nPlease specify between 0 and "+std::to_string(zLvNum-1));
     
     return zLvIndex;
 }
@@ -171,10 +179,10 @@ void tryCXXOPTS(int argc, char * argv[]) {
     auto allFilesPath = handleInOutFile(result.get());
     bool isWrfoutFile = checkIsWrfoutFile(allFilesPath[0]);
     auto varNames = getVarNames(isWrfoutFile);
-    int zLvIndex = handleZLvIndex(result.get(), allFilesPath[0], isWrfoutFile);
+    int zLvIndex = handleZLvIndex(result.get(), varNames, allFilesPath[0], isWrfoutFile);
     auto [noTempFiles, tempFilesDir] = handleTempFiles(result.get());
     
-    auto fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, zLvIndex-1, noTempFiles, tempFilesDir.c_str());
+    auto fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, zLvIndex, noTempFiles, tempFilesDir.c_str());
     TTCore::TCs tcs;
     
     /// （无用的变量，因为cli直接Ctrl+C就可终止程序）

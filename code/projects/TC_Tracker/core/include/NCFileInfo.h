@@ -22,7 +22,9 @@ public:
 //    NCFileInfo(const char* filePath, bool isWrfoutFile, const VarNames &varNames, bool noTempFiles, const char* dumpDirectory);
 //    NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char *latVName, const char *lonVName, const char *vorVName, int zLevelIndex, const char *dumpDirectory);
     NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, const char *dumpDirectory);
+    NCFileInfo(const char* filePath, const VarNames &varNames);
     NCFileInfo(const char* filePath);
+
     void checkFileValid();
     int getZLvDimLenName(std::string &zLvDimName);
     bool checkIsWrfoutFile(std::string &exceptionInfo);

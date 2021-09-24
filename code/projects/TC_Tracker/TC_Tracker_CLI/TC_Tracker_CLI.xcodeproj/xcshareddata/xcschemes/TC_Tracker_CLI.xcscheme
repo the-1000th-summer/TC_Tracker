@@ -52,11 +52,19 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrfout_d01_2016-10-19_00_00_00_persist_minForVor.nc"
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrf_data/wrfout_d01_2016-10-19_00_00_00_persist_minForVor.nc"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrf_data/minForVor_track_compact.nc"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_JRA-55_hourly.nc"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/minForVor_track_compact.nc"
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general.nc"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
@@ -65,7 +73,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-z 1"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-p /Users/richard/Desktop"

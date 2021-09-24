@@ -18,6 +18,7 @@ namespace TTCore {
 //NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const VarNames &varNames, bool noTempFiles, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), noTempFiles(noTempFiles), dumpDir(dumpDirectory) {}
 //NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, int zLevelIndex, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {}
 NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, const char *dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), noTempFiles(noTempFiles), dumpDir(dumpDirectory) {}
+NCFileInfo::NCFileInfo(const char* filePath, const VarNames &varNames) : ncFilePath(filePath), varNames(varNames) {}
 NCFileInfo::NCFileInfo(const char* filePath) : ncFilePath(filePath) {}
 
 void NCFileInfo::checkFileValid() {
@@ -192,7 +193,7 @@ void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const s
     auto timeData = std::make_unique<float[]>(stormDimSize * timeDimSize);
     auto latData = std::make_unique<float[]>(stormDimSize * timeDimSize);
     auto lonData = std::make_unique<float[]>(stormDimSize * timeDimSize);
-    auto serialNoData = std::make_unique<float[]>(stormDimSize * timeDimSize);
+    auto serialNoData = std::make_unique<short[]>(stormDimSize * timeDimSize);
     
     size_t tc_i = 0;
     for (auto const &tc : tcs.getTcs()) {
@@ -209,7 +210,7 @@ void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const s
     }
     
     // 写入变量属性
-    timeVar.putAtt("units", "minutes since 2016-10-19 00:00:00");
+    timeVar.putAtt("units", tcs.getTimeUnits());
     latVar.putAtt("units", "degrees_north");
     lonVar.putAtt("units", "degrees_east");
     
@@ -255,7 +256,7 @@ void NCFileInfo::exportFile_nc_compact(const TCs &tcs, const std::string &oNcFil
     auto timeData = std::make_unique<float[]>(timeDimSize);
     auto latData = std::make_unique<float[]>(timeDimSize);
     auto lonData = std::make_unique<float[]>(timeDimSize);
-    auto serialNoData = std::make_unique<float[]>(timeDimSize);
+    auto serialNoData = std::make_unique<short[]>(timeDimSize);
     
     size_t tc_i = 0, pastTimeLen = 0;
     for (auto const &tc : tcs.getTcs()) {

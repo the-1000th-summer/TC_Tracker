@@ -54,8 +54,6 @@ private:
     
     std::unique_ptr<float[]> latArr, lonArr;
     TwoDArray latArr2D = TwoDArray(0,0), lonArr2D = TwoDArray(0,0);
-    /// 记录所有有台风的日期的数组（从基准日期起算的时次数）
-    std::vector<int> hasTC_timeIndex{};
     TCInfo tcInfo;
     std::vector<std::vector<TC1Time>> allVortexes{};
 //    Vortexes vortexes;
@@ -63,6 +61,7 @@ private:
 //    TCs tcs;
     std::vector<std::vector<std::pair<float, float>>> landPolygons;
     
+    int getLastNotEmptyVecIndex();
     void checkDirAndCreate(const std::string &folderName);
     void getLandPolygons();
     bool pnpoly(const std::vector<std::pair<float, float>>& polygon, float testLat, float testLon);

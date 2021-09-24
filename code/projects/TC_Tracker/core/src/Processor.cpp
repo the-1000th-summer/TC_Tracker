@@ -18,6 +18,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/dll/runtime_symbol_info.hpp>
+#include <omp.h>
 #include "json.hpp"
 #include "multiArray.h"
 #include "Processor.h"
@@ -160,10 +161,9 @@ void Processor::recognizeTyphoon() {
     }
     Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue());
     //Constants::HAS_TP_MIN_ReVOR = isWrfoutFile ? 100e-5 : 8e-5;
-    
-    
     std::cout << "RECURSION_MIN_ReVOR: " << Constants::RECURSION_MIN_ReVOR << std::endl;
-    int itsPerCheck = timeLength / 20;
+    
+    unsigned long itsPerCheck = timeLength / 20;
     for (unsigned long timeIndex = startIndexInFile; timeIndex < timeLength; ++timeIndex) {
         // std::cout << vorVar.getName() << std::endl;
         if (timeIndex % itsPerCheck == 0) {
@@ -178,9 +178,9 @@ void Processor::recognizeTyphoon() {
         
         int tpNum_timei = getVortexNum1Time(vorField, timeIndex, TCNum_prevTime);
         TCNum_prevTime = tpNum_timei;
-        if (tpNum_timei >= 1) {
-            hasTC_timeIndex.push_back(timeIndex);
-        }
+//        if (tpNum_timei >= 1) {
+//            hasTC_timeIndex.push_back(timeIndex);
+//        }
         
     }
     // delete [] arrayy;
@@ -201,7 +201,7 @@ void Processor::getRealTC() {
     ///
     //int hasVortex_notHandledYetIndex = 0;
     /// 最后有气旋的时次的index+1
-    int hasTCLastTimeIndex = hasTC_timeIndex.back() + 1;
+    int hasTCLastTimeIndex = getLastNotEmptyVecIndex();
     /// 跟踪时仍未确定消亡日期的气旋；跟踪完成的气旋
     std::vector<Typhoon> tempTCs{};
     
@@ -209,7 +209,8 @@ void Processor::getRealTC() {
         if (timeIndex % 1000 == 0)
             std::cout << timeIndex << std::endl;
         /// 当前时次是否有气旋？
-        hasTCCurrentTime = (std::find(hasTC_timeIndex.begin(), hasTC_timeIndex.end(), timeIndex) != hasTC_timeIndex.end()) ? true : false;
+//        hasTCCurrentTime = (std::find(hasTC_timeIndex.begin(), hasTC_timeIndex.end(), timeIndex) != hasTC_timeIndex.end()) ? true : false;
+        hasTCCurrentTime = !allVortexes[timeIndex].empty();
         if (!hasTCCurrentTime) {
             if (hasTCPrevTime) {  // 当前时次无气旋，前一时次有气旋，确定气旋消亡日期
                 for (auto &tempTC : tempTCs)
@@ -627,6 +628,12 @@ inline void Processor::removeVortex(ThreeDArray &vorField, int timeIndex, std::u
     }
 }
 
+int Processor::getLastNotEmptyVecIndex() {
+    int i = allVortexes.size() - 1;
+    while (allVortexes[i].empty()) { --i; }
+    return i;
+}
+
 
 /// @brief 此方法检查一个文件夹名字对应的路径是否为路径
 /// @param folderName 文件夹名称
@@ -661,7 +668,6 @@ void Processor::dumpStep1(const std::string ncFilePath) {
     std::ofstream ofs(stepDumpDir / ( std::filesystem::path(ncFilePath).stem().string() + "_step1.dat" ), std::ios::binary);
     boost::archive::binary_oarchive oa(ofs);
     // write class instance to archive
-    std::cout << "msg from dump step1, vortex number: " << allVortexes.size() << std::endl;
     //        oa << hasTC_timeIndex << vortexes;
     Vortexes vortexes(allVortexes, tcInfo);
     oa << vortexes;
