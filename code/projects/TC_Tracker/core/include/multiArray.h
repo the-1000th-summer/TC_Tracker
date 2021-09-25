@@ -4,6 +4,7 @@
 #include <memory>
 #include <algorithm>
 #include <utility>
+#include <omp.h>
 
 namespace TTCore {
 
@@ -78,12 +79,16 @@ public:
         auto minElemIndex = std::distance(data.get(), minElemIter);
         return {{minElemIndex/(_rows*_columns), minElemIndex%(_rows*_columns)/_columns, minElemIndex%_columns}, *minElemIter};
     }
-    float avgMinValue() const {
-        float avgValue = 0;
+    float avgMinValue(int threadNum) const {
+//        float avgValue = 0;
+        auto avgValues = std::make_unique<float[]>(_times);
+#       pragma omp parallel for num_threads(threadNum)
         for (size_t i = 0; i < _times; ++i) {
-            avgValue += (*std::min_element(i*_rows*_columns + data.get(), (i+1)*_rows*_columns + data.get()));
+//            avgValue += (*std::min_element(i*_rows*_columns + data.get(), (i+1)*_rows*_columns + data.get()));
+            avgValues[i] = (*std::min_element(i*_rows*_columns + data.get(), (i+1)*_rows*_columns + data.get()));
         }
-        return avgValue / _times;
+//        return avgValue / _times;
+        return std::accumulate(avgValues.get(), avgValues.get()+_times, 0.0) / static_cast<float>(_times);
     }
     // void printData() {
     //     for (int i = 0; i < 2; i++) {

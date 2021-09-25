@@ -30,7 +30,7 @@ namespace TTCore {
 
 Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, int threadNum, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), threadNum(threadNum), dumpDir(dumpDirectory), iiFile(&iFile), tcInfo(getTCInfo()) {
     
-
+    threadNum ? threadNum : omp_get_max_threads();
     getDimLength();
     allVortexes = std::vector<std::vector<TC1Time>>(timeLength);
     if (isWrfoutFile) {
@@ -160,7 +160,7 @@ void Processor::recognizeTyphoon() {
     } else {
         iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
     }
-    Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue());
+    Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue(threadNum));
     //Constants::HAS_TP_MIN_ReVOR = isWrfoutFile ? 100e-5 : 8e-5;
     std::cout << "RECURSION_MIN_ReVOR: " << Constants::RECURSION_MIN_ReVOR << std::endl;
     
