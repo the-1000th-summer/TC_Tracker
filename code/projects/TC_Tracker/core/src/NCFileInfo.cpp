@@ -17,7 +17,7 @@ namespace TTCore {
 //NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {}
 //NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const VarNames &varNames, bool noTempFiles, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), noTempFiles(noTempFiles), dumpDir(dumpDirectory) {}
 //NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, int zLevelIndex, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory) {}
-NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, const char *dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), noTempFiles(noTempFiles), dumpDir(dumpDirectory) {}
+NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, int threadNum, const char *dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), noTempFiles(noTempFiles), threadNum(threadNum), dumpDir(dumpDirectory) {}
 NCFileInfo::NCFileInfo(const char* filePath, const VarNames &varNames) : ncFilePath(filePath), varNames(varNames) {}
 NCFileInfo::NCFileInfo(const char* filePath) : ncFilePath(filePath) {}
 
@@ -98,7 +98,7 @@ void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled) {
     
     netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
     
-    Processor p(isCanceled, f, isWrfoutFile, varNames, zLevelIndex, dumpDir);
+    Processor p(isCanceled, f, isWrfoutFile, varNames, zLevelIndex, threadNum, dumpDir);
     
     p.recognizeTyphoon();
     if (*isCanceled) return;

@@ -152,6 +152,16 @@ std::pair<bool, std::string> handleTempFiles(const cxxopts::ParseResult *result)
     return {noTempFiles, tempFilesDir};
 }
 
+int handleThreadNum(const cxxopts::ParseResult *result) {
+    if (!result->count("thread"))
+        return 1;
+    int threadNum = (*result)["thread"].as<int>();
+    if (threadNum < 0)
+        abortWithMsg("Thread number cannot be negative!");
+    // 将判断是否为0留到Processor.cpp中
+    return threadNum;
+}
+
 void tryCXXOPTS(int argc, char * argv[]) {
     auto exePath = std::filesystem::weakly_canonical(std::filesystem::path(argv[0])).parent_path();
     std::vector<std::string> argList(argv, argv + argc);   // for history
@@ -164,6 +174,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     ("z,z-lv-index", "Specify the index of z level (1-based)", cxxopts::value<int>())
     ("t,no-temp-files", "Do not export temp files")
     ("n,var-names", "Set time,lat,lon,vorticity variable names. \",\" as separator.", cxxopts::value<std::string>())
+    ("thread", "Set the number of threads tracking, 0 for maximum number of threads", cxxopts::value<int>()->default_value("1"))
     ("p,temp-files-dir", "Set directory of temp files", cxxopts::value<std::string>()->default_value(exePath))
     ;
     // hidden options
@@ -198,8 +209,9 @@ void tryCXXOPTS(int argc, char * argv[]) {
     auto varNames = getVarNames(result.get(), isWrfoutFile);
     int zLvIndex = handleZLvIndex(result.get(), varNames, allFilesPath[0], isWrfoutFile);
     auto [noTempFiles, tempFilesDir] = handleTempFiles(result.get());
+    int threadNum = handleThreadNum(result.get());
     
-    auto fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, zLvIndex, noTempFiles, tempFilesDir.c_str());
+    auto fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, zLvIndex, noTempFiles, threadNum, tempFilesDir.c_str());
     TTCore::TCs tcs;
     
     /// （无用的变量，因为cli直接Ctrl+C就可终止程序）

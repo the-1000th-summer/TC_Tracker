@@ -28,10 +28,11 @@
 
 namespace TTCore {
 
-Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), dumpDir(dumpDirectory), iiFile(&iFile), tcInfo(getTCInfo()) {
+Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, int threadNum, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), threadNum(threadNum), dumpDir(dumpDirectory), iiFile(&iFile), tcInfo(getTCInfo()) {
     
 
     getDimLength();
+    allVortexes = std::vector<std::vector<TC1Time>>(timeLength);
     if (isWrfoutFile) {
         latArr2D = TwoDArray(latGridNum, lonGridNum);
         lonArr2D = TwoDArray(latGridNum, lonGridNum);
@@ -144,11 +145,11 @@ void Processor::recognizeTyphoon() {
     std::cout << "第一步(recognize_typhoon): 导入文件成功，开始识别。" << std::endl;
     
     /// 记录前一个时次的台风数目
-    int TCNum_prevTime = 0;
+//    int TCNum_prevTime = 0;
     //constexpr int startYear = 1979, endYear = 2018;
     
     /// startYear的1月1日0时时次在文件中的index
-    int startIndexInFile = 0;
+//    int startIndexInFile = 0;
     /// endYear的12月31日0时时次在文件中的index
     //        int endIndexInFile = 58436;
     
@@ -163,27 +164,25 @@ void Processor::recognizeTyphoon() {
     //Constants::HAS_TP_MIN_ReVOR = isWrfoutFile ? 100e-5 : 8e-5;
     std::cout << "RECURSION_MIN_ReVOR: " << Constants::RECURSION_MIN_ReVOR << std::endl;
     
-    unsigned long itsPerCheck = timeLength / 20;
-    for (unsigned long timeIndex = startIndexInFile; timeIndex < timeLength; ++timeIndex) {
+    
+//    unsigned long itsPerCheck = timeLength / 20;
+#   pragma omp parallel for num_threads(threadNum)
+    for (int timeIndex = 0; timeIndex < timeLength; ++timeIndex) {
         // std::cout << vorVar.getName() << std::endl;
-        if (timeIndex % itsPerCheck == 0) {
-            //std::cout << static_cast<int>(timeIndex / static_cast<float>(timeLength) * 100) << "%" << std::endl;
-            std::cout << timeIndex << std::endl;
-            if (*isCanceled) { 
-                std::cout << "msg from step1: Canceled!!!" << std::endl;
-                return;
-            }
-        }
+//        if (timeIndex % itsPerCheck == 0) {
+//            //std::cout << static_cast<int>(timeIndex / static_cast<float>(timeLength) * 100) << "%" << std::endl;
+//            std::cout << timeIndex << std::endl;
+//            if (*isCanceled) {
+//                std::cout << "msg from step1: Canceled!!!" << std::endl;
+//                return;
+//            }
+//        }
         // vorVar.getVar({timeIndex,0,0}, {1, latGridNum, lonGridNum}, vorField.get());
         
-        int tpNum_timei = getVortexNum1Time(vorField, timeIndex, TCNum_prevTime);
-        TCNum_prevTime = tpNum_timei;
-//        if (tpNum_timei >= 1) {
-//            hasTC_timeIndex.push_back(timeIndex);
-//        }
+        getVortexNum1Time(vorField, timeIndex);
+//        TCNum_prevTime = tpNum_timei;
         
     }
-    // delete [] arrayy;
     std::cout << "Done step1" << std::endl;
 }
 
@@ -454,9 +453,10 @@ void Processor::removeNoise() {
 }
 
 /// 此方法识别某个时次是否有台风以及台风的个数
-/// @param[in] vorField 涡度场（2d array）
+/// @param[in] vorField 涡度场
+/// @param[in] timeIndex 时间index
 /// @return 当前时次的涡旋数量
-int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex, int TCNum_prevTime) {
+int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex) {
     /// 当前时次的涡旋的个数
     int tpNum = 0;
     std::vector<TC1Time> vortexesThisTime{};
@@ -476,21 +476,22 @@ int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex, int TCNum
         
         if (allCellsIndex.empty())
             break;
-        if ((allCellsIndex.size() <= Constants::TP_MIN_PTS) && (TCNum_prevTime == 0) )
-            break;
+//        if ((allCellsIndex.size() <= Constants::TP_MIN_PTS) && (TCNum_prevTime == 0) )
+//            break;
         
-        if (!isWrfoutFile) {
-            float e = get_e(allCellsIndex);
-            if ((e > Constants::TP_MIN_E) && (TCNum_prevTime == 0))
-                break;
-        }
+//        if (!isWrfoutFile) {
+//            float e = get_e(allCellsIndex);
+//            if ((e > Constants::TP_MIN_E) && (TCNum_prevTime == 0))
+//                break;
+//        }
         
         ++tpNum;
         auto vortexCenterLatLon = isWrfoutFile ? UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr2D, lonArr2D) : UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr.get(), lonArr.get());
         vortexesThisTime.push_back(TC1Time{maxVorCell.first, vortexCenterLatLon});
         removeVortex(vorField, timeIndex, allCellsIndex);
     }
-    allVortexes.push_back(vortexesThisTime);
+//    allVortexes.push_back(vortexesThisTime);
+    allVortexes[timeIndex] = vortexesThisTime;
     return tpNum;
     
 }

@@ -13,6 +13,7 @@ public:
     VarNames varNames;
     int zLevelIndex = -1;
     bool noTempFiles = false;
+    int threadNum = 1;
     std::string dumpDir;
     bool isWrfoutFile = false;
     bool isFileValid = false;
@@ -21,7 +22,7 @@ public:
 //    NCFileInfo(const char* filePath, bool isWrfoutFile, const char *timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory);
 //    NCFileInfo(const char* filePath, bool isWrfoutFile, const VarNames &varNames, bool noTempFiles, const char* dumpDirectory);
 //    NCFileInfo(const char *filePath, bool isWrfoutFile, const char* timeVName, const char *latVName, const char *lonVName, const char *vorVName, int zLevelIndex, const char *dumpDirectory);
-    NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, const char *dumpDirectory);
+    NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, int threadNum, const char *dumpDirectory);
     NCFileInfo(const char* filePath, const VarNames &varNames);
     NCFileInfo(const char* filePath);
 
