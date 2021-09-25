@@ -18,7 +18,6 @@
 		79DB6D6226F0AC120097DCC2 /* libnetcdf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79DB6D6126F0AC120097DCC2 /* libnetcdf.a */; };
 		79DB6D6426F0ACE30097DCC2 /* libboost_serialization.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79DB6D6326F0ACE30097DCC2 /* libboost_serialization.a */; };
 		79DB6D6626F0AD4C0097DCC2 /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79DB6D6526F0AD4C0097DCC2 /* libboost_filesystem.a */; };
-		79F9D43A26F3313300F75059 /* libboost_program_options.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79F9D43826F32E5B00F75059 /* libboost_program_options.a */; };
 		79F9D44226F37B1300F75059 /* NCFileInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79F9D44126F37B1300F75059 /* NCFileInfo.cpp */; };
 /* End PBXBuildFile section */
 
@@ -69,7 +68,6 @@
 				79DB6D6226F0AC120097DCC2 /* libnetcdf.a in Frameworks */,
 				79DB6D6426F0ACE30097DCC2 /* libboost_serialization.a in Frameworks */,
 				79DB6D6626F0AD4C0097DCC2 /* libboost_filesystem.a in Frameworks */,
-				79F9D43A26F3313300F75059 /* libboost_program_options.a in Frameworks */,
 				7922B26C26FDD1B3002AE343 /* libomp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

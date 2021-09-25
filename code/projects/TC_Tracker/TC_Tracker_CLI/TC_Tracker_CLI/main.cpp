@@ -9,13 +9,13 @@
 #include <netcdf>
 #include <filesystem>
 //#include <numeric>
-#include <boost/program_options.hpp>
+//#include <boost/program_options.hpp>
 #include "cxxopts.hpp"
 #include "NCFileInfo.h"
 #include "Typhoon.h"
 #include "Utils.h"
 
-namespace bpo = boost::program_options;
+//namespace bpo = boost::program_options;
 
 //inline void handleHelpAndVersion(const cxxopts::ParseResult &result) {
 //    if (result.count("help")) {
@@ -171,7 +171,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     ("c,compact-nc-file", "The program will output compact version of netCDF file")
     ("h,help", "Display available options") // a bool parameter
     ("v,version", "Print version information")
-    ("z,z-lv-index", "Specify the index of z level (1-based)", cxxopts::value<int>())
+    ("z,z-lv-index", "Specify the index of z level (0-based)", cxxopts::value<int>())
     ("t,no-temp-files", "Do not export temp files")
     ("n,var-names", "Set time,lat,lon,vorticity variable names. \",\" as separator.", cxxopts::value<std::string>())
     ("thread", "Set the number of threads tracking, 0 for maximum number of threads", cxxopts::value<int>()->default_value("1"))
@@ -229,33 +229,33 @@ void tryCXXOPTS(int argc, char * argv[]) {
     std::cout << "end of tracking" << std::endl;
 }
 
-void tryBoostOptions(int argc, char * argv[]) {
-    bpo::options_description desc("Allowed options");
-    desc.add_options()
-        ("help,h", "Display available options")
-        ("version,v", "Print version information")
-        ("compression", bpo::value<int>(), "set compression level");
-    bpo::variables_map vm;
-    bpo::store(bpo::parse_command_line(argc, argv, desc), vm);
-    bpo::notify(vm);
-
-    if (vm.count("help")) {
-        std::cout << desc << std::endl;
-        return;
-    }
-    if (vm.count("version")) {
-        std::cout << "TC_Tracker_CLI v0.1" << std::endl;
-        return;
-    }
-
-    if (vm.count("compression")) {
-        std::cout << "Compression level was set to "
-     << vm["compression"].as<int>() << ".\n";
-    } else {
-        std::cout << "Compression level was not set.\n";
-    }
-
-}
+//void tryBoostOptions(int argc, char * argv[]) {
+//    bpo::options_description desc("Allowed options");
+//    desc.add_options()
+//        ("help,h", "Display available options")
+//        ("version,v", "Print version information")
+//        ("compression", bpo::value<int>(), "set compression level");
+//    bpo::variables_map vm;
+//    bpo::store(bpo::parse_command_line(argc, argv, desc), vm);
+//    bpo::notify(vm);
+//
+//    if (vm.count("help")) {
+//        std::cout << desc << std::endl;
+//        return;
+//    }
+//    if (vm.count("version")) {
+//        std::cout << "TC_Tracker_CLI v0.1" << std::endl;
+//        return;
+//    }
+//
+//    if (vm.count("compression")) {
+//        std::cout << "Compression level was set to "
+//     << vm["compression"].as<int>() << ".\n";
+//    } else {
+//        std::cout << "Compression level was not set.\n";
+//    }
+//
+//}
 
 
 int main(int argc, char * argv[]) {

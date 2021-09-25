@@ -8,6 +8,7 @@ xcuserdata/
 /code/pureCpp/build
 /code/pythonScripts/vorticity/cxxVer/build
 /code/scripts/myMap2BoostBin/build
+/code/projects/TC_Tracker/TC_Tracker_CLI/TC_Tracker_CLI/build
 # cache
 .cache
 # vscode
