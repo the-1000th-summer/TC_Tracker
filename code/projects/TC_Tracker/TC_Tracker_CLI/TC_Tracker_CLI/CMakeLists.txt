@@ -15,9 +15,9 @@ aux_source_directory(../../core/src SRC_LIST)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.76.0 REQUIRED COMPONENTS serialization filesystem ) 
+find_package(Boost 1.70 REQUIRED COMPONENTS serialization filesystem ) 
 find_package(netCDF REQUIRED)
-find_package(OpenMP)
+find_package(OpenMP REQUIRED)
 
 if(Boost_FOUND AND netCDF_FOUND AND OPENMP_FOUND)
     # set for OpenMP
@@ -31,6 +31,10 @@ if(Boost_FOUND AND netCDF_FOUND AND OPENMP_FOUND)
     add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/data")
     add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/../../../../../data/myMap/myMap.dat" "${CMAKE_BINARY_DIR}/data")
     target_link_libraries(TC_Tracker_CLI Boost::serialization Boost::filesystem OpenMP::OpenMP_CXX ${libncxxPath})
+    # install to -DCMAKE_INSTALL_PREFIX
+    # (RUNTIME means executable file path)
+    install (TARGETS TC_Tracker_CLI RUNTIME DESTINATION .)
+    install(FILES build/data/myMap.dat DESTINATION data)
 endif()
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
