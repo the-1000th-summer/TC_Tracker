@@ -4,6 +4,7 @@
 #include <netcdf>
 #include <algorithm>
 #include <filesystem>
+#include <cmath>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
@@ -174,9 +175,13 @@ void NCFileInfo::exportFile(const std::string& outFilePath) {
 /// 将结果输出为netCDF文件（标准：CF Convention）
 void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand) {
     netCDF::NcFile outFile(oNcFilePath, netCDF::NcFile::replace);
+    /// 每个台风的生命长度
     std::vector<int> tcsAge{};
     std::transform(tcs.cbegin(), tcs.cend(), std::back_inserter(tcsAge), [](const Typhoon& tc){return tc.maxVorCells.size();});
-    
+    double intpart;          // (无用变量)
+    double hourInterval = tcs.getTcInfo().getHourInterval();
+    assert(std::modf(hourInterval, &intpart) == 0.0);
+    double firstTValue = tcs.getTcInfo().getFirstTValue();
     // 创建维度
     auto stormDimSize = tcs.size();
     auto timeDimSize = *std::max_element(std::begin(tcsAge), std::end(tcsAge));
@@ -197,7 +202,9 @@ void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const s
     
     size_t tc_i = 0;
     for (auto const &tc : tcs.getTcs()) {
-        std::iota(timeData.get()+timeDimSize*tc_i, timeData.get()+timeDimSize*tc_i+tc.geoCenters.size(), tc.startTimeIndex);
+//        std::iota(timeData.get()+timeDimSize*tc_i, timeData.get()+timeDimSize*tc_i+tc.geoCenters.size(), tc.startTimeIndex);
+        double startTI = firstTValue+hourInterval*tc.startTimeIndex - hourInterval;
+        std::generate(timeData.get()+timeDimSize*tc_i, timeData.get()+timeDimSize*tc_i+tc.geoCenters.size(), [&startTI, hourInterval]{ return startTI+=hourInterval; });
         std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), latData.get()+timeDimSize*tc_i, [](const std::pair<float, float> &geoCenter){return geoCenter.first;});
         std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), lonData.get()+timeDimSize*tc_i, [](const std::pair<float, float> &geoCenter){return geoCenter.second;});
         std::fill(serialNoData.get()+timeDimSize*tc_i, serialNoData.get()+timeDimSize*tc_i+tc.geoCenters.size(), tc.serialNo);

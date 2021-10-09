@@ -55,6 +55,7 @@ void getLatLonData(netCDF::NcFile *iFile, const std::string& latVarName, const s
 void getLatLonData2d(netCDF::NcFile *iFile, unsigned long latGridNum, unsigned long lonGridNum, float* latArray2d, float* lonArray2d);
 void getVorField(netCDF::NcFile *iFile, float *vor);
 double getTimeInterval(netCDF::NcVar &timeVar);
+double getHourInterval(netCDF::NcVar &timeVar);
 void modifyMaxDist(netCDF::NcFile *iFile, const std::string &timeVarName);
 
 // std::pair<std::pair<int, int>, float> max_element_2d(float vorField[Constants::latGridNum][Constants::lonGridNum]);

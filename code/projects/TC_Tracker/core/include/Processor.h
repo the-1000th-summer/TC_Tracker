@@ -59,6 +59,7 @@ private:
     TCInfo tcInfo;
     std::vector<std::vector<TC1Time>> allVortexes{};
 //    Vortexes vortexes;
+    /// 识别出来的纯Typhoon数据
     std::vector<Typhoon> realTCs{};
 //    TCs tcs;
     std::vector<std::vector<std::pair<float, float>>> landPolygons;

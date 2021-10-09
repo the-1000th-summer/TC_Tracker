@@ -63,7 +63,9 @@ TCInfo Processor::getTCInfo() {
     std::string timeUnits;
     auto timeVar = iiFile->getVar(varNames.timeVarName);
     timeVar.getAtt("units").getValues(timeUnits);
-    return TCInfo(timeUnits, UtilFunc::getTimeInterval(timeVar));
+    double firstTValue;
+    timeVar.getVar({0}, {1}, &firstTValue);
+    return TCInfo(timeUnits, UtilFunc::getTimeInterval(timeVar), firstTValue);
     //        vortexes = Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
 //    return Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
 }
@@ -453,7 +455,7 @@ void Processor::removeNoise() {
 }
 
 /// 此方法识别某个时次是否有台风以及台风的个数
-/// @param[in] vorField 涡度场
+/// @param[in] vorField 涡度场（时间、纬度、经度）
 /// @param[in] timeIndex 时间index
 /// @return 当前时次的涡旋数量
 int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex) {

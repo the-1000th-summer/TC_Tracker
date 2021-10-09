@@ -10,17 +10,36 @@
 
 class TCInfo {
 public:
-    TCInfo(const std::string &timeUnits, double timeInterval) : timeUnits(timeUnits), timeInterval(timeInterval) {}
+    TCInfo(const std::string &timeUnits, double timeInterval, double firstTValue) : timeUnits(timeUnits), timeInterval(timeInterval), firstTValue(firstTValue) {}
     inline std::string getTimeUnits() const { return timeUnits; }
     inline double getTimeInterval() const { return timeInterval; }
+    inline double getFirstTValue() const { return firstTValue; }
+    double getHourInterval() const {
+        double timeInterval = getTimeInterval();
+        std::string timeUnitLen = timeUnits.substr(0, timeUnits.find(" "));
+        if (timeUnitLen == "minutes") {
+            return timeInterval / 60.0;
+        } else if (timeUnitLen == "hours") {
+            return timeInterval;
+        } else if (timeUnitLen == "days") {
+            return timeInterval * 24.0;
+        } else if (timeUnitLen == "seconds") {
+            return timeInterval / 3600.0;
+        } else {
+            throw std::runtime_error("未知单位: " + timeUnitLen);
+        }
+    }
 private:
     std::string timeUnits;
     double timeInterval;
+    /// 文件中的time variable第一个数据的值
+    double firstTValue;
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar & timeUnits;
         ar & timeInterval;
+        ar & firstTValue;
     }
 };
 

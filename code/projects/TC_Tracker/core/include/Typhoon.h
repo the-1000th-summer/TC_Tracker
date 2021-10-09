@@ -32,7 +32,7 @@ private:
 class TCs {
 public:
     TCs(const std::vector<Typhoon> &tcs, TCInfo &tcInfo) : tcs(tcs), tcInfo(tcInfo) {}
-    TCs() : tcInfo("",0) {}
+    TCs() : tcInfo("",0,0) {}
     
     // return by value! 编译器会进行优化以避免不必要的数据复制
     // https://stackoverflow.com/questions/10553091/what-is-the-best-way-to-return-string-in-c

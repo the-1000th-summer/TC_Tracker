@@ -128,6 +128,24 @@ double UtilFunc::getTimeInterval(netCDF::NcVar &timeVar) {
     return (secondValue - firstValue);
 }
 
+double UtilFunc::getHourInterval(netCDF::NcVar &timeVar) {
+    double timeInterval = getTimeInterval(timeVar);
+    std::string timeUnits;
+    timeVar.getAtt("units").getValues(timeUnits);
+    std::string timeUnitLen = timeUnits.substr(0, timeUnits.find(" "));
+    if (timeUnitLen == "minutes") {
+        return timeInterval / 60.0;
+    } else if (timeUnitLen == "hours") {
+        return timeInterval;
+    } else if (timeUnitLen == "days") {
+        return timeInterval * 24.0;
+    } else if (timeUnitLen == "seconds") {
+        return timeInterval / 3600.0;
+    } else {
+        throw std::runtime_error("未知单位: " + timeUnitLen);
+    }
+}
+
 void UtilFunc::modifyMaxDist(netCDF::NcFile* iFile, const std::string &timeVarName) {
     auto timeVar = iFile->getVar(timeVarName);
     Constants::LINK_TP_MAX_DIST *= UtilFunc::getTimeInterval(timeVar);
@@ -146,6 +164,8 @@ void UtilFunc::modifyMaxDist(netCDF::NcFile* iFile, const std::string &timeVarNa
         std::cout << "未知单位: " << timeUnitLen << std::endl;
     }
 }
+
+
 
 /// 找出2d array的最大值和相应的index
 /// @param[in] vorField 涡度场（2d array）
