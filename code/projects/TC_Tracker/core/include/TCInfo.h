@@ -8,6 +8,7 @@
 #pragma once
 #include <iostream>
 
+/// 存储台风的总体信息
 class TCInfo {
 public:
     TCInfo(const std::string &timeUnits, double timeInterval, double firstTValue) : timeUnits(timeUnits), timeInterval(timeInterval), firstTValue(firstTValue) {}

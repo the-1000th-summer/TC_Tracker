@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <memory>
 #include <algorithm>
+#include <numeric>
 #include <utility>
 #include <omp.h>
 
@@ -69,6 +70,8 @@ public:
         auto maxElemIndex = std::distance(data.get(), maxElemIter);
         return {{maxElemIndex/(_rows*_columns), maxElemIndex%(_rows*_columns)/_columns, maxElemIndex%_columns}, *maxElemIter};
     }
+    /// 计算出最高维为index时二维场的最大值
+    /// @param index 最高维的index
     std::pair<std::pair<int, int>, float> max(size_t index) const {
         auto maxElemIter = std::max_element(data.get()+index*_rows*_columns, data.get()+(index+1)*_rows*_columns);
         auto maxElemIndex = std::distance(data.get()+index*_rows*_columns, maxElemIter);

@@ -6,7 +6,6 @@
 #include <iterator>
 #include <algorithm>
 #include <numeric>
-#include <netcdf>
 #include <ostream>
 #include <set>
 #include <utility>
@@ -462,6 +461,7 @@ int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex) {
     /// 当前时次的涡旋的个数
     int tpNum = 0;
     std::vector<TC1Time> vortexesThisTime{};
+    std::vector<std::unordered_set<std::pair<int, int>, pair_hash>> vortexesCellsIndex;
     
     for (int i = 0; i < Constants::TODAY_MAX_TP_NUM; ++i) {
         // auto maxVorCell = UtilFunc::max_element_2d(vorField);
@@ -489,10 +489,12 @@ int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex) {
         
         ++tpNum;
         auto vortexCenterLatLon = isWrfoutFile ? UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr2D, lonArr2D) : UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr.get(), lonArr.get());
+        vortexesCellsIndex.push_back(allCellsIndex);
         vortexesThisTime.push_back(TC1Time{maxVorCell.first, vortexCenterLatLon});
         removeVortex(vorField, timeIndex, allCellsIndex);
     }
 //    allVortexes.push_back(vortexesThisTime);
+    allVorsCellsIndex[timeIndex] = vortexesCellsIndex;
     allVortexes[timeIndex] = vortexesThisTime;
     return tpNum;
     

@@ -128,6 +128,8 @@ double UtilFunc::getTimeInterval(netCDF::NcVar &timeVar) {
     return (secondValue - firstValue);
 }
 
+/// 获取单位时间间隔的小时数
+/// @param timeVar time变量对象
 double UtilFunc::getHourInterval(netCDF::NcVar &timeVar) {
     double timeInterval = getTimeInterval(timeVar);
     std::string timeUnits;
@@ -146,6 +148,9 @@ double UtilFunc::getHourInterval(netCDF::NcVar &timeVar) {
     }
 }
 
+/// 此函数根据时间变量的属性将LINK_TP_MAX_DIST的值修改成正确的
+/// @param iFile netCDF文件的指针
+/// @param timeVarName time变量名
 void UtilFunc::modifyMaxDist(netCDF::NcFile* iFile, const std::string &timeVarName) {
     auto timeVar = iFile->getVar(timeVarName);
     Constants::LINK_TP_MAX_DIST *= UtilFunc::getTimeInterval(timeVar);
@@ -327,5 +332,7 @@ float UtilFunc::cellsLonAvg(const float* lonArray, const std::vector<std::pair<i
         avg += lonArray[cell.second];
     return avg / cells.size();
 }
+
+
 
 }

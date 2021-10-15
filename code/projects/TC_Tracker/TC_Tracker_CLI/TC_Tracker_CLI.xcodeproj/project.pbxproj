@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		7922B26C26FDD1B3002AE343 /* libomp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7922B26B26FDD1B3002AE343 /* libomp.a */; };
 		7957EA6C26F3980400305982 /* myMap.dat in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7957EA6B26F3980400305982 /* myMap.dat */; };
+		79A4884D2719BA4600D4BA02 /* VortexesDumper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79A4884C2719BA4600D4BA02 /* VortexesDumper.cpp */; };
 		79DB6D4926F0A3530097DCC2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79DB6D4826F0A3530097DCC2 /* main.cpp */; };
 		79DB6D5926F0A6A70097DCC2 /* TC1Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79DB6D5526F0A6A70097DCC2 /* TC1Time.cpp */; };
 		79DB6D5A26F0A6A70097DCC2 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79DB6D5626F0A6A70097DCC2 /* Utils.cpp */; };
@@ -39,6 +40,8 @@
 		7922B26B26FDD1B3002AE343 /* libomp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libomp.a; path = ../../../../../../../../../../opt/homebrew/Cellar/libomp/12.0.1/lib/libomp.a; sourceTree = "<group>"; };
 		792CD4E626F61A3B0036E762 /* multiArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multiArray.h; path = ../../core/include/multiArray.h; sourceTree = "<group>"; };
 		7957EA6B26F3980400305982 /* myMap.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = myMap.dat; path = ../../../../data/myMap/myMap.dat; sourceTree = "<group>"; };
+		79A4884B2719BA1700D4BA02 /* VortexesDumper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VortexesDumper.h; path = ../../core/include/VortexesDumper.h; sourceTree = "<group>"; };
+		79A4884C2719BA4600D4BA02 /* VortexesDumper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = VortexesDumper.cpp; path = ../../core/src/VortexesDumper.cpp; sourceTree = "<group>"; };
 		79DB6D4526F0A3530097DCC2 /* TC_Tracker_CLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TC_Tracker_CLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		79DB6D4826F0A3530097DCC2 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		79DB6D5026F0A6540097DCC2 /* Typhoon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Typhoon.h; path = ../../core/include/Typhoon.h; sourceTree = "<group>"; };
@@ -170,6 +173,7 @@
 			children = (
 				79DB6D5326F0A6540097DCC2 /* Processor.h */,
 				79DB6D5126F0A6540097DCC2 /* Utils.h */,
+				79A4884B2719BA1700D4BA02 /* VortexesDumper.h */,
 			);
 			name = Calculator;
 			sourceTree = "<group>";
@@ -179,6 +183,7 @@
 			children = (
 				79DB6D5826F0A6A70097DCC2 /* Processor.cpp */,
 				79DB6D5626F0A6A70097DCC2 /* Utils.cpp */,
+				79A4884C2719BA4600D4BA02 /* VortexesDumper.cpp */,
 			);
 			name = Calculator;
 			sourceTree = "<group>";
@@ -244,6 +249,7 @@
 				79DB6D5B26F0A6A70097DCC2 /* Typhoon.cpp in Sources */,
 				79DB6D5C26F0A6A70097DCC2 /* Processor.cpp in Sources */,
 				79DB6D5A26F0A6A70097DCC2 /* Utils.cpp in Sources */,
+				79A4884D2719BA4600D4BA02 /* VortexesDumper.cpp in Sources */,
 				79DB6D5926F0A6A70097DCC2 /* TC1Time.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

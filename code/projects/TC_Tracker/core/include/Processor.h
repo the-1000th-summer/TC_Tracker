@@ -58,6 +58,7 @@ private:
     TwoDArray latArr2D = TwoDArray(0,0), lonArr2D = TwoDArray(0,0);
     TCInfo tcInfo;
     std::vector<std::vector<TC1Time>> allVortexes{};
+    std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>> allVorsCellsIndex;
 //    Vortexes vortexes;
     /// 识别出来的纯Typhoon数据
     std::vector<Typhoon> realTCs{};

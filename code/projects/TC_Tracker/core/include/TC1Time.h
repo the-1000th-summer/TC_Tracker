@@ -7,10 +7,13 @@
 #include "TCInfo.h"
 
 namespace TTCore {
+
+/// 一个涡旋的数据（位置、index）
 class TC1Time {
 public:
     //TC1Time(std::pair<int, int> maxVorCellIndex, std::pair<float, float> geoCenter);
     std::pair<int, int> maxVorCellIndex;
+    /// 涡旋中心纬度、经度
     std::pair<float, float> geoCenter;
     
 private:
@@ -22,6 +25,7 @@ private:
     }
 };
 
+/// 所有时次、每个时次里所有涡旋的信息
 class Vortexes {
 public:
 //    Vortexes(const std::vector<std::vector<TC1Time>> &vortexes, const std::string &timeUnits, double timeInterval) : vortexes(vortexes), tcInfo(timeUnits, timeInterval) {}

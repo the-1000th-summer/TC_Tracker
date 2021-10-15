@@ -9,6 +9,7 @@
 
 namespace TTCore {
 
+/// 识别得到的一个台风的轨迹数据
 class Typhoon {
 public:
     // Typhoon();
@@ -29,6 +30,7 @@ private:
     }
 };
 
+/// 所有台风的轨迹数据和台风总体的信息
 class TCs {
 public:
     TCs(const std::vector<Typhoon> &tcs, TCInfo &tcInfo) : tcs(tcs), tcInfo(tcInfo) {}
