@@ -23,11 +23,12 @@
 #include "Processor.h"
 #include "Utils.h"
 #include "Typhoon.h"
+#include "VortexesDumper.h"
 
 
 namespace TTCore {
 
-Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, int threadNum, const std::string& dumpDirectory) : isCanceled(isCanceled), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), threadNum(threadNum), dumpDir(dumpDirectory), iiFile(&iFile), tcInfo(getTCInfo()) {
+Processor::Processor(bool* isCanceled, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, int threadNum, const std::string& dumpDirectory) : isCanceled(isCanceled), iFilePath(iFilePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), threadNum(threadNum), dumpDir(dumpDirectory), iiFile{std::make_unique<netCDF::NcFile>(iFilePath, netCDF::NcFile::read)}, tcInfo(getTCInfo()) {
     
     threadNum ? threadNum : omp_get_max_threads();
     getDimLength();
@@ -35,11 +36,11 @@ Processor::Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile,
     if (isWrfoutFile) {
         latArr2D = TwoDArray(latGridNum, lonGridNum);
         lonArr2D = TwoDArray(latGridNum, lonGridNum);
-        UtilFunc::getLatLonData2d(iiFile, latGridNum, lonGridNum, latArr2D.get(), lonArr2D.get());
+        UtilFunc::getLatLonData2d(iiFile.get(), latGridNum, lonGridNum, latArr2D.get(), lonArr2D.get());
     } else {
         latArr = std::make_unique<float[]>(latGridNum);
         lonArr = std::make_unique<float[]>(lonGridNum);
-        UtilFunc::getLatLonData(iiFile, varNames.latVarName, varNames.lonVarName, latArr.get(), lonArr.get());
+        UtilFunc::getLatLonData(iiFile.get(), varNames.latVarName, varNames.lonVarName, latArr.get(), lonArr.get());
     }
     
     // std::cout << a << std::endl;
@@ -153,15 +154,16 @@ void Processor::recognizeTyphoon() {
 //    int startIndexInFile = 0;
     /// endYear的12月31日0时时次在文件中的index
     //        int endIndexInFile = 58436;
-    
+    allVorsCellsIndex = std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>>(timeLength);
     auto vorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
     
     if (isWrfoutFile) {
-        calcRelativeVorField(iiFile, vorField);
+        calcRelativeVorField(iiFile.get(), vorField);
     } else {
         iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
     }
-    Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue(threadNum));
+//    Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue(threadNum));
+    Constants::RECURSION_MIN_ReVOR = 0.0002;
     //Constants::HAS_TP_MIN_ReVOR = isWrfoutFile ? 100e-5 : 8e-5;
     std::cout << "RECURSION_MIN_ReVOR: " << Constants::RECURSION_MIN_ReVOR << std::endl;
     
@@ -184,13 +186,14 @@ void Processor::recognizeTyphoon() {
 //        TCNum_prevTime = tpNum_timei;
         
     }
+    dumpVortexes(allVorsCellsIndex);
     std::cout << "Done step1" << std::endl;
 }
 
 /// 第二步：跟踪第一步生成的每个时次的气旋，生成真正的气旋对象。
 void Processor::getRealTC() {
     std::cout << "开始跟踪" << std::endl;
-    UtilFunc::modifyMaxDist(iiFile, isWrfoutFile ? "XTIME" : varNames.timeVarName);
+    UtilFunc::modifyMaxDist(iiFile.get(), isWrfoutFile ? "XTIME" : varNames.timeVarName);
     
     /// 当前时次和前一时次是否有气旋
     bool hasTCCurrentTime = false, hasTCPrevTime = false;
@@ -728,6 +731,12 @@ void Processor::getStep2DataFromFile(const std::string& filePath) {
     realTCs = tcs.getTcs();
     tcInfo = tcs.getTcInfo();
 
+}
+
+void Processor::dumpVortexes(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>> &allVorsCellsIndex) {
+    VortexesDumper dumper(iFilePath, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/ERA5_onlyVortexes.nc", tcInfo);
+    dumper.setLatLonData(latArr.get(), latGridNum, lonArr.get(), lonGridNum);
+    dumper.dumpVortexes2NC(allVorsCellsIndex);
 }
 
 void Processor::copyRealTCs(std::vector<Typhoon>& tcs) {

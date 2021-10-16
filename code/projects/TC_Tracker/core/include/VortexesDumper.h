@@ -12,11 +12,26 @@
 #include <utility>
 #include <unordered_set>
 #include "Utils.h"
+#include "TCInfo.h"
+
+namespace TTCore {
 
 class VortexesDumper {
 public:
-    VortexesDumper();
-    void dumpVortexes2NC(std::vector<std::vector<std::unordered_set<std::pair<int, int>, TTCore::pair_hash>>> &allVorsCellsIndex, const std::string &oFilePath);
+    VortexesDumper(const std::string vorNcFilePath, const std::string &oFilePath, TCInfo &tcInfo);
+    void setLatLonData(float *latArr, size_t latDimLen, float *lonArr, size_t lonDimLen);
+    void dumpVortexes2NC(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>> &allVorsCellsIndex);
 private:
+    std::string vorNcFilePath;
     std::string oFilePath;
+    TCInfo tcInfo;
+    size_t latDimLen = 0, lonDimLen = 0;
+    std::unique_ptr<float[]> timeData, latData, lonData;
+    bool latLonDataDone = false;
+    
+    void fillTimeData(float *timeData, size_t dataLen);
+    void fillVorData(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>> &allVorsCellsIndex, ThreeDArray &vorData);
+    void copyAllCharAtt(const netCDF::NcVar &inVar, netCDF::NcVar &oVar);
 };
+
+}

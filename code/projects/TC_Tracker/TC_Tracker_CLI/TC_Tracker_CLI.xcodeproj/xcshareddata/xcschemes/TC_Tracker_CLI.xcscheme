@@ -68,12 +68,20 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_JRA-55_hourly.nc"
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_ERA5_hourly_0pt25_1979.nc"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general.nc"
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/ERA5_general.nc"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_JRA-55_hourly.nc"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general.nc"
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-u"

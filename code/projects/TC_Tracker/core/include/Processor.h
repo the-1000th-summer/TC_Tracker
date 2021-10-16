@@ -16,7 +16,7 @@ namespace TTCore {
 class Processor {
 public:
 //    Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &timeVName="", const std::string & latVName="", const std::string & lonVName="", const std::string & vorVName="", int zLevelIndex = -1, const std::string & dumpDirectory = "");
-    Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, int threadNum, const std::string & dumpDirectory);
+    Processor(bool* isCanceled, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, int threadNum, const std::string & dumpDirectory);
     //Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
     ~Processor();
     TCInfo getTCInfo();
@@ -39,12 +39,15 @@ public:
     void dumpStep3(const std::string ncFilePath);
     void getStep1DataFromFile(const std::string &filePath);
     void getStep2DataFromFile(const std::string &filePath);
+    void dumpVortexes(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>> &allVorsCellsIndex);
     void copyRealTCs(std::vector<Typhoon> &tcs);
     void copyTCs(TCs &tcs);
     
 private:
     bool* isCanceled;
-    netCDF::NcFile *iiFile;
+//    netCDF::NcFile *iiFile;
+    std::string iFilePath;
+    std::unique_ptr<netCDF::NcFile> iiFile;
     VarNames varNames;
     int zLevelIndex = -1;
     std::string dumpDir;

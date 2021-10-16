@@ -88,6 +88,8 @@ inline float cellsLatAvg(const std::vector<std::pair<float, float>>& geoCenters)
 float cellsLonAvg(const float* lonArray, const std::vector<std::pair<int, int>>& cells);
 inline float cellsLonAvg(const std::vector<std::pair<float, float>>& geoCenters);
 
+inline void appendHistoryInfo(netCDF::NcFile &ncFile, const std::string &fullCommand);
+
 }
 
 /// 计算两点欧氏距离
@@ -107,6 +109,8 @@ inline float UtilFunc::cellsLonAvg(const std::vector<std::pair<float, float>>& g
     return std::accumulate(geoCenters.begin(), geoCenters.end(), 0.0f, [](auto& a, auto& b) {return a + b.second; }) / geoCenters.size();
 }
 
-
+inline void UtilFunc::appendHistoryInfo(netCDF::NcFile &ncFile, const std::string &fullCommand) {
+    ncFile.putAtt("history", currentDateTime()+": "+fullCommand);
+}
 
 }

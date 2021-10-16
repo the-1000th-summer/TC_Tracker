@@ -97,9 +97,9 @@ void NCFileInfo::getVorDimsName(const std::string& vorVarName, std::vector<std::
 
 void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled) {
     
-    netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+//    netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
     
-    Processor p(isCanceled, f, isWrfoutFile, varNames, zLevelIndex, threadNum, dumpDir);
+    Processor p(isCanceled, ncFilePath, isWrfoutFile, varNames, zLevelIndex, threadNum, dumpDir);
     
     p.recognizeTyphoon();
     if (*isCanceled) return;
@@ -227,7 +227,7 @@ void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const s
     lonVar.putAtt("_FillValue", netCDF::NcType::nc_FLOAT, -9999.0);
     serialNoVar.putAtt("_FillValue", netCDF::NcType::nc_SHORT, -9999);
     // 写入全局属性
-    appendHistoryInfo(outFile, fullCommand);
+    UtilFunc::appendHistoryInfo(outFile, fullCommand);
     outFile.putAtt("featureType", "trajectory");
     outFile.putAtt("vorThresHold", netCDF::NcType::nc_FLOAT, Constants::RECURSION_MIN_ReVOR);
     // 写入数据
@@ -283,7 +283,7 @@ void NCFileInfo::exportFile_nc_compact(const TCs &tcs, const std::string &oNcFil
     
     serialNoVar.putAtt("coordinates", "time lon lat");
     // 写入全局属性
-    appendHistoryInfo(outFile, fullCommand);
+    UtilFunc::appendHistoryInfo(outFile, fullCommand);
     outFile.putAtt("featureType", "trajectory");
     outFile.putAtt("vorThresHold", netCDF::NcType::nc_FLOAT, Constants::RECURSION_MIN_ReVOR);
     
@@ -297,11 +297,6 @@ void NCFileInfo::exportFile_nc_compact(const TCs &tcs, const std::string &oNcFil
     
     outFile.close();
 }
-
-void NCFileInfo::appendHistoryInfo(netCDF::NcFile &ncFile, const std::string &fullCommand) {
-    ncFile.putAtt("history", UtilFunc::currentDateTime()+": "+fullCommand);
-}
-
 
 
 void NCFileInfo::getDataFromStep3File(const std::string& inFilePath, std::vector<Typhoon>& tcs) {

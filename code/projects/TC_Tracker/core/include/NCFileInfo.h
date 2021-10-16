@@ -45,7 +45,7 @@ public:
     
     void getDataFromStep3File(const std::string& inFilePath, std::vector<Typhoon>& tcs);
 private:
-    void appendHistoryInfo(netCDF::NcFile &ncFile, const std::string &fullCommand);
+    
     //    netCDF::NcFile *iiFile = nullptr;
 };
 }

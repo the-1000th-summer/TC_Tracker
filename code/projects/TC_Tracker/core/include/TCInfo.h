@@ -6,6 +6,8 @@
 //
 
 #pragma once
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 #include <iostream>
 
 /// 存储台风的总体信息

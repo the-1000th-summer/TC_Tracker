@@ -65,6 +65,11 @@ public:
     inline float *get() {
         return data.get();
     }
+    /// 以指定的值填充array中所有的element
+    /// @param value 要填充的值
+    inline void fillWith(float value) {
+        std::fill_n(data.get(), _times*_rows*_columns, value);
+    }
     std::pair<std::tuple<int, int, int>, float> max() const {
         auto maxElemIter = std::max_element(data.get(), data.get() + _times*_rows*_columns);
         auto maxElemIndex = std::distance(data.get(), maxElemIter);
