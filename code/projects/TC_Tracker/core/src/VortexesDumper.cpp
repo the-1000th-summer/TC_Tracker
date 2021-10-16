@@ -70,8 +70,8 @@ void VortexesDumper::dumpVortexes2NC(const std::vector<std::vector<std::unordere
 }
 
 void VortexesDumper::fillTimeData(float *timeData, size_t dataLen) {
-    int startTI = tcInfo.getFirstTValue();
     const int hourInterval = tcInfo.getHourInterval();
+    int startTI = tcInfo.getFirstTValue() - hourInterval;
     std::generate(timeData, timeData+dataLen, [&startTI, hourInterval]{ return startTI+=hourInterval; });
 }
 
