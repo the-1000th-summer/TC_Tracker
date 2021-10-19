@@ -38,7 +38,7 @@ const std::string STEP_FILE_NAME = "stepFile";
 }
 
 struct pair_hash {
-    inline std::size_t operator()(const std::pair<int,int> & v) const {
+    inline std::size_t operator()(const std::pair<int,int> &v) const {
         return v.first*31+v.second;
     }
 };

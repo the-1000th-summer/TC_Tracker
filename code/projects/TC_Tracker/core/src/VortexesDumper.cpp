@@ -5,14 +5,16 @@
 //  Created by the-1000th-summer on 2021/10/15.
 //
 
-
+#include <fstream>
 #include <netcdf>
 #include "multiArray.h"
+#include "Utils.h"
 #include "VortexesDumper.h"
+#include "vortexes.pb.h"
 
 namespace TTCore {
 
-VortexesDumper::VortexesDumper(const std::string vorNcFilePath, const std::string &oFilePath, TCInfo &tcInfo) : vorNcFilePath(vorNcFilePath), oFilePath(oFilePath), tcInfo(tcInfo) {
+VortexesDumper::VortexesDumper(const std::string vorNcFilePath, const std::string &oFilePath, const TCInfo &tcInfo) : vorNcFilePath(vorNcFilePath), oFilePath(oFilePath), tcInfo(tcInfo) {
     
 }
 
@@ -68,6 +70,30 @@ void VortexesDumper::dumpVortexes2NC(const std::vector<std::vector<std::unordere
     UtilFunc::appendThresholdInfo(oFile);
     
     oFile.close();
+}
+
+void VortexesDumper::dumpVortexes2Proto3(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, TTCore::pair_hash>>> &allVorsCellsIndex) {
+    VortexesP v;
+    for (int i = 0; i < latDimLen; ++i)
+        v.add_lat(latData[i]);
+    for (int i = 0; i < lonDimLen; ++i)
+        v.add_lon(lonData[i]);
+    for (auto const &oneTimeCellsIndex : allVorsCellsIndex) {
+        auto vorsAllTime_ptr = v.add_vorsalltime();
+        for (auto const &oneVorCellsIndex : oneTimeCellsIndex) {
+            auto oneVortex_ptr = vorsAllTime_ptr->add_vorsonetime();
+            for (auto const &cellIndex : oneVorCellsIndex) {
+                oneVortex_ptr->add_latsindexarr(cellIndex.first);
+                oneVortex_ptr->add_lonsindexarr(cellIndex.second);
+            }
+        }
+    }
+    std::fstream output(oFilePath, std::ios::out | std::ios::trunc | std::ios::binary);
+    if (!v.SerializeToOstream(&output)) {
+        std::cout << "Failed to write proto3 file." << std::endl;
+        exit(-1);
+    }
+    
 }
 
 void VortexesDumper::fillTimeData(float *timeData, size_t dataLen) {
