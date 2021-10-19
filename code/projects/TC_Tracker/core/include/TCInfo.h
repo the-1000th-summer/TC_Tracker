@@ -46,6 +46,7 @@ private:
     }
 };
 
+/// 存储输入nc文件的变量名字
 class VarNames {
 public:
     VarNames(const std::string &timeVarName, const std::string &latVarName, const std::string &lonVarName, const std::string &vorVarName) : timeVarName(timeVarName), latVarName(latVarName), lonVarName(lonVarName), vorVarName(vorVarName) {}

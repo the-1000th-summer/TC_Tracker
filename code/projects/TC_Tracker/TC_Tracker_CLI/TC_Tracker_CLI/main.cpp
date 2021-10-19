@@ -176,6 +176,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     ("n,var-names", "Set time,lat,lon,vorticity variable names. \",\" as separator.", cxxopts::value<std::string>())
     ("thread", "Set the number of threads tracking, 0 for maximum number of threads", cxxopts::value<int>()->default_value("1"))
     ("p,temp-files-dir", "Set directory of temp files", cxxopts::value<std::string>()->default_value(exePath))
+    ("min-vorticity", "Set vorticity threshold", cxxopts::value<float>())
     ;
     // hidden options
     options.add_options("hiddenOpts")

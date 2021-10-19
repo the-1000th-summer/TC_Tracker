@@ -19,9 +19,9 @@
 
 namespace TTCore {
 
-float Constants::RECURSION_MIN_ReVOR = 30e-5;
+float Constants::RECURSION_MIN_ReVOR = 30e-5;  // 随便设置的初始值
 //float Constants::HAS_TP_MIN_ReVOR = 100e-5;
-double Constants::LINK_TP_MAX_DIST = 56.67;
+double Constants::LINK_TP_MAX_DIST = 56.67;    // 根据统计得到的1小时的移动距离的最大值
 
 bool UtilFunc::ifFileExists (const std::string& name) {
     struct stat buffer;
@@ -166,8 +166,10 @@ void UtilFunc::modifyMaxDist(netCDF::NcFile* iFile, const std::string &timeVarNa
     } else if (timeUnitLen == "seconds") {
         Constants::LINK_TP_MAX_DIST /= 3600.0;
     } else {
-        std::cout << "未知单位: " << timeUnitLen << std::endl;
+//        std::cout << "未知单位: " << timeUnitLen << std::endl;
+        throw std::runtime_error("unrecognized time units: "+timeUnitLen);
     }
+    std::cout << "TC move dist per unit time THRESHOLD: " << Constants::LINK_TP_MAX_DIST << std::endl;
 }
 
 

@@ -229,7 +229,7 @@ void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const s
     // 写入全局属性
     UtilFunc::appendHistoryInfo(outFile, fullCommand);
     outFile.putAtt("featureType", "trajectory");
-    outFile.putAtt("vorThresHold", netCDF::NcType::nc_FLOAT, Constants::RECURSION_MIN_ReVOR);
+    UtilFunc::appendThresholdInfo(outFile);
     // 写入数据
     timeVar.putVar(timeData.get());
     latVar.putVar(latData.get());
@@ -285,7 +285,7 @@ void NCFileInfo::exportFile_nc_compact(const TCs &tcs, const std::string &oNcFil
     // 写入全局属性
     UtilFunc::appendHistoryInfo(outFile, fullCommand);
     outFile.putAtt("featureType", "trajectory");
-    outFile.putAtt("vorThresHold", netCDF::NcType::nc_FLOAT, Constants::RECURSION_MIN_ReVOR);
+    UtilFunc::appendThresholdInfo(outFile);
     
     // 写入数据
     // https://stackoverflow.com/questions/2923272/how-to-convert-vector-to-array

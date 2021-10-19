@@ -15,7 +15,7 @@ namespace TTCore {
 
 namespace Constants {
 /// 一天中最多会出现的涡旋数量
-constexpr int TODAY_MAX_TP_NUM = 5;
+constexpr int TODAY_MAX_TP_NUM = 8;
 /// 查看相对涡度场时认为可能有台风的最小相对涡度值
 //extern float HAS_TP_MIN_ReVOR;
 //constexpr float HAS_TP_MIN_ReVOR = 8e-5;
@@ -89,7 +89,7 @@ float cellsLonAvg(const float* lonArray, const std::vector<std::pair<int, int>>&
 inline float cellsLonAvg(const std::vector<std::pair<float, float>>& geoCenters);
 
 inline void appendHistoryInfo(netCDF::NcFile &ncFile, const std::string &fullCommand);
-
+inline void appendThresholdInfo(netCDF::NcFile &ncFile);
 }
 
 /// 计算两点欧氏距离
@@ -111,6 +111,12 @@ inline float UtilFunc::cellsLonAvg(const std::vector<std::pair<float, float>>& g
 
 inline void UtilFunc::appendHistoryInfo(netCDF::NcFile &ncFile, const std::string &fullCommand) {
     ncFile.putAtt("history", currentDateTime()+": "+fullCommand);
+}
+
+inline void UtilFunc::appendThresholdInfo(netCDF::NcFile &ncFile) {
+    ncFile.putAtt("vorThreshold", netCDF::NcType::nc_FLOAT, Constants::RECURSION_MIN_ReVOR);
+    ncFile.putAtt("distThreshold", netCDF::NcType::nc_DOUBLE, Constants::LINK_TP_MAX_DIST);
+    ncFile.putAtt("vorNumThreshold", netCDF::NcType::nc_INT, Constants::TODAY_MAX_TP_NUM);
 }
 
 }
