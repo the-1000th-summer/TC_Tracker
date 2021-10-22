@@ -10,8 +10,9 @@
 #include "multiArray.h"
 #include "Utils.h"
 #include "VortexesDumper.h"
-#include "vortexes.pb.h"
-
+#ifdef GETVORBASEDONREAL
+  #include "vortexes.pb.h"
+#endif
 namespace TTCore {
 
 VortexesDumper::VortexesDumper(const std::string vorNcFilePath, const std::string &oFilePath, const TCInfo &tcInfo) : vorNcFilePath(vorNcFilePath), oFilePath(oFilePath), tcInfo(tcInfo) {
@@ -72,7 +73,8 @@ void VortexesDumper::dumpVortexes2NC(const std::vector<std::vector<std::unordere
     oFile.close();
 }
 
-void VortexesDumper::dumpVortexes2Proto3(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, TTCore::pair_hash>>> &allVorsCellsIndex) {
+#ifdef GETVORBASEDONREAL
+void VortexesDumper::dumpVortexes2Proto3(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, TTCore::pair_hash>>> &allVorsCellsIndex, const std::vector<std::vector<int>> &findRank) {
     VortexesP v;
     for (int i = 0; i < latDimLen; ++i)
         v.add_lat(latData[i]);
@@ -85,9 +87,17 @@ void VortexesDumper::dumpVortexes2Proto3(const std::vector<std::vector<std::unor
             for (auto const &cellIndex : oneVorCellsIndex) {
                 oneVortex_ptr->add_latsindexarr(cellIndex.first);
                 oneVortex_ptr->add_lonsindexarr(cellIndex.second);
+                oneVortex_ptr->set_isvortex(IsVortex::NOTDECIDED);
             }
         }
     }
+    for (auto const &oneTimeRanks : findRank) {
+        auto indexAllTime_ptr = v.add_realvorindexesalltime();
+        for (const int rank : oneTimeRanks) {
+            indexAllTime_ptr->add_realvorindexes1time(rank);
+        }
+    }
+    
     std::fstream output(oFilePath, std::ios::out | std::ios::trunc | std::ios::binary);
     if (!v.SerializeToOstream(&output)) {
         std::cout << "Failed to write proto3 file." << std::endl;
@@ -95,6 +105,7 @@ void VortexesDumper::dumpVortexes2Proto3(const std::vector<std::vector<std::unor
     }
     
 }
+#endif
 
 void VortexesDumper::fillTimeData(float *timeData, size_t dataLen) {
     const int hourInterval = tcInfo.getHourInterval();
