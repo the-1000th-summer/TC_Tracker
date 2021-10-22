@@ -5,37 +5,38 @@ include(CTest)
 enable_testing()
 
 set(CMAKE_CXX_STANDARD 17)
-# project include file and source file
+
+set(nccDir /wind1/home/16dengh/software/myLib/cxxLib/netCDF/real_gcc940)
+set(nccxxDir /wind1/home/16dengh/software/myLib/cxxLib/netCDF)
+# set(nccxxDir /wind1/home/16dengh/anaconda3)
+set(boostDir /wind1/home/16dengh/software/myLib/cxxLib/boost/real)
+
 include_directories(
+    ${nccDir}/include
+    ${nccxxDir}/include
+    ${boostDir}/include
     ../../core/include
 )
 aux_source_directory(../../core/src SRC_LIST)
 
-# find boost
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.70 REQUIRED COMPONENTS serialization filesystem ) 
-find_package(netCDF REQUIRED)
-find_package(OpenMP REQUIRED)
+add_executable(TC_Tracker_CLI main.cpp ${SRC_LIST})
+message("${CMAKE_BINARY_DIR}")
+add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/data")
+add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/../../../../../data/myMap/myMap.dat" "${CMAKE_BINARY_DIR}/data")
+find_library(libncPath netcdf ${nccDir}/lib)
+find_library(libncxxPath netcdf_c++4 /wind1/home/16dengh/anaconda3/lib)
+find_library(libserPath
+             boost_serialization
+             PATHS ${boostDir}/lib
+             NO_DEFAULT_PATH
+)
 
-if(Boost_FOUND AND netCDF_FOUND AND OPENMP_FOUND)
-    # set for OpenMP
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-    
-    find_library(libncxxPath netcdf-cxx4 ${netCDF_LIB_DIR})
-    add_executable(TC_Tracker_CLI main.cpp ${SRC_LIST})
-    # create "data" dir in build dir and copy the data into it
-    add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/data")
-    add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/../../../../../data/myMap/myMap.dat" "${CMAKE_BINARY_DIR}/data")
-    target_link_libraries(TC_Tracker_CLI Boost::serialization Boost::filesystem OpenMP::OpenMP_CXX ${libncxxPath})
-    # install to -DCMAKE_INSTALL_PREFIX
-    # (RUNTIME means executable file path)
-    install (TARGETS TC_Tracker_CLI RUNTIME DESTINATION .)
-    install(FILES build/data/myMap.dat DESTINATION data)
-endif()
+find_library(libfsPath
+             boost_filesystem
+             PATHS ${boostDir}/lib
+             NO_DEFAULT_PATH
+)
+target_link_libraries(TC_Tracker_CLI ${libncPath} ${libncxxPath} ${libserPath} ${libfsPath} -fopenmp -ldl)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
