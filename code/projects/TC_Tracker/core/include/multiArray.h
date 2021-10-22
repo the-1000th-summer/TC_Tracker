@@ -5,7 +5,10 @@
 #include <algorithm>
 #include <numeric>
 #include <utility>
-#include <omp.h>
+
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 namespace TTCore {
 
@@ -90,7 +93,9 @@ public:
     float avgMinValue(int threadNum) const {
 //        float avgValue = 0;
         auto avgValues = std::make_unique<float[]>(_times);
+#ifdef _OPENMP
 #       pragma omp parallel for num_threads(threadNum)
+#endif
         for (size_t i = 0; i < _times; ++i) {
 //            avgValue += (*std::min_element(i*_rows*_columns + data.get(), (i+1)*_rows*_columns + data.get()));
             avgValues[i] = (*std::min_element(i*_rows*_columns + data.get(), (i+1)*_rows*_columns + data.get()));
