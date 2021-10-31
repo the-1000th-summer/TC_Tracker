@@ -162,8 +162,8 @@ void Processor::recognizeTyphoon() {
     } else {
         iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
     }
-//    Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue(threadNum));
-    Constants::RECURSION_MIN_ReVOR = 0.00005;
+    Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue(threadNum));
+//    Constants::RECURSION_MIN_ReVOR = 0.00005;
     //Constants::HAS_TP_MIN_ReVOR = isWrfoutFile ? 100e-5 : 8e-5;
     std::cout << "RECURSION_MIN_ReVOR: " << Constants::RECURSION_MIN_ReVOR << std::endl;
     
@@ -186,7 +186,7 @@ void Processor::recognizeTyphoon() {
 //        TCNum_prevTime = tpNum_timei;
         
     }
-    dumpVortexes(allVorsCellsIndex);
+//    dumpVortexes(allVorsCellsIndex);
     std::cout << "Done step1" << std::endl;
 }
 

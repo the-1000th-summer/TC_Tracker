@@ -22,7 +22,7 @@ public:
     inline size_t rows() const { return _rows; }
     inline size_t columns() const { return _columns; }
     
-    // float *operator[](size_t row) { return row * _columns + data.get(); }
+    float *operator[](size_t row) { return row * _columns + data.get(); }
     inline float &operator()(size_t row, size_t column) {
         return data[row * _columns + column];
     }

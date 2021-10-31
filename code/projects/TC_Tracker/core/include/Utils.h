@@ -15,7 +15,7 @@ namespace TTCore {
 
 namespace Constants {
 /// 一天中最多会出现的涡旋数量
-constexpr int TODAY_MAX_TP_NUM = 8;
+constexpr int TODAY_MAX_TP_NUM = 5;
 /// 查看相对涡度场时认为可能有台风的最小相对涡度值
 //extern float HAS_TP_MIN_ReVOR;
 //constexpr float HAS_TP_MIN_ReVOR = 8e-5;

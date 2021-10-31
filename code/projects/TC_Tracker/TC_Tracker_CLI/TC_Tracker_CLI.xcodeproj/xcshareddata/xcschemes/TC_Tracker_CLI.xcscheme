@@ -69,6 +69,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_ERA5_hourly_0pt25_1979.nc"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_ERA5_hourly_0pt25_rg_1pt0.nc"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
@@ -81,6 +85,14 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general.nc"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_JRA-55_hourly_regridded.nc"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general_regridded.nc"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
