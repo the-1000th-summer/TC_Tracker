@@ -63,10 +63,10 @@ bool uv2vr_cfd::calRV(TTCore::TwoDArray &u, TTCore::TwoDArray &v, float *latData
     int mlStart, mlEnd;
     if (jopt == 1 || jopt == 3) {          // cyclic
         mlStart = 0;
-        mlEnd = lonSize - 1;
+        mlEnd = lonSize;
     } else {
         mlStart = 1;
-        mlEnd = lonSize - 2;
+        mlEnd = lonSize - 1;
     }
     
     // longitude loop
@@ -74,7 +74,7 @@ bool uv2vr_cfd::calRV(TTCore::TwoDArray &u, TTCore::TwoDArray &v, float *latData
         // iopt = 0 or 1
         int lonIndexM1 = lonIndex - 1;
         int lonIndexP1 = lonIndex + 1;
-        if (lonIndex == 1) { lonIndexM1 = lonSize-1; }   // 最左边的格点
+        if (lonIndex == 0) { lonIndexM1 = lonSize-1; }   // 最左边的格点
         if (lonIndex == lonSize-1) { lonIndexP1 = 0; }   // 最右边的格点
         
         for (int latIndex = 1; latIndex < latSize-1; ++latIndex) {
