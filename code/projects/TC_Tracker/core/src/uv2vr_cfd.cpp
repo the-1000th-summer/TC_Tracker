@@ -125,42 +125,46 @@ bool uv2vr_cfd::calRV(TTCore::TwoDArray &u, TTCore::TwoDArray &v, float *latData
     if (std::abs(latData[latSize-1]) == 90.0) { toAverage(rv[latSize-1], lonSize, msgValue); }
     
     // special for corners (jopt=2 only), use linear extrapolation from two directions
-    if (jopt == 2) { extrapolateForCorner(rv, latSize, lonSize, msgValue); }
+    if (jopt == 2) { extrapolateForCorner(rv.get(), latSize, lonSize, msgValue); }
    
     return true;
 }
 
-void uv2vr_cfd::extrapolateForCorner(TTCore::TwoDArray &data, int latSize, int lonSize, float msgValue) {
-    if (data(0,0) == msgValue) {                // 左下角格点
-        float latP1 = data(1,0), latP2 = data(2,0);
-        float lonP1 = data(0,1), lonP2 = data(0,2);
+void uv2vr_cfd::extrapolateForCorner(float *data, int latSize, int lonSize, float msgValue) {
+    if (data[0] == msgValue) {                // 左下角格点
+        float latP1 = data[lonSize], latP2 = data[2*lonSize];
+        float lonP1 = data[1], lonP2 = data[2];
         if (latP1 != msgValue && latP2 != msgValue && lonP1 != msgValue && lonP2 != msgValue) {
-            data(0,0) = (2.0*latP1 - latP2 + 2.0*lonP1 - lonP2) * 0.5;
+            data[0] = (2.0*latP1 - latP2 + 2.0*lonP1 - lonP2) * 0.5;
         }
     }
-    if (data(0,lonSize-1) == msgValue) {               // 右下角格点
-        float latP1 = data(1,lonSize-1), latP2 = data(2,lonSize-1);
-        float lonM1 = data(0,lonSize-2), lonM2 = data(0,lonSize-3);
+    if (data[lonSize-1] == msgValue) {               // 右下角格点
+        float latP1 = data[2*lonSize-1], latP2 = data[3*lonSize-1];
+        float lonM1 = data[lonSize-2], lonM2 = data[lonSize-3];
         if (latP1 != msgValue && latP2 != msgValue && lonM1 != msgValue && lonM2 != msgValue) {
-            data(0,lonSize-1) = (2.0*latP1 - latP2 + 2.0*lonM1 - lonM2) * 0.5;
+            data[lonSize-1] = (2.0*latP1 - latP2 + 2.0*lonM1 - lonM2) * 0.5;
         }
     }
-    if (data(latSize-1,0) == msgValue) {          // 左上角格点
-        float latM1 = data(latSize-2,0), latM2 = data(latSize-3,0);
-        float lonP1 = data(latSize-1,1), lonP2 = data(latSize-1,2);
+    if (data[(latSize-1)*lonSize] == msgValue) {          // 左上角格点
+        float latM1 = data[(latSize-2)*lonSize], latM2 = data[(latSize-3)*lonSize];
+        float lonP1 = data[(latSize-1)*lonSize+1], lonP2 = data[(latSize-1)*lonSize+2];
         if (latM1 != msgValue && latM2 != msgValue && lonP1 != msgValue && lonP2 != msgValue) {
-            data(latSize-1,0) = (2.0*latM1 - latM2 + 2.0*lonP1 - lonP2) * 0.5;
+            data[(latSize-1)*lonSize] = (2.0*latM1 - latM2 + 2.0*lonP1 - lonP2) * 0.5;
         }
     }
-    if (data(latSize-1,lonSize-1) == msgValue) {     // 右上角格点
-        float latM1 = data(latSize-2,lonSize-1), latM2 = data(latSize-3,lonSize-1);
-        float lonM1 = data(latSize-1,lonSize-2), lonM2 = data(latSize-1,lonSize-3);
+    if (data[latSize*lonSize-1] == msgValue) {     // 右上角格点
+        float latM1 = data[(latSize-1)*lonSize-1], latM2 = data[(latSize-2)*lonSize-1];
+        float lonM1 = data[latSize*lonSize-2], lonM2 = data[latSize*lonSize-3];
         if (latM1 != msgValue && latM2 != msgValue && lonM1 != msgValue && lonM2 != msgValue) {
-            data(latSize-1,lonSize-1) = (2.0*latM1-latM2 + 2.0*lonM1-lonM2) * 0.5;
+            data[latSize*lonSize-1] = (2.0*latM1-latM2 + 2.0*lonM1-lonM2) * 0.5;
         }
     }
 }
 
+/// 计算1d array中所有非缺测值的平均值并写入到该1d array的每个元素
+/// @param data 1d array
+/// @param dataSize 1d array的元素个数
+/// @param msgValue 缺测值
 void uv2vr_cfd::toAverage(float *data, int dataSize, float msgValue) {
     int msgGridNum = std::count(data, data+dataSize, msgValue);
     if (msgGridNum == dataSize) { return; }
