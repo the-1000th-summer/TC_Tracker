@@ -11,7 +11,7 @@
 class uv2vr_cfd {
 
 public:
-    bool calRV(float *u, float *v, float *latData, float *lonData, int latSize, int lonSize, float msgValue, int iopt, TTCore::TwoDArray &rv);
+    bool calRV(float *u, float *v, float *latData, float *lonData, int latSize, int lonSize, float msgValue, int iopt, float *rv);
 private:
     void toAverage(float *data, int dataSize, float msgValue);
     void extrapolateForCorner(float *data, int latSize, int lonSize, float msgValue);

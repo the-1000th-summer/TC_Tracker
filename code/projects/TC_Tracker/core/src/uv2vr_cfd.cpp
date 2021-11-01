@@ -9,7 +9,7 @@
 #include <cmath>
 #include "uv2vr_cfd.h"
 
-bool uv2vr_cfd::calRV(float *u, float *v, float *latData, float *lonData, int latSize, int lonSize, float msgValue, int iopt, TTCore::TwoDArray &rv) {
+bool uv2vr_cfd::calRV(float *u, float *v, float *latData, float *lonData, int latSize, int lonSize, float msgValue, int iopt, float *rv) {
     if (lonSize < 1 || latSize < 1) { return false; }
     if (std::abs(latData[0]) > 90.0 || std::abs(latData[latSize-1]) > 90.0) {return false;}
     
@@ -35,7 +35,7 @@ bool uv2vr_cfd::calRV(float *u, float *v, float *latData, float *lonData, int la
     }
     
     // 输出数组初始化为缺测值
-    std::fill_n(rv.get(), latSize*lonSize, msgValue);
+    std::fill_n(rv, latSize*lonSize, msgValue);
     // calculate "1/dy" [bot, top]
     double dyBottom = 1.0 / (rcon * (latData[1] - latData[0]));
     double dyTop = 1.0 / (rcon * (latData[latSize-1] - latData[latSize-2]));
@@ -82,7 +82,7 @@ bool uv2vr_cfd::calRV(float *u, float *v, float *latData, float *lonData, int la
             float u_latP1 = u[(latIndex+1)*lonSize+lonIndex], u_latM1 = u[(latIndex-1)*lonSize+lonIndex];
             float u_here = u[latIndex*lonSize+lonIndex];
             if (v_lonP1 != msgValue && v_lonM1 != msgValue && u_latP1 != msgValue && u_latM1 != msgValue && u_here != msgValue) {
-                rv(latIndex,lonIndex) = (v_lonP1-v_lonM1)*dx2[latIndex] - (u_latP1-u_latM1)*dy2[latIndex] + u_here*tLatRe[latIndex];
+                rv[latIndex*lonSize+lonIndex] = (v_lonP1-v_lonM1)*dx2[latIndex] - (u_latP1-u_latM1)*dy2[latIndex] + u_here*tLatRe[latIndex];
             }
         }
         
@@ -91,14 +91,14 @@ bool uv2vr_cfd::calRV(float *u, float *v, float *latData, float *lonData, int la
         float v_b_lonP1 = v[lonIndexP1], v_b_lonM1 = v[lonIndexM1];
         float u_b_latP1 = u[lonSize+lonIndex], u_b_here = u[lonIndex];
         if (v_b_lonP1 != msgValue && v_b_lonM1 != msgValue && u_b_latP1 != msgValue && u_b_here != msgValue) {
-            rv(0,lonIndex) = (v_b_lonP1-v_b_lonM1)*dx2[0] - (u_b_latP1-u_b_here)*dyBottom + u_b_here*tLatRe[0];
+            rv[lonIndex] = (v_b_lonP1-v_b_lonM1)*dx2[0] - (u_b_latP1-u_b_here)*dyBottom + u_b_here*tLatRe[0];
         }
         // top bound (nl = nlat)
         float v_t_lonP1 = v[(latSize-1)*lonSize+lonIndexP1], v_t_lonM1 = v[(latSize-1)*lonSize+lonIndexM1];
         float u_t_here = u[(latSize-1)*lonSize+lonIndex];
         float u_t_latM1 = u[(latSize-2)*lonSize+lonIndex];
         if (v_t_lonP1 != msgValue && v_t_lonM1 != msgValue && u_t_here != msgValue && u_t_latM1 != msgValue) {
-            rv(latSize-1,lonIndex) = (v_t_lonP1-v_t_lonM1)*dx2[latSize-1] - (u_t_here-u_t_latM1)*dyTop + u_t_here*tLatRe[latSize-1];
+            rv[(latSize-1)*lonSize+lonIndex] = (v_t_lonP1-v_t_lonM1)*dx2[latSize-1] - (u_t_here-u_t_latM1)*dyTop + u_t_here*tLatRe[latSize-1];
         }
     }
     
@@ -109,7 +109,7 @@ bool uv2vr_cfd::calRV(float *u, float *v, float *latData, float *lonData, int la
             float u_l_latP1 = u[(latIndex+1)*lonSize], u_l_latM1 = u[(latIndex-1)*lonSize];
             float u_l_here = u[latIndex*lonSize];
             if (v_l_lonP1 != msgValue && v_l_here != msgValue && u_l_latP1 != msgValue && u_l_latM1 != msgValue && u_l_here != msgValue) {
-                rv(latIndex,0) = (v_l_lonP1-v_l_here)*dx[latIndex] - (u_l_latP1-u_l_latM1)*dy2[latIndex] + u_l_here*tLatRe[latIndex];
+                rv[latIndex*lonSize] = (v_l_lonP1-v_l_here)*dx[latIndex] - (u_l_latP1-u_l_latM1)*dy2[latIndex] + u_l_here*tLatRe[latIndex];
             }
             // right bound (lonIndex = lonSize - 1)
             float v_r_here = v[latIndex*lonSize+lonSize-1], v_r_lonM1 = v[latIndex*lonSize+lonSize-2];
@@ -117,17 +117,17 @@ bool uv2vr_cfd::calRV(float *u, float *v, float *latData, float *lonData, int la
             float u_r_latM1 = u[(latIndex-1)*lonSize+lonSize-1];
             float u_r_here = u[latIndex*lonSize+lonSize-1];
             if (v_r_here != msgValue && v_r_lonM1 != msgValue && u_r_latP1 != msgValue && u_r_latM1 != msgValue && u_r_here != msgValue) {
-                rv(latIndex,lonSize-1) = (v_r_here-v_r_lonM1)*dx[latIndex] - (u_r_latP1-u_r_latM1)*dy2[latIndex] + u_r_here*tLatRe[latIndex];
+                rv[latIndex*lonSize+lonSize-1] = (v_r_here-v_r_lonM1)*dx[latIndex] - (u_r_latP1-u_r_latM1)*dy2[latIndex] + u_r_here*tLatRe[latIndex];
             }
         }
     }
     
     // special at +/-90 use average
-    if (std::abs(latData[0]) == 90.0) { toAverage(rv[0], lonSize, msgValue); }
-    if (std::abs(latData[latSize-1]) == 90.0) { toAverage(rv[latSize-1], lonSize, msgValue); }
+    if (std::abs(latData[0]) == 90.0) { toAverage(rv, lonSize, msgValue); }
+    if (std::abs(latData[latSize-1]) == 90.0) { toAverage(rv+(latSize-1)*lonSize, lonSize, msgValue); }
     
     // special for corners (jopt=2 only), use linear extrapolation from two directions
-    if (jopt == 2) { extrapolateForCorner(rv.get(), latSize, lonSize, msgValue); }
+    if (jopt == 2) { extrapolateForCorner(rv, latSize, lonSize, msgValue); }
    
     return true;
 }
