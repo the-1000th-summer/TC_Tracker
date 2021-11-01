@@ -4,11 +4,22 @@
 //
 //  Created by 邓浩 on 2021/10/30.
 //
+
+#include "uv2vr_cfd.h"
 #include <algorithm>
 #include <numeric>
 #include <cmath>
-#include "uv2vr_cfd.h"
 
+/// 使用中央差分法计算相对涡度: rv = dv/dx-du/dy+(u/a)tan(lat)
+/// @param[in] u u风场 (2d array)
+/// @param[in] v v风场 (2d array)
+/// @param[in] latData 纬度数据 (1d array)
+/// @param[in] lonData 经度数据 (1d array)
+/// @param[in] latSize latData元素个数
+/// @param[in] lonSize lonData元素个数
+/// @param[in] msgValue 缺测值
+/// @param[in] iopt 额外选项, 意义参见https://www.ncl.ucar.edu/Document/Functions/Built-in/uv2vr_cfd.shtml
+/// @param[out] rv 相对涡度场 (2d array)
 bool uv2vr_cfd::calRV(float *u, float *v, float *latData, float *lonData, int latSize, int lonSize, float msgValue, int iopt, float *rv) {
     if (lonSize < 1 || latSize < 1) { return false; }
     if (std::abs(latData[0]) > 90.0 || std::abs(latData[latSize-1]) > 90.0) {return false;}
