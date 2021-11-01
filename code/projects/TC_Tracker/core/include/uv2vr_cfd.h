@@ -6,7 +6,6 @@
 //
 
 #pragma once
-#include "multiArray.h"
 
 class uv2vr_cfd {
 

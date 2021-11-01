@@ -132,6 +132,11 @@ bool uv2vr_cfd::calRV(float *u, float *v, float *latData, float *lonData, int la
     return true;
 }
 
+/// 为输出的2d array的四角的值计算外推
+/// @param[in,out] data 2d array
+/// @param[in] latSize 经向格点数
+/// @param[in] lonSize 纬向格点数
+/// @param[in] msgValue 缺测值
 void uv2vr_cfd::extrapolateForCorner(float *data, int latSize, int lonSize, float msgValue) {
     if (data[0] == msgValue) {                // 左下角格点
         float latP1 = data[lonSize], latP2 = data[2*lonSize];
@@ -164,9 +169,9 @@ void uv2vr_cfd::extrapolateForCorner(float *data, int latSize, int lonSize, floa
 }
 
 /// 计算1d array中所有非缺测值的平均值并写入到该1d array的每个元素
-/// @param data 1d array
-/// @param dataSize 1d array的元素个数
-/// @param msgValue 缺测值
+/// @param[in,out] data 1d array
+/// @param[in] dataSize 1d array的元素个数
+/// @param[in] msgValue 缺测值
 void uv2vr_cfd::toAverage(float *data, int dataSize, float msgValue) {
     int msgGridNum = std::count(data, data+dataSize, msgValue);
     if (msgGridNum == dataSize) { return; }
