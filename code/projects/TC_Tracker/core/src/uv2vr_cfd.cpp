@@ -20,7 +20,7 @@
 /// @param[in] msgValue 缺测值
 /// @param[in] iopt 额外选项, 意义参见https://www.ncl.ucar.edu/Document/Functions/Built-in/uv2vr_cfd.shtml
 /// @param[out] rv 相对涡度场 (2d array)
-bool uv2vr_cfd::calRV(float *u, float *v, float *latData, float *lonData, int latSize, int lonSize, float msgValue, int iopt, float *rv) {
+bool uv2vr_cfd::calRV(const float* const u, const float* const v, const float* const latData, const float* const lonData, int latSize, int lonSize, float msgValue, int iopt, float* const rv) {
     if (lonSize < 1 || latSize < 1) { return false; }
     if (std::abs(latData[0]) > 90.0 || std::abs(latData[latSize-1]) > 90.0) {return false;}
     
@@ -148,7 +148,7 @@ bool uv2vr_cfd::calRV(float *u, float *v, float *latData, float *lonData, int la
 /// @param[in] latSize 经向格点数
 /// @param[in] lonSize 纬向格点数
 /// @param[in] msgValue 缺测值
-void uv2vr_cfd::extrapolateForCorner(float *data, int latSize, int lonSize, float msgValue) {
+void uv2vr_cfd::extrapolateForCorner(float* const data, int latSize, int lonSize, float msgValue) {
     if (data[0] == msgValue) {                // 左下角格点
         float latP1 = data[lonSize], latP2 = data[2*lonSize];
         float lonP1 = data[1], lonP2 = data[2];
@@ -183,7 +183,7 @@ void uv2vr_cfd::extrapolateForCorner(float *data, int latSize, int lonSize, floa
 /// @param[in,out] data 1d array
 /// @param[in] dataSize 1d array的元素个数
 /// @param[in] msgValue 缺测值
-void uv2vr_cfd::toAverage(float *data, int dataSize, float msgValue) {
+void uv2vr_cfd::toAverage(float* const data, int dataSize, float msgValue) {
     int msgGridNum = std::count(data, data+dataSize, msgValue);
     if (msgGridNum == dataSize) { return; }
     float avgData = (std::accumulate(data, data+dataSize, 0.0) - msgValue*msgGridNum) / (dataSize - msgGridNum);
