@@ -18,6 +18,7 @@ public:
     std::vector<std::pair<float, float>> geoCenters;
     int startTimeIndex;
     int endTimeIndex;
+    std::vector<std::vector<std::pair<int, int>>> vorsCellsIndex;
 private:
     friend class boost::serialization::access;
     template<class Archive>
@@ -27,6 +28,7 @@ private:
         ar & geoCenters;
         ar & startTimeIndex;
         ar & endTimeIndex;
+        ar & vorsCellsIndex;
     }
 };
 

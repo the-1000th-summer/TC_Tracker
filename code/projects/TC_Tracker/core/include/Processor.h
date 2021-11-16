@@ -37,6 +37,7 @@ public:
     void dumpStep1(const std::string ncFilePath);
     void dumpStep2(const std::string ncFilePath);
     void dumpStep3(const std::string ncFilePath);
+    void dumpStep3_proto3(const std::string oFilePath);
     void getStep1DataFromFile(const std::string &filePath);
     void getStep2DataFromFile(const std::string &filePath);
     void dumpVortexes(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>> &allVorsCellsIndex);
@@ -67,6 +68,7 @@ private:
     std::vector<Typhoon> realTCs{};
 //    TCs tcs;
     std::vector<std::vector<std::pair<float, float>>> landPolygons;
+    std::vector<std::pair<int, int>> set2Vector(const std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex);
     
     int getLastNotEmptyVecIndex();
     void checkDirAndCreate(const std::string &folderName);

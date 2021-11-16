@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		7922B26C26FDD1B3002AE343 /* libomp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7922B26B26FDD1B3002AE343 /* libomp.a */; };
 		7957EA6C26F3980400305982 /* myMap.dat in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7957EA6B26F3980400305982 /* myMap.dat */; };
+		799923662743F4FC00191008 /* TCsP.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 799923652743F4FC00191008 /* TCsP.pb.cc */; };
+		799923682743F53400191008 /* libprotobuf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 799923672743F53400191008 /* libprotobuf.a */; };
 		79A4884D2719BA4600D4BA02 /* VortexesDumper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79A4884C2719BA4600D4BA02 /* VortexesDumper.cpp */; };
 		79DB6D4926F0A3530097DCC2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79DB6D4826F0A3530097DCC2 /* main.cpp */; };
 		79DB6D5926F0A6A70097DCC2 /* TC1Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79DB6D5526F0A6A70097DCC2 /* TC1Time.cpp */; };
@@ -40,6 +42,8 @@
 		7922B26B26FDD1B3002AE343 /* libomp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libomp.a; path = ../../../../../../../../../../opt/homebrew/Cellar/libomp/12.0.1/lib/libomp.a; sourceTree = "<group>"; };
 		792CD4E626F61A3B0036E762 /* multiArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multiArray.h; path = ../../core/include/multiArray.h; sourceTree = "<group>"; };
 		7957EA6B26F3980400305982 /* myMap.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = myMap.dat; path = ../../../../data/myMap/myMap.dat; sourceTree = "<group>"; };
+		799923652743F4FC00191008 /* TCsP.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TCsP.pb.cc; path = ../../../../../../../../myWork/TC_Tracker_Supplementary/code/proto3/Typhoon/TCsP.pb.cc; sourceTree = "<group>"; };
+		799923672743F53400191008 /* libprotobuf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libprotobuf.a; path = ../../../../../../../../../../opt/homebrew/lib/libprotobuf.a; sourceTree = "<group>"; };
 		79A4884B2719BA1700D4BA02 /* VortexesDumper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VortexesDumper.h; path = ../../core/include/VortexesDumper.h; sourceTree = "<group>"; };
 		79A4884C2719BA4600D4BA02 /* VortexesDumper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = VortexesDumper.cpp; path = ../../core/src/VortexesDumper.cpp; sourceTree = "<group>"; };
 		79DB6D4526F0A3530097DCC2 /* TC_Tracker_CLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TC_Tracker_CLI; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,6 +76,7 @@
 				79DB6D6426F0ACE30097DCC2 /* libboost_serialization.a in Frameworks */,
 				79DB6D6626F0AD4C0097DCC2 /* libboost_filesystem.a in Frameworks */,
 				7922B26C26FDD1B3002AE343 /* libomp.a in Frameworks */,
+				799923682743F53400191008 /* libprotobuf.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +97,7 @@
 		790AE2B226F73178007A6408 /* TCStruct */ = {
 			isa = PBXGroup;
 			children = (
+				799923652743F4FC00191008 /* TCsP.pb.cc */,
 				79DB6D5726F0A6A70097DCC2 /* Typhoon.cpp */,
 				79DB6D5526F0A6A70097DCC2 /* TC1Time.cpp */,
 			);
@@ -158,6 +164,7 @@
 		79DB6D5E26F0AC090097DCC2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				799923672743F53400191008 /* libprotobuf.a */,
 				7922B26B26FDD1B3002AE343 /* libomp.a */,
 				79F9D43826F32E5B00F75059 /* libboost_program_options.a */,
 				79DB6D6526F0AD4C0097DCC2 /* libboost_filesystem.a */,
@@ -244,6 +251,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				799923662743F4FC00191008 /* TCsP.pb.cc in Sources */,
 				79F9D44226F37B1300F75059 /* NCFileInfo.cpp in Sources */,
 				79DB6D4926F0A3530097DCC2 /* main.cpp in Sources */,
 				79DB6D5B26F0A6A70097DCC2 /* Typhoon.cpp in Sources */,
@@ -378,6 +386,7 @@
 					/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/code/projects/TC_Tracker/core/include,
 					/opt/homebrew/include,
 					/opt/homebrew/Cellar/boost/1.76.0/include,
+					/Users/richard/Documents/myWork/TC_Tracker_Supplementary/code/proto3/Typhoon,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/lib,
@@ -401,6 +410,7 @@
 					/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/code/projects/TC_Tracker/core/include,
 					/opt/homebrew/include,
 					/opt/homebrew/Cellar/boost/1.76.0/include,
+					/Users/richard/Documents/myWork/TC_Tracker_Supplementary/code/proto3/Typhoon,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/lib,

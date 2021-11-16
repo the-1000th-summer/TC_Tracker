@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <utility>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
@@ -12,9 +13,12 @@ namespace TTCore {
 class TC1Time {
 public:
     //TC1Time(std::pair<int, int> maxVorCellIndex, std::pair<float, float> geoCenter);
+    /// 涡旋中心纬度index、经度index
     std::pair<int, int> maxVorCellIndex;
     /// 涡旋中心纬度、经度
     std::pair<float, float> geoCenter;
+    /// 涡旋包含的cells的index
+    std::vector<std::pair<int, int>> cellsIndex;
     
 private:
     friend class boost::serialization::access;
@@ -22,6 +26,7 @@ private:
     void serialize(Archive& ar, const unsigned int version) {
         ar & maxVorCellIndex;
         ar & geoCenter;
+        ar & cellsIndex;
     }
 };
 

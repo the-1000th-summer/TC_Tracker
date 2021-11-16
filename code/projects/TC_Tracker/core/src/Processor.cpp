@@ -24,7 +24,7 @@
 #include "Utils.h"
 #include "Typhoon.h"
 #include "VortexesDumper.h"
-
+#include "TCsP.pb.h"
 
 namespace TTCore {
 
@@ -234,7 +234,7 @@ void Processor::getRealTC() {
                 
                 for (int i = 0; i < currentTimeTCNum; ++i) {
                     tempTCs.push_back(Typhoon{
-                        i+TC_No, {currentTimeVortexes[i].maxVorCellIndex}, {currentTimeVortexes[i].geoCenter}, timeIndex, timeIndex
+                        i+TC_No, {currentTimeVortexes[i].maxVorCellIndex}, {currentTimeVortexes[i].geoCenter}, timeIndex, timeIndex, {currentTimeVortexes[i].cellsIndex}
                     });
                 }
                 // 更新气旋编号，注意更新后的编号所代表的气旋仍未出现
@@ -352,6 +352,8 @@ void Processor::getRealTC() {
                         tempTCs[minDistIndex.first].geoCenters.push_back(minD_currentTTC.geoCenter);
                         // 更新台风消亡时间
                         tempTCs[minDistIndex.first].endTimeIndex = timeIndex;
+                        // 更新台风涡旋包含的点的index
+                        tempTCs[minDistIndex.first].vorsCellsIndex.push_back(minD_currentTTC.cellsIndex);
                         
                         tempTCsIndexForD.erase(minDistIndex.first);
                         // 移除对应成功的当前时次的涡旋
@@ -377,7 +379,7 @@ void Processor::getRealTC() {
                     int currentTTCsNum = currentTimeVortexes.size();
                     for (int i = 0; i < currentTTCsNum; ++i) {
                         tempTCs.push_back(Typhoon{
-                            TC_No+i, {currentTimeVortexes[i].maxVorCellIndex}, {currentTimeVortexes[i].geoCenter}, timeIndex, timeIndex
+                            TC_No+i, {currentTimeVortexes[i].maxVorCellIndex}, {currentTimeVortexes[i].geoCenter}, timeIndex, timeIndex, {currentTimeVortexes[i].cellsIndex}
                         });
                     }
                     // 更新台风编号，注意更新后的编号所代表的台风仍未出现
@@ -454,6 +456,8 @@ void Processor::removeNoise() {
     
     std::cout << "remove noise completed" << std::endl;
     std::cout << "msg from removeNoise, realTC number: " << realTCs.size() << std::endl;
+    
+    dumpStep3_proto3("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general.protobuf");
 }
 
 /// 此方法识别某个时次是否有台风以及台风的个数
@@ -495,7 +499,7 @@ int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex) {
         ++tpNum;
         auto vortexCenterLatLon = isWrfoutFile ? UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr2D, lonArr2D) : UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr.get(), lonArr.get());
         vortexesCellsIndex.push_back(allCellsIndex);
-        vortexesThisTime.push_back(TC1Time{maxVorCell.first, vortexCenterLatLon});
+        vortexesThisTime.push_back(TC1Time{maxVorCell.first, vortexCenterLatLon, set2Vector(allCellsIndex)});
         removeVortex(vorField, timeIndex, allCellsIndex);
     }
 //    allVortexes.push_back(vortexesThisTime);
@@ -638,6 +642,12 @@ inline void Processor::removeVortex(ThreeDArray &vorField, int timeIndex, std::u
     }
 }
 
+std::vector<std::pair<int, int>> Processor::set2Vector(const std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex) {
+    std::vector<std::pair<int, int>> ret;
+    ret.insert(ret.end(), vortexCellsIndex.begin(), vortexCellsIndex.end());
+    return ret;
+}
+
 int Processor::getLastNotEmptyVecIndex() {
     int i = allVortexes.size() - 1;
     while (allVortexes[i].empty()) { --i; }
@@ -715,6 +725,39 @@ void Processor::dumpStep3(const std::string ncFilePath) {
     boost::archive::binary_oarchive oa(ofs);
     TCs tcs(realTCs, tcInfo);
     oa << tcs;
+}
+
+void Processor::dumpStep3_proto3(const std::string oFilePath) {
+    TCsP tcsP;
+    for (const Typhoon &tc : realTCs) {
+        auto tc_ptr = tcsP.add_typhoons();
+        
+        for (const std::pair<int, int> &maxVorCell : tc.maxVorCells) {
+            auto maxVorCell_ptr = tc_ptr->add_maxvorcells();
+            maxVorCell_ptr->set_latindex(maxVorCell.first);
+            maxVorCell_ptr->set_lonindex(maxVorCell.second);
+        }
+        for (const std::pair<float, float> &geoCenter : tc.geoCenters) {
+            auto geoCenter_ptr = tc_ptr->add_geocenters();
+            geoCenter_ptr->set_lat(geoCenter.first);
+            geoCenter_ptr->set_lon(geoCenter.second);
+        }
+        tc_ptr->set_starttimeindex(tc.startTimeIndex);
+        tc_ptr->set_endtimeindex(tc.endTimeIndex);
+        for (const std::vector<std::pair<int, int>> &vorCellsIndex : tc.vorsCellsIndex) {
+            auto vorCellsIndex_ptr = tc_ptr->add_vorscellsindex();
+            for (const std::pair<int, int> &cellIndex : vorCellsIndex) {
+                auto cellIndex_ptr = vorCellsIndex_ptr->add_vorcellsindex();
+                cellIndex_ptr->set_latindex(cellIndex.first);
+                cellIndex_ptr->set_lonindex(cellIndex.second);
+            }
+        }
+    }
+    std::fstream output(oFilePath, std::ios::out | std::ios::trunc | std::ios::binary);
+    if (!tcsP.SerializeToOstream(&output)) {
+        std::cout << "Failed to write proto3 file." << std::endl;
+        exit(-1);
+    }
 }
 
 /// 读取dumpStep1生成的boost序列化文件并将数据读到vortexes属性
