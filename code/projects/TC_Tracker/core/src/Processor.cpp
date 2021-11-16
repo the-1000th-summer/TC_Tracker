@@ -464,11 +464,13 @@ int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex) {
     /// 当前时次的涡旋的个数
     int tpNum = 0;
     std::vector<TC1Time> vortexesThisTime{};
+    /// 当前时次所有vortex的cells的index
     std::vector<std::unordered_set<std::pair<int, int>, pair_hash>> vortexesCellsIndex;
     
     for (int i = 0; i < Constants::TODAY_MAX_TP_NUM; ++i) {
         // auto maxVorCell = UtilFunc::max_element_2d(vorField);
         auto maxVorCell = vorField.max(timeIndex);
+        /// 当前vortex的cells的index
         std::unordered_set<std::pair<int, int>, pair_hash> allCellsIndex;
         getVortexCellsIndex(vorField, timeIndex, maxVorCell.first, allCellsIndex);
         
@@ -519,9 +521,8 @@ void Processor::getVortexCellsIndex(ThreeDArray &vorField, int timeIndex, std::p
 }
 
 /// 此函数接受一个点，返回周围的点（最多8个），如果在边缘则排除边缘外的点。
-/// @param[in] vorField 涡度场（2d array）
-/// @param[in] maxValIndex 涡度最大值的格点对应的纬度、经度index
-/// @return 周围的点的index
+/// @param[in] cellIndex 点的index
+/// @return 周围的点的index组成的vector
 std::unordered_set<std::pair<int, int>, pair_hash> Processor::getSurroundingCellsIndex(std::pair<int, int> cellIndex) {
     std::unordered_set<std::pair<int, int>, pair_hash> surroundingCells{
         // 左列三个点
@@ -629,6 +630,7 @@ std::pair<float, float> Processor::getMinorAxisLen(const std::vector<std::pair<i
 
 /// 此函数消除相对涡度大值中心，为识别多个台风服务，替换为1e-6
 /// @param[in,out] vorField 涡度场（2d array）
+/// @param[out] timeIndex 时间index
 /// @param[out] vortexCellsIndex 涡旋包含的点的index
 inline void Processor::removeVortex(ThreeDArray &vorField, int timeIndex, std::unordered_set<std::pair<int, int>, pair_hash> vortexCellsIndex) {
     for (auto &i : vortexCellsIndex) {
@@ -644,7 +646,7 @@ int Processor::getLastNotEmptyVecIndex() {
 
 
 /// @brief 此方法检查一个文件夹名字对应的路径是否为路径
-/// @param folderName 文件夹名称
+/// @param[in] folderName 文件夹名称
 void Processor::checkDirAndCreate(const std::string& folderName) {
     //std::filesystem::path dumpDir("E:\\University\\TC_Tracker\\data\\stepFile\\");
     if (!dumpDir.empty()) {
@@ -669,6 +671,8 @@ void Processor::checkDirAndCreate(const std::string& folderName) {
     
 }
 
+/// 将第一步生成的Vortex数据用boost序列化为文件
+/// @param[in] ncFilePath 文件绝对路径
 void Processor::dumpStep1(const std::string ncFilePath) {
     //checkDirAndCreate("step1");
     
@@ -681,6 +685,8 @@ void Processor::dumpStep1(const std::string ncFilePath) {
     oa << vortexes;
 }
 
+/// 将二步生成的TC数据用boost序列化为文件
+/// @param[in] ncFilePath 文件绝对路径
 void Processor::dumpStep2(const std::string ncFilePath) {
     //checkDirAndCreate("step2");
     std::filesystem::path stepDumpDir(dumpDir);
@@ -700,6 +706,8 @@ void Processor::dumpStep2(const std::string ncFilePath) {
     //std::cout << pnpolys(20.260121, 107.827437) << std::endl;  // false
 }
 
+/// 将三步生成的TC数据用boost序列化为文件
+/// @param[in] ncFilePath 文件绝对路径
 void Processor::dumpStep3(const std::string ncFilePath) {
     //checkDirAndCreate("step3");
     std::filesystem::path stepDumpDir(dumpDir);
@@ -709,6 +717,8 @@ void Processor::dumpStep3(const std::string ncFilePath) {
     oa << tcs;
 }
 
+/// 读取dumpStep1生成的boost序列化文件并将数据读到vortexes属性
+/// @param[in] filePath 文件绝对路径
 void Processor::getStep1DataFromFile(const std::string& filePath) {
     std::ifstream ifs(filePath, std::ios::binary);
     boost::archive::binary_iarchive ia(ifs);
@@ -721,6 +731,8 @@ void Processor::getStep1DataFromFile(const std::string& filePath) {
     tcInfo = vortexes.getTcInfo();
 }
 
+/// 读取dumpStep2生成的boost序列化文件并将数据读到tcs
+/// @param[in] filePath 文件绝对路径
 void Processor::getStep2DataFromFile(const std::string& filePath) {
     std::ifstream ifs(filePath, std::ios::binary);
     boost::archive::binary_iarchive ia(ifs);
@@ -733,6 +745,8 @@ void Processor::getStep2DataFromFile(const std::string& filePath) {
 
 }
 
+/// 将第1步生成的vortexes输出为nc文件
+/// @param allVorsCellsIndex 包含所有时次的vortex数据的vector
 void Processor::dumpVortexes(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>> &allVorsCellsIndex) {
     VortexesDumper dumper(iFilePath, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/ERA5_onlyVortexes.nc", tcInfo);
     dumper.setLatLonData(latArr.get(), latGridNum, lonArr.get(), lonGridNum);
@@ -749,6 +763,7 @@ void Processor::copyTCs(TCs &tcs) {
     tcs = TCs(realTCs, tcInfo);
 }
 
+/// 读取boost序列化的大陆mask文件并将数据读到landPolygons
 void Processor::getLandPolygons() {
     auto exeDirStr = boost::dll::program_location().parent_path().string();
     std::filesystem::path exeDir(exeDirStr);
@@ -765,9 +780,9 @@ void Processor::getLandPolygons() {
 /// @return 点是否在多边形内
 bool Processor::pnpoly(const std::vector<std::pair<float,float>> &polygon, float testLat, float testLon) {
     bool isInPolygon = false;
-    int i, j;
+    size_t i, j;
     /// 多边形的顶点个数
-    int nvert = polygon.size();
+    size_t nvert = polygon.size();
     for (i = 0, j = nvert - 1; i < nvert; j = i++) {
         if (((polygon[i].first > testLat) != (polygon[j].first > testLat)) && (testLon < (polygon[j].second - polygon[i].second) * (testLat - polygon[i].first) / (polygon[j].first - polygon[i].first) + polygon[i].second))
             isInPolygon = !isInPolygon;

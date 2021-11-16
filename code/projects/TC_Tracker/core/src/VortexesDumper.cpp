@@ -19,7 +19,12 @@ VortexesDumper::VortexesDumper(const std::string vorNcFilePath, const std::strin
     
 }
 
-void VortexesDumper::setLatLonData(float *latArr, size_t latDimLen, float *lonArr, size_t lonDimLen) {
+/// 将纬度经度数据写到该对象对应的属性里
+/// @param[in] latArr 纬度数据
+/// @param[in] latDimLen latArr长度
+/// @param[in] lonArr 经度数据
+/// @param[in] lonDimLen lonArr长度
+void VortexesDumper::setLatLonData(const float* const latArr, size_t latDimLen, const float* const lonArr, size_t lonDimLen) {
     latData = std::make_unique<float[]>(latDimLen);
     lonData = std::make_unique<float[]>(lonDimLen);
     std::copy(latArr, latArr+latDimLen, latData.get());
@@ -107,12 +112,18 @@ void VortexesDumper::dumpVortexes2Proto3(const std::vector<std::vector<std::unor
 }
 #endif
 
+/// 根据tcInfo中的time开始index和interval和time的长度将等差数列数据写入timeData
+/// @param[out] timeData 保存时间的数组
+/// @param[in] dataLen timeData的长度
 void VortexesDumper::fillTimeData(float *timeData, size_t dataLen) {
     const int hourInterval = tcInfo.getHourInterval();
     int startTI = tcInfo.getFirstTValue() - hourInterval;
     std::generate(timeData, timeData+dataLen, [&startTI, hourInterval]{ return startTI+=hourInterval; });
 }
 
+/// 根据原始相对涡度数据和vortexes的cells的index提取出仅包含vortex的相对涡度数据的ThreeDArray，并写入vorData
+/// @param[in] allVorsCellsIndex 所有时次的vortexes的cells的index
+/// @param[out] vorData 待写入的3d array，将包含vortex的相对涡度数据
 void VortexesDumper::fillVorData(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>> &allVorsCellsIndex, ThreeDArray &vorData) {
     const auto timeDimLen = allVorsCellsIndex.size();
     auto originVorData = ThreeDArray(timeDimLen, latDimLen, lonDimLen);
@@ -130,6 +141,9 @@ void VortexesDumper::fillVorData(const std::vector<std::vector<std::unordered_se
     }
 }
 
+/// 将inVar中所有的CHAR类型的属性拷贝到oVar中
+/// @param[in] inVar 被拷贝的变量
+/// @param[out] oVar 拷贝到的变量
 void VortexesDumper::copyAllCharAtt(const netCDF::NcVar &inVar, netCDF::NcVar &oVar) {
     auto inVarAtts = inVar.getAtts();
     for (auto const &inVarAtt : inVarAtts) {

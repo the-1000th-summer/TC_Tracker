@@ -19,7 +19,7 @@ namespace TTCore {
 class VortexesDumper {
 public:
     VortexesDumper(const std::string vorNcFilePath, const std::string &oFilePath, const TCInfo &tcInfo);
-    void setLatLonData(float *latArr, size_t latDimLen, float *lonArr, size_t lonDimLen);
+    void setLatLonData(const float* const latArr, size_t latDimLen, const float* const lonArr, size_t lonDimLen);
     void dumpVortexes2NC(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>> &allVorsCellsIndex);
 #ifdef GETVORBASEDONREAL
     void dumpVortexes2Proto3(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, TTCore::pair_hash>>> &allVorsCellsIndex, const std::vector<std::vector<int>> &findRank);

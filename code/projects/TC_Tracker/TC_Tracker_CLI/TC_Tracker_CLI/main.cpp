@@ -34,6 +34,10 @@ inline void abortWithMsg(const std::string &msg) {
     exit(1);
 }
 
+/// 拆分字符串
+/// @param[in] s 原始字符串
+/// @param[in] delim 分隔符
+/// @returns 拆分后的字符串vector
 std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> result;
     std::stringstream ss (s);
@@ -44,6 +48,10 @@ std::vector<std::string> split(const std::string &s, char delim) {
     return result;
 }
 
+/// 连接字符串
+/// @param[in] strVec 多个字符串组成的vector
+/// @param[in] delimiter 分隔符
+/// @returns 连接后的字符串
 std::string joinStrings(const std::vector<std::string> &strVec, const char *delimiter) {
     std::string ret;
     auto iter = strVec.begin(), endIter = strVec.end() - 1;
