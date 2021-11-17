@@ -25,6 +25,7 @@
 #include "Typhoon.h"
 #include "VortexesDumper.h"
 #include "TCsP.pb.h"
+#include "Linint2.h"
 
 namespace TTCore {
 
@@ -160,7 +161,13 @@ void Processor::recognizeTyphoon() {
     if (isWrfoutFile) {
         calcRelativeVorField(iiFile.get(), vorField);
     } else {
-        iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
+        if (shouldRegrid(1.25)) {
+            regridVorData(1.25, vorField);
+        } else {
+            iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
+        }
+        
+        
     }
     Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue(threadNum));
 //    Constants::RECURSION_MIN_ReVOR = 0.00005;
@@ -648,12 +655,38 @@ std::vector<std::pair<int, int>> Processor::set2Vector(const std::unordered_set<
     return ret;
 }
 
+bool Processor::shouldRegrid(float spatialRes) {
+    assert(latArr[1] > latArr[0]);
+    assert(lonArr[1] > lonArr[0]);
+    if (std::abs(latArr[1] - latArr[0] - spatialRes) > 1e-4 ) { return true; }
+    if (std::abs(lonArr[1] - lonArr[0] - spatialRes) > 1e-4 ) { return true; }
+    return false;
+}
+
+void Processor::regridVorData(float spatialRes, ThreeDArray &vorField) {
+    int minLatGridNum = static_cast<int>(latArr[0] / spatialRes);
+    int maxLatGridNum = static_cast<int>(latArr[latGridNum-1] / spatialRes);
+    int ref_latGridNum = maxLatGridNum - minLatGridNum + 1;
+    auto ref_latData = std::make_unique<float>(ref_latGridNum);
+    std::iota(ref_latData.get(), ref_latData.get()+ref_latGridNum, minLatGridNum * spatialRes);
+    
+    int minLonGridNum = static_cast<int>(lonArr[0] / spatialRes);
+    int maxLonGridNum = static_cast<int>(lonArr[lonGridNum-1] / spatialRes);
+    int ref_lonGridNum = maxLonGridNum - minLonGridNum + 1;
+    auto ref_lonData = std::make_unique<float>(ref_lonGridNum);
+    std::iota(ref_lonData.get(), ref_lonData.get()+ref_lonGridNum, minLonGridNum * spatialRes);
+
+    auto tempVorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
+    iiFile->getVar(varNames.vorVarName).getVar(tempVorField.get());
+    auto interp = Linint2();
+    interp.linint2(lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.get(), ref_lonGridNum, ref_latData.get(), ref_latGridNum, tempVorField.get(), vorField.get(), false, -9999);
+}
+
 int Processor::getLastNotEmptyVecIndex() {
     int i = allVortexes.size() - 1;
     while (allVortexes[i].empty()) { --i; }
     return i;
 }
-
 
 /// @brief 此方法检查一个文件夹名字对应的路径是否为路径
 /// @param[in] folderName 文件夹名称

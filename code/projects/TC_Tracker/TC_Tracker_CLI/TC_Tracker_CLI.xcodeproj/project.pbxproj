@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7900DD862744AA9E00779E2B /* Linint2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7900DD852744AA9E00779E2B /* Linint2.cpp */; };
 		7922B26C26FDD1B3002AE343 /* libomp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7922B26B26FDD1B3002AE343 /* libomp.a */; };
 		7957EA6C26F3980400305982 /* myMap.dat in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7957EA6B26F3980400305982 /* myMap.dat */; };
 		799923662743F4FC00191008 /* TCsP.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 799923652743F4FC00191008 /* TCsP.pb.cc */; };
@@ -38,6 +39,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7900DD852744AA9E00779E2B /* Linint2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Linint2.cpp; path = ../../../../../../../../myWork/TC_Tracker_Supplementary/code/regrid/linint2_cxx/linint2_cxx/Linint2.cpp; sourceTree = "<group>"; };
 		790AE2B026F72FF5007A6408 /* TCInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TCInfo.h; path = ../../core/include/TCInfo.h; sourceTree = "<group>"; };
 		7922B26B26FDD1B3002AE343 /* libomp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libomp.a; path = ../../../../../../../../../../opt/homebrew/Cellar/libomp/12.0.1/lib/libomp.a; sourceTree = "<group>"; };
 		792CD4E626F61A3B0036E762 /* multiArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multiArray.h; path = ../../core/include/multiArray.h; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 				79DB6D5826F0A6A70097DCC2 /* Processor.cpp */,
 				79DB6D5626F0A6A70097DCC2 /* Utils.cpp */,
 				79A4884C2719BA4600D4BA02 /* VortexesDumper.cpp */,
+				7900DD852744AA9E00779E2B /* Linint2.cpp */,
 			);
 			name = Calculator;
 			sourceTree = "<group>";
@@ -253,6 +256,7 @@
 			files = (
 				799923662743F4FC00191008 /* TCsP.pb.cc in Sources */,
 				79F9D44226F37B1300F75059 /* NCFileInfo.cpp in Sources */,
+				7900DD862744AA9E00779E2B /* Linint2.cpp in Sources */,
 				79DB6D4926F0A3530097DCC2 /* main.cpp in Sources */,
 				79DB6D5B26F0A6A70097DCC2 /* Typhoon.cpp in Sources */,
 				79DB6D5C26F0A6A70097DCC2 /* Processor.cpp in Sources */,
@@ -387,6 +391,7 @@
 					/opt/homebrew/include,
 					/opt/homebrew/Cellar/boost/1.76.0/include,
 					/Users/richard/Documents/myWork/TC_Tracker_Supplementary/code/proto3/Typhoon,
+					/Users/richard/Documents/myWork/TC_Tracker_Supplementary/code/regrid/linint2_cxx/linint2_cxx,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/lib,
@@ -411,6 +416,7 @@
 					/opt/homebrew/include,
 					/opt/homebrew/Cellar/boost/1.76.0/include,
 					/Users/richard/Documents/myWork/TC_Tracker_Supplementary/code/proto3/Typhoon,
+					/Users/richard/Documents/myWork/TC_Tracker_Supplementary/code/regrid/linint2_cxx/linint2_cxx,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/lib,

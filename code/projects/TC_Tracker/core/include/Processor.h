@@ -69,6 +69,8 @@ private:
 //    TCs tcs;
     std::vector<std::vector<std::pair<float, float>>> landPolygons;
     std::vector<std::pair<int, int>> set2Vector(const std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex);
+    bool shouldRegrid(float spatialRes);
+    void regridVorData(float spatialRes, ThreeDArray &vorField);
     
     int getLastNotEmptyVecIndex();
     void checkDirAndCreate(const std::string &folderName);
