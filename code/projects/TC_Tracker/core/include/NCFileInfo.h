@@ -40,12 +40,13 @@ public:
     
     void exportFile(const std::string &inFilePath, const std::string &outFilePath);
     void exportFile(const std::string &outFilePath);
+    void exportFile_proto3(TCs &tcs, const std::string oFilePath);
     void exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand);
     void exportFile_nc_compact(const TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand);
     
     void getDataFromStep3File(const std::string& inFilePath, std::vector<Typhoon>& tcs);
 private:
-    
+    std::vector<float> lat_data, lon_data;
     //    netCDF::NcFile *iiFile = nullptr;
 };
 }

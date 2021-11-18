@@ -13,6 +13,7 @@
 #include "NCFileInfo.h"
 #include "Processor.h"
 #include "Typhoon.h"
+#include "TCsP.pb.h"
 
 namespace TTCore {
 //NCFileInfo::NCFileInfo(const char* filePath, bool isWrfoutFile, const char* timeVName, const char* latVName, const char* lonVName, const char* vorVName, const char* dumpDirectory) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), timeVarName(timeVName), latVarName(latVName), lonVarName(lonVName), vorVarName(vorVName), dumpDir(dumpDirectory) {}
@@ -111,11 +112,13 @@ void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled) {
         p.dumpStep2(ncFilePath);
     
     p.removeNoise();
+
     if (!noTempFiles)
         p.dumpStep3(ncFilePath);
     
     //        p.copyRealTCs(tcs);
     p.copyTCs(tcs);
+    p.copyLatLonData(lat_data, lon_data);
 }
 
 void NCFileInfo::startFromStep2(std::vector<Typhoon>& tcs) {
@@ -170,6 +173,47 @@ void NCFileInfo::exportFile(const std::string& inFilePath, const std::string& ou
 }
 void NCFileInfo::exportFile(const std::string& outFilePath) {
     exportFile((std::filesystem::path(dumpDir) / (std::filesystem::path(ncFilePath).stem().string() + "_step3.dat")).string(), outFilePath);
+}
+
+void NCFileInfo::exportFile_proto3(TCs &tcs, const std::string oFilePath) {
+    TCsP tcsP;
+    for (const Typhoon &tc : tcs.getTcs()) {
+        auto tc_ptr = tcsP.add_typhoons();
+        
+        for (const std::pair<int, int> &maxVorCell : tc.maxVorCells) {
+            auto maxVorCell_ptr = tc_ptr->add_maxvorcells();
+            maxVorCell_ptr->set_latindex(maxVorCell.first);
+            maxVorCell_ptr->set_lonindex(maxVorCell.second);
+        }
+        for (const std::pair<float, float> &geoCenter : tc.geoCenters) {
+            auto geoCenter_ptr = tc_ptr->add_geocenters();
+            geoCenter_ptr->set_lat(geoCenter.first);
+            geoCenter_ptr->set_lon(geoCenter.second);
+        }
+        tc_ptr->set_starttimeindex(tc.startTimeIndex);
+        tc_ptr->set_endtimeindex(tc.endTimeIndex);
+        for (const std::vector<std::pair<int, int>> &vorCellsIndex : tc.vorsCellsIndex) {
+            auto vorCellsIndex_ptr = tc_ptr->add_vorscellsindex();
+            for (const std::pair<int, int> &cellIndex : vorCellsIndex) {
+                auto cellIndex_ptr = vorCellsIndex_ptr->add_vorcellsindex();
+                cellIndex_ptr->set_latindex(cellIndex.first);
+                cellIndex_ptr->set_lonindex(cellIndex.second);
+            }
+        }
+    }
+    auto tcInfo = tcs.getTcInfo();
+    tcsP.set_timeunits(tcInfo.getTimeUnits());
+    tcsP.set_firsttimevalue(tcInfo.getFirstTValue());
+    tcsP.set_timehourinterval(tcInfo.getHourInterval());
+    
+    for (auto i : lat_data) { tcsP.add_lats(i); }
+    for (auto i : lon_data) { tcsP.add_lons(i); }
+    
+    std::fstream output(oFilePath, std::ios::out | std::ios::trunc | std::ios::binary);
+    if (!tcsP.SerializeToOstream(&output)) {
+        std::cout << "Failed to write proto3 file." << std::endl;
+        exit(-1);
+    }
 }
 
 /// 将结果输出为netCDF文件（标准：CF Convention）

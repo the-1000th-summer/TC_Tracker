@@ -156,18 +156,25 @@ void Processor::recognizeTyphoon() {
     /// endYear的12月31日0时时次在文件中的index
     //        int endIndexInFile = 58436;
     allVorsCellsIndex = std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>>(timeLength);
-    auto vorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
+//    auto vorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
+//    std::unique_ptr<ThreeDArray> vorField;
+    auto vorField = ThreeDArray();
     
     if (isWrfoutFile) {
+//        vorField = std::make_unique<ThreeDArray>(timeLength, latGridNum, lonGridNum);
+        vorField.setDims(timeLength, latGridNum, lonGridNum);
         calcRelativeVorField(iiFile.get(), vorField);
     } else {
         if (shouldRegrid(1.25)) {
-            regridVorData(1.25, vorField);
+            std::cout << "file should be regrid" << std::endl;
+            auto ref_latData = getRgedLatArr(1.25);
+            auto ref_lonData = getRgedLonArr(1.25);
+            vorField.setDims(timeLength, ref_latData.size(), ref_lonData.size());
+            regridVorData(ref_latData, ref_lonData, vorField);
         } else {
+            vorField.setDims(timeLength, latGridNum, lonGridNum);
             iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
         }
-        
-        
     }
     Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue(threadNum));
 //    Constants::RECURSION_MIN_ReVOR = 0.00005;
@@ -464,7 +471,8 @@ void Processor::removeNoise() {
     std::cout << "remove noise completed" << std::endl;
     std::cout << "msg from removeNoise, realTC number: " << realTCs.size() << std::endl;
     
-    dumpStep3_proto3("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general.protobuf");
+//    dumpStep3_proto3("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general.protobuf");
+//    dumpStep3_proto3("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/modelResult/CESM_result_1pt5.protobuf");
 }
 
 /// 此方法识别某个时次是否有台风以及台风的个数
@@ -663,23 +671,37 @@ bool Processor::shouldRegrid(float spatialRes) {
     return false;
 }
 
-void Processor::regridVorData(float spatialRes, ThreeDArray &vorField) {
+std::vector<float> Processor::getRgedLatArr(float spatialRes) {
     int minLatGridNum = static_cast<int>(latArr[0] / spatialRes);
     int maxLatGridNum = static_cast<int>(latArr[latGridNum-1] / spatialRes);
     int ref_latGridNum = maxLatGridNum - minLatGridNum + 1;
-    auto ref_latData = std::make_unique<float>(ref_latGridNum);
-    std::iota(ref_latData.get(), ref_latData.get()+ref_latGridNum, minLatGridNum * spatialRes);
-    
+    std::vector<float> ref_latData(ref_latGridNum, 0);
+    std::iota(ref_latData.data(), ref_latData.data()+ref_latGridNum, minLatGridNum * spatialRes);
+    return ref_latData;
+}
+std::vector<float> Processor::getRgedLonArr(float spatialRes) {
     int minLonGridNum = static_cast<int>(lonArr[0] / spatialRes);
     int maxLonGridNum = static_cast<int>(lonArr[lonGridNum-1] / spatialRes);
     int ref_lonGridNum = maxLonGridNum - minLonGridNum + 1;
-    auto ref_lonData = std::make_unique<float>(ref_lonGridNum);
-    std::iota(ref_lonData.get(), ref_lonData.get()+ref_lonGridNum, minLonGridNum * spatialRes);
+    std::vector<float> ref_lonData(ref_lonGridNum, 0);
+    std::iota(ref_lonData.data(), ref_lonData.data()+ref_lonGridNum, minLonGridNum * spatialRes);
+    return ref_lonData;
+}
+
+void Processor::regridVorData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, ThreeDArray &vorField) {
+    std::cout << "start regridding" << std::endl;
+    int ref_latGridNum = ref_latData.size(), ref_lonGridNum = ref_lonData.size();
 
     auto tempVorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
     iiFile->getVar(varNames.vorVarName).getVar(tempVorField.get());
     auto interp = Linint2();
-    interp.linint2(lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.get(), ref_lonGridNum, ref_latData.get(), ref_latGridNum, tempVorField.get(), vorField.get(), false, -9999);
+    interp.linint2(timeLength, lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempVorField.get(), vorField.get(), false, -9999);
+    // 将旧的lat和lon数据替换为regrid后的lat和lon
+    latGridNum = ref_latGridNum; lonGridNum = ref_lonGridNum;
+    latArr = std::make_unique<float[]>(latGridNum);   // reassign, 不会导致内存泄漏
+    lonArr = std::make_unique<float[]>(lonGridNum);   // reassign, 不会导致内存泄漏
+    std::copy(ref_latData.data(), ref_latData.data()+latGridNum, latArr.get());
+    std::copy(ref_lonData.data(), ref_lonData.data()+lonGridNum, lonArr.get());
 }
 
 int Processor::getLastNotEmptyVecIndex() {
@@ -761,36 +783,46 @@ void Processor::dumpStep3(const std::string ncFilePath) {
 }
 
 void Processor::dumpStep3_proto3(const std::string oFilePath) {
-    TCsP tcsP;
-    for (const Typhoon &tc : realTCs) {
-        auto tc_ptr = tcsP.add_typhoons();
-        
-        for (const std::pair<int, int> &maxVorCell : tc.maxVorCells) {
-            auto maxVorCell_ptr = tc_ptr->add_maxvorcells();
-            maxVorCell_ptr->set_latindex(maxVorCell.first);
-            maxVorCell_ptr->set_lonindex(maxVorCell.second);
-        }
-        for (const std::pair<float, float> &geoCenter : tc.geoCenters) {
-            auto geoCenter_ptr = tc_ptr->add_geocenters();
-            geoCenter_ptr->set_lat(geoCenter.first);
-            geoCenter_ptr->set_lon(geoCenter.second);
-        }
-        tc_ptr->set_starttimeindex(tc.startTimeIndex);
-        tc_ptr->set_endtimeindex(tc.endTimeIndex);
-        for (const std::vector<std::pair<int, int>> &vorCellsIndex : tc.vorsCellsIndex) {
-            auto vorCellsIndex_ptr = tc_ptr->add_vorscellsindex();
-            for (const std::pair<int, int> &cellIndex : vorCellsIndex) {
-                auto cellIndex_ptr = vorCellsIndex_ptr->add_vorcellsindex();
-                cellIndex_ptr->set_latindex(cellIndex.first);
-                cellIndex_ptr->set_lonindex(cellIndex.second);
-            }
-        }
-    }
-    std::fstream output(oFilePath, std::ios::out | std::ios::trunc | std::ios::binary);
-    if (!tcsP.SerializeToOstream(&output)) {
-        std::cout << "Failed to write proto3 file." << std::endl;
-        exit(-1);
-    }
+//    TCsP tcsP;
+//    for (const Typhoon &tc : realTCs) {
+//        auto tc_ptr = tcsP.add_typhoons();
+//        
+//        for (const std::pair<int, int> &maxVorCell : tc.maxVorCells) {
+//            auto maxVorCell_ptr = tc_ptr->add_maxvorcells();
+//            maxVorCell_ptr->set_latindex(maxVorCell.first);
+//            maxVorCell_ptr->set_lonindex(maxVorCell.second);
+//        }
+//        for (const std::pair<float, float> &geoCenter : tc.geoCenters) {
+//            auto geoCenter_ptr = tc_ptr->add_geocenters();
+//            geoCenter_ptr->set_lat(geoCenter.first);
+//            geoCenter_ptr->set_lon(geoCenter.second);
+//        }
+//        tc_ptr->set_starttimeindex(tc.startTimeIndex);
+//        tc_ptr->set_endtimeindex(tc.endTimeIndex);
+//        for (const std::vector<std::pair<int, int>> &vorCellsIndex : tc.vorsCellsIndex) {
+//            auto vorCellsIndex_ptr = tc_ptr->add_vorscellsindex();
+//            for (const std::pair<int, int> &cellIndex : vorCellsIndex) {
+//                auto cellIndex_ptr = vorCellsIndex_ptr->add_vorcellsindex();
+//                cellIndex_ptr->set_latindex(cellIndex.first);
+//                cellIndex_ptr->set_lonindex(cellIndex.second);
+//            }
+//        }
+//    }
+//    tcsP.set_timeunits(tcInfo.getTimeUnits());
+//    tcsP.set_firsttimevalue(tcInfo.getFirstTValue());
+//    tcsP.set_timehourinterval(tcInfo.getHourInterval());
+//    for (int i = 0; i < latGridNum; ++i) {
+//        tcsP.add_lats(latArr[i]);
+//    }
+//    for (int i = 0; i < lonGridNum; ++i) {
+//        tcsP.add_lons(lonArr[i]);
+//    }
+//    
+//    std::fstream output(oFilePath, std::ios::out | std::ios::trunc | std::ios::binary);
+//    if (!tcsP.SerializeToOstream(&output)) {
+//        std::cout << "Failed to write proto3 file." << std::endl;
+//        exit(-1);
+//    }
 }
 
 /// 读取dumpStep1生成的boost序列化文件并将数据读到vortexes属性
@@ -837,6 +869,12 @@ void Processor::copyRealTCs(std::vector<Typhoon>& tcs) {
 
 void Processor::copyTCs(TCs &tcs) {
     tcs = TCs(realTCs, tcInfo);
+}
+void Processor::copyLatLonData(std::vector<float> &lat_data, std::vector<float> &lon_data) {
+    lat_data.clear();
+    lon_data.clear();
+    std::copy(latArr.get(), latArr.get()+latGridNum, std::back_inserter(lat_data));
+    std::copy(lonArr.get(), lonArr.get()+lonGridNum, std::back_inserter(lon_data));
 }
 
 /// 读取boost序列化的大陆mask文件并将数据读到landPolygons

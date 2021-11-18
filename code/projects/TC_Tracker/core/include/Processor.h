@@ -43,6 +43,7 @@ public:
     void dumpVortexes(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>> &allVorsCellsIndex);
     void copyRealTCs(std::vector<Typhoon> &tcs);
     void copyTCs(TCs &tcs);
+    void copyLatLonData(std::vector<float> &lat_data, std::vector<float> &lon_data);
     
 private:
     bool* isCanceled;
@@ -70,7 +71,9 @@ private:
     std::vector<std::vector<std::pair<float, float>>> landPolygons;
     std::vector<std::pair<int, int>> set2Vector(const std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex);
     bool shouldRegrid(float spatialRes);
-    void regridVorData(float spatialRes, ThreeDArray &vorField);
+    std::vector<float> getRgedLatArr(float spatialRes);
+    std::vector<float> getRgedLonArr(float spatialRes);
+    void regridVorData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, ThreeDArray &vorField);
     
     int getLastNotEmptyVecIndex();
     void checkDirAndCreate(const std::string &folderName);

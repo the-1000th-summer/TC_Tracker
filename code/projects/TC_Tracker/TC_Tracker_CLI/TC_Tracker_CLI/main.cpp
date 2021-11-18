@@ -234,6 +234,9 @@ void tryCXXOPTS(int argc, char * argv[]) {
         fileInfo.exportFile_nc(tcs, allFilesPath.back(), argStr);
     }
     
+    auto pp = (std::filesystem::path(allFilesPath.back()).parent_path() / (std::filesystem::path(allFilesPath.back()).stem().string() + ".protobuf")).string();
+    fileInfo.exportFile_proto3(tcs, pp);
+    
     std::cout << "end of tracking" << std::endl;
 }
 

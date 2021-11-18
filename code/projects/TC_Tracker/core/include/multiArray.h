@@ -54,8 +54,17 @@ class ThreeDArray {
     size_t _rows;
     size_t _columns;
     std::unique_ptr<float[]> data;
+    /// 是否已经初始化
+    bool inited = false;
 public:
-    ThreeDArray(size_t times, size_t rows, size_t columns) : _times{times}, _rows{rows}, _columns{columns}, data{std::make_unique<float[]>(times * rows * columns)} {}
+    ThreeDArray(size_t times, size_t rows, size_t columns) : _times{times}, _rows{rows}, _columns{columns}, data{std::make_unique<float[]>(times * rows * columns)} { inited = true; }
+    
+    ThreeDArray() {}
+    inline void setDims(size_t times, size_t rows, size_t columns) {
+        assert(inited == false);
+        _times = times; _rows = rows; _columns = columns;
+        data = std::make_unique<float[]>(times * rows * columns);
+    }
     
     inline size_t times() const { return _times; }
     inline size_t rows() const { return _rows; }

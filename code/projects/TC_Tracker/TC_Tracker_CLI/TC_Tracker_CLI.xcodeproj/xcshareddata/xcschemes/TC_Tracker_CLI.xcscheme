@@ -31,7 +31,7 @@
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -76,16 +76,20 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/ERA5_general.nc"
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_ERA5_hourly_1pt0_rg_1pt25_1979_cxx.nc"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/ERA5_general_1pt0_rg_1pt25.nc"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_JRA-55_hourly.nc"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general.nc"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_JRA-55_hourly_regridded.nc"
@@ -94,6 +98,14 @@
          <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general_regridded.nc"
             isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Volumes/My_Passport/model_data/generate/daily/Vorticity_FUTURE_daily/1pt5/Vorticity_daily_1pt5_005_h1_2006-2100.nc"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/modelResult/CESM_result_1pt5_005.nc"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-u"
