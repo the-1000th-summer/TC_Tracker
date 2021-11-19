@@ -13,8 +13,9 @@
 /// 存储台风的总体信息
 class TCInfo {
 public:
-    TCInfo(const std::string &timeUnits, double timeInterval, double firstTValue) : timeUnits(timeUnits), timeInterval(timeInterval), firstTValue(firstTValue) {}
+    TCInfo(const std::string &timeUnits, bool time_noleap, double timeInterval, double firstTValue) : timeUnits(timeUnits), time_noleap(time_noleap), timeInterval(timeInterval), firstTValue(firstTValue) {}
     inline std::string getTimeUnits() const { return timeUnits; }
+    inline bool getTime_noleap() const { return time_noleap; }
     inline double getTimeInterval() const { return timeInterval; }
     inline double getFirstTValue() const { return firstTValue; }
     double getHourInterval() const {
@@ -34,6 +35,7 @@ public:
     }
 private:
     std::string timeUnits;
+    bool time_noleap;
     double timeInterval;
     /// 文件中的time variable第一个数据的值
     double firstTValue;
@@ -41,6 +43,7 @@ private:
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar & timeUnits;
+        ar & time_noleap;
         ar & timeInterval;
         ar & firstTValue;
     }

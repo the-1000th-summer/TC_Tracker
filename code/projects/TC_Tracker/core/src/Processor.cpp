@@ -61,12 +61,23 @@ Processor::~Processor() {
 }
 
 TCInfo Processor::getTCInfo() {
+    // time units
     std::string timeUnits;
     auto timeVar = iiFile->getVar(varNames.timeVarName);
     timeVar.getAtt("units").getValues(timeUnits);
+    // time calendar
+    bool time_noleap;
+    auto calendarAtt = timeVar.getAtt("calendar");
+    if (calendarAtt.isNull()) {
+        time_noleap = false;
+    } else {
+        std::string calendarStr;
+        calendarAtt.getValues(calendarStr);
+        time_noleap = (calendarStr == "noleap");
+    }
     double firstTValue;
     timeVar.getVar({0}, {1}, &firstTValue);
-    return TCInfo(timeUnits, UtilFunc::getTimeInterval(timeVar), firstTValue);
+    return TCInfo(timeUnits, time_noleap, UtilFunc::getTimeInterval(timeVar), firstTValue);
     //        vortexes = Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
 //    return Vortexes(timeUnits, UtilFunc::getTimeInterval(timeVar));
 }
@@ -780,49 +791,6 @@ void Processor::dumpStep3(const std::string ncFilePath) {
     boost::archive::binary_oarchive oa(ofs);
     TCs tcs(realTCs, tcInfo);
     oa << tcs;
-}
-
-void Processor::dumpStep3_proto3(const std::string oFilePath) {
-//    TCsP tcsP;
-//    for (const Typhoon &tc : realTCs) {
-//        auto tc_ptr = tcsP.add_typhoons();
-//        
-//        for (const std::pair<int, int> &maxVorCell : tc.maxVorCells) {
-//            auto maxVorCell_ptr = tc_ptr->add_maxvorcells();
-//            maxVorCell_ptr->set_latindex(maxVorCell.first);
-//            maxVorCell_ptr->set_lonindex(maxVorCell.second);
-//        }
-//        for (const std::pair<float, float> &geoCenter : tc.geoCenters) {
-//            auto geoCenter_ptr = tc_ptr->add_geocenters();
-//            geoCenter_ptr->set_lat(geoCenter.first);
-//            geoCenter_ptr->set_lon(geoCenter.second);
-//        }
-//        tc_ptr->set_starttimeindex(tc.startTimeIndex);
-//        tc_ptr->set_endtimeindex(tc.endTimeIndex);
-//        for (const std::vector<std::pair<int, int>> &vorCellsIndex : tc.vorsCellsIndex) {
-//            auto vorCellsIndex_ptr = tc_ptr->add_vorscellsindex();
-//            for (const std::pair<int, int> &cellIndex : vorCellsIndex) {
-//                auto cellIndex_ptr = vorCellsIndex_ptr->add_vorcellsindex();
-//                cellIndex_ptr->set_latindex(cellIndex.first);
-//                cellIndex_ptr->set_lonindex(cellIndex.second);
-//            }
-//        }
-//    }
-//    tcsP.set_timeunits(tcInfo.getTimeUnits());
-//    tcsP.set_firsttimevalue(tcInfo.getFirstTValue());
-//    tcsP.set_timehourinterval(tcInfo.getHourInterval());
-//    for (int i = 0; i < latGridNum; ++i) {
-//        tcsP.add_lats(latArr[i]);
-//    }
-//    for (int i = 0; i < lonGridNum; ++i) {
-//        tcsP.add_lons(lonArr[i]);
-//    }
-//    
-//    std::fstream output(oFilePath, std::ios::out | std::ios::trunc | std::ios::binary);
-//    if (!tcsP.SerializeToOstream(&output)) {
-//        std::cout << "Failed to write proto3 file." << std::endl;
-//        exit(-1);
-//    }
 }
 
 /// 读取dumpStep1生成的boost序列化文件并将数据读到vortexes属性

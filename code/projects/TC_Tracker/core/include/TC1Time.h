@@ -35,7 +35,7 @@ class Vortexes {
 public:
 //    Vortexes(const std::vector<std::vector<TC1Time>> &vortexes, const std::string &timeUnits, double timeInterval) : vortexes(vortexes), tcInfo(timeUnits, timeInterval) {}
     Vortexes(const std::vector<std::vector<TC1Time>> &vortexes, TCInfo &tcInfo) : vortexes(vortexes), tcInfo(tcInfo) {}
-    Vortexes() : tcInfo("", 0, 0) {}
+    Vortexes() : tcInfo("", false, 0, 0) {}
     
     
 //    void push_back(const )

@@ -203,6 +203,7 @@ void NCFileInfo::exportFile_proto3(TCs &tcs, const std::string oFilePath) {
     }
     auto tcInfo = tcs.getTcInfo();
     tcsP.set_timeunits(tcInfo.getTimeUnits());
+    tcsP.set_time_noleap(tcInfo.getTime_noleap());
     tcsP.set_firsttimevalue(tcInfo.getFirstTValue());
     tcsP.set_timehourinterval(tcInfo.getHourInterval());
     
@@ -264,6 +265,9 @@ void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const s
     timeVar.putAtt("units", tcs.getTimeUnits());
     latVar.putAtt("units", "degrees_north");
     lonVar.putAtt("units", "degrees_east");
+    if (tcs.getTcInfo().getTime_noleap()) {
+        timeVar.putAtt("calendar", "noleap");
+    }
     
     serialNoVar.putAtt("coordinates", "time lon lat");
     timeVar.putAtt("_FillValue", netCDF::NcType::nc_DOUBLE, -9999000.0);
