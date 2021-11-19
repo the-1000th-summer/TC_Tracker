@@ -100,11 +100,11 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Volumes/My_Passport/model_data/generate/daily/Vorticity_FUTURE_daily/1pt5/Vorticity_daily_1pt5_005_h1_2006-2100.nc"
+            argument = "/Volumes/My_Passport/model_data/generate/daily/Vorticity_FUTURE_daily/1pt5/Vorticity_daily_1pt5_001_h1_2006-2100.nc"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/modelResult/CESM_result_1pt5_005.nc"
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/modelResult/daily/CESM_result_1pt5_001.nc"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

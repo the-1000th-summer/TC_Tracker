@@ -180,6 +180,11 @@ void Processor::recognizeTyphoon() {
             std::cout << "file should be regrid" << std::endl;
             auto ref_latData = getRgedLatArr(1.25);
             auto ref_lonData = getRgedLonArr(1.25);
+            std::cout << "ref lat data:" << std::endl;
+            for (float i : ref_latData) { std::cout << i << " "; }
+            std::cout << "ref lon data:" << std::endl;
+            for (float i : ref_lonData) { std::cout << i << " "; }
+            std::cout << std::endl;
             vorField.setDims(timeLength, ref_latData.size(), ref_lonData.size());
             regridVorData(ref_latData, ref_lonData, vorField);
         } else {
@@ -687,7 +692,9 @@ std::vector<float> Processor::getRgedLatArr(float spatialRes) {
     int maxLatGridNum = static_cast<int>(latArr[latGridNum-1] / spatialRes);
     int ref_latGridNum = maxLatGridNum - minLatGridNum + 1;
     std::vector<float> ref_latData(ref_latGridNum, 0);
-    std::iota(ref_latData.data(), ref_latData.data()+ref_latGridNum, minLatGridNum * spatialRes);
+//    std::iota(ref_latData.data(), ref_latData.data()+ref_latGridNum, minLatGridNum * spatialRes);
+    float startLat = minLatGridNum * spatialRes - spatialRes;
+    std::generate(ref_latData.data(), ref_latData.data()+ref_latGridNum, [&startLat, spatialRes]{ return startLat+=spatialRes; });
     return ref_latData;
 }
 std::vector<float> Processor::getRgedLonArr(float spatialRes) {
@@ -695,7 +702,9 @@ std::vector<float> Processor::getRgedLonArr(float spatialRes) {
     int maxLonGridNum = static_cast<int>(lonArr[lonGridNum-1] / spatialRes);
     int ref_lonGridNum = maxLonGridNum - minLonGridNum + 1;
     std::vector<float> ref_lonData(ref_lonGridNum, 0);
-    std::iota(ref_lonData.data(), ref_lonData.data()+ref_lonGridNum, minLonGridNum * spatialRes);
+//    std::iota(ref_lonData.data(), ref_lonData.data()+ref_lonGridNum, minLonGridNum * spatialRes);
+    float startLon = minLonGridNum * spatialRes - spatialRes;
+    std::generate(ref_lonData.data(), ref_lonData.data()+ref_lonGridNum, [&startLon, spatialRes]{ return startLon+=spatialRes; });
     return ref_lonData;
 }
 
