@@ -182,7 +182,7 @@ void Processor::recognizeTyphoon() {
             auto ref_lonData = getRgedLonArr(1.25);
             std::cout << "ref lat data:" << std::endl;
             for (float i : ref_latData) { std::cout << i << " "; }
-            std::cout << "ref lon data:" << std::endl;
+            std::cout << "\nref lon data:" << std::endl;
             for (float i : ref_lonData) { std::cout << i << " "; }
             std::cout << std::endl;
             vorField.setDims(timeLength, ref_latData.size(), ref_lonData.size());
@@ -709,13 +709,14 @@ std::vector<float> Processor::getRgedLonArr(float spatialRes) {
 }
 
 void Processor::regridVorData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, ThreeDArray &vorField) {
-    std::cout << "start regridding" << std::endl;
     int ref_latGridNum = ref_latData.size(), ref_lonGridNum = ref_lonData.size();
 
     auto tempVorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
+    std::cout << "reading file from disk..." << std::endl;
     iiFile->getVar(varNames.vorVarName).getVar(tempVorField.get());
+    std::cout << "start regridding..." << std::endl;
     auto interp = Linint2();
-    interp.linint2(timeLength, lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempVorField.get(), vorField.get(), false, -9999);
+    interp.linint2(threadNum, timeLength, lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempVorField.get(), vorField.get(), false, -9999);
     // 将旧的lat和lon数据替换为regrid后的lat和lon
     latGridNum = ref_latGridNum; lonGridNum = ref_lonGridNum;
     latArr = std::make_unique<float[]>(latGridNum);   // reassign, 不会导致内存泄漏
