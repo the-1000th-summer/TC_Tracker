@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <numeric>
 #include <cmath>
+#include <memory>
 
 /// 使用中央差分法计算相对涡度: rv = dv/dx-du/dy+(u/a)tan(lat)
 /// @param[in] u u风场 (2d array)
