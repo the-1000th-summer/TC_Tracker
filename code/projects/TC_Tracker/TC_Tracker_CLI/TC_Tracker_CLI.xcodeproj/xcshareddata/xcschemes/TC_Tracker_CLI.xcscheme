@@ -105,11 +105,11 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Volumes/My_Passport/model_data/generate/daily/Vorticity_FUTURE_daily/1pt5OS/Vorticity_daily_1pt5OS_002_h1_2006-2100.nc"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/modelResult/daily/CESM_result_1pt5OS_002.nc"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-u"

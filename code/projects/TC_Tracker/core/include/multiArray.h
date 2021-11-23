@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <numeric>
 #include <utility>
+#include <cassert>
 
 #ifdef _OPENMP
   #include <omp.h>
