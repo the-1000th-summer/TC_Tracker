@@ -76,7 +76,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_ERA5_hourly_0pt25_rg_1pt0.nc"
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_ERA5_hourly_0pt25_rg_1pt25.nc"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -110,6 +110,14 @@
          <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/modelResult/daily/CESM_result_1pt5OS_002.nc"
             isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Volumes/My_Passport/Data/ERA5_Data/generated_hourly/Vorticity_ERA5_hourly_2pt0.nc"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/era5Result_regrid/ERA5_trackResult_2pt0_regridded.nc"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-u"
