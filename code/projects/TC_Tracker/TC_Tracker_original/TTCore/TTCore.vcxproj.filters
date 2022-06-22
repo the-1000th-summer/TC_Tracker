@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\Calculator">
+      <UniqueIdentifier>{62696a6c-99fb-45c2-8aa5-205b8f14fd9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Calculator">
+      <UniqueIdentifier>{71a33de1-2cc4-48b1-8130-cd0adecdf2a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\3rdPartyLib">
+      <UniqueIdentifier>{b5bce0d4-a167-4efb-804c-ea6f20a55443}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Core.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\multiArray.h">
+      <Filter>头文件\Calculator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\Processor.h">
+      <Filter>头文件\Calculator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\TC1Time.h">
+      <Filter>头文件\Calculator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\Typhoon.h">
+      <Filter>头文件\Calculator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\Utils.h">
+      <Filter>头文件\Calculator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\date.h">
+      <Filter>头文件\3rdPartyLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\json.hpp">
+      <Filter>头文件\3rdPartyLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\NCFileInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\core\src\Processor.cpp">
+      <Filter>源文件\Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\core\src\TC1Time.cpp">
+      <Filter>源文件\Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\core\src\Typhoon.cpp">
+      <Filter>源文件\Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\core\src\Utils.cpp">
+      <Filter>源文件\Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\core\src\NCFileInfo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
