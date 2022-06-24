@@ -10,7 +10,7 @@
         <Label x:Name="label" Content="工作文件" HorizontalAlignment="Left" Margin="97,60,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="170,60,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="442" Height="25"/>
         <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="644,60,0,0" VerticalAlignment="Top" Height="25" Width="78" Click="browseButton_Click"/>
-        <Button x:Name="selVarButton" Content="选择变量..." HorizontalAlignment="Left" Margin="158,122,0,0" VerticalAlignment="Top" Height="34" Width="72"/>
+        <Button x:Name="selVarButton" Content="选择变量..." HorizontalAlignment="Left" Margin="158,122,0,0" VerticalAlignment="Top" Height="34" Width="72" Click="varSelClicked"/>
         <Label x:Name="label1" Content="时间变量名：" HorizontalAlignment="Left" Margin="106,177,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label1_Copy" Content="纬度变量名：" HorizontalAlignment="Left" Margin="106,207,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label1_Copy1" Content="经度变量名：" HorizontalAlignment="Left" Margin="106,237,0,0" VerticalAlignment="Top"/>
@@ -19,6 +19,10 @@
         <TextBlock x:Name="latNameTextBlock" HorizontalAlignment="Left" Margin="193,212,0,0" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
         <TextBlock x:Name="lonNameTextBlock" HorizontalAlignment="Left" Margin="193,242,0,0" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
         <TextBlock x:Name="vorNameTextBlock" HorizontalAlignment="Left" Margin="193,272,0,0" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
+        <Label x:Name="label2" Content="z方向维度名：" HorizontalAlignment="Left" Margin="361,182,0,0" VerticalAlignment="Top"/>
+        <TextBlock x:Name="zLvNameTextBlock" HorizontalAlignment="Left" Margin="449,187,0,0" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
+        <Label x:Name="label3" Content="选取第                    层数据" HorizontalAlignment="Left" Margin="355,210,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="zLvComboBox" HorizontalAlignment="Left" Margin="404,213,0,0" VerticalAlignment="Top" Width="56" Height="20"/>
 
     </Grid>
 </Window>

@@ -18,6 +18,7 @@ using System.Diagnostics;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 using myCLI;
+using TC_Tracker.otherWindow;
 
 namespace TC_Tracker {
     /// <summary>
@@ -205,6 +206,46 @@ namespace TC_Tracker {
             latNameTextBlock.Text = latLabelName;
             lonNameTextBlock.Text = lonLabelName;
             vorNameTextBlock.Text = varNameLabelName;
+        }
+
+        /// <summary>
+        /// 点击选择变量按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void varSelClicked(object sender, RoutedEventArgs e) {
+            var varSelView = new VarSelector();
+            varSelView.Owner = this;
+            varSelView.ShowDialog();
+            if (!varSelView.selectOK) {
+                varNameSelected = false;
+                return;
+            }
+            timeVarStr = (string)varSelView.comboBox_time.SelectedValue;
+            latVarStr = (string)varSelView.comboBox_lat.SelectedValue;
+            lonVarStr = (string)varSelView.comboBox_lon.SelectedValue;
+            vorVarStr = (string)varSelView.comboBox_vor.SelectedValue;
+            setVarNameLabel(timeVarStr, latVarStr, lonVarStr, vorVarStr);
+            handleZLevelDim();
+            varNameSelected = true;
+        }
+
+        private void handleZLevelDim() {
+            //NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
+            //var zLvDimName = "";
+            //var zLvDimLen = fileInfo.getZLvDimLenName(ref zLvDimName);
+
+            //if (zLvDimLen == 0) {    // 无z维度
+            //    zLvNameTextBlock.Text = "(无)";
+            //    zLvComboBox.SelectedIndex = -1;
+            //    zDimLvCanSelect = false;
+            //    return;
+            //}
+            //zLvNameTextBlock.Text = zLvDimName;
+            //List<int> zLvIndex = Enumerable.Range(1, zLvDimLen).ToList();
+            //zLvComboBox.ItemsSource = zLvIndex;
+            //zLvComboBox.SelectedIndex = 0;
+            //zDimLvCanSelect = true;
         }
     }
 }

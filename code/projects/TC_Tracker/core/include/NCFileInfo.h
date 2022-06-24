@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace TTCore {
 
@@ -13,6 +14,9 @@ public:
     NCFileInfo(const char* filePath);
     std::string getFilePath();
     void checkFileValid();
+
+    void getVarsName(std::vector<std::string>& varsName);
+    void getVorDimsName(const std::string& vorVarName, std::vector<std::string>& varsName);
 };
 
 

@@ -3,6 +3,11 @@
 #include "ManagedObject.h"
 #include "../TTCore/Core.h"
 
+using namespace System;
+using namespace System::Diagnostics;
+using namespace System::Collections::Generic;
+using namespace System::Threading;
+
 namespace myCLI {
 
 
@@ -12,6 +17,9 @@ public:
 
     bool checkFileValid(String^% fileValidInfo);
     String^ echoFilePath();
+
+    List<String^>^ getVarsName();
+    void getVorDimsName(String^ vorVarName, List<String^>^ vorDimList);
 
 };
 
