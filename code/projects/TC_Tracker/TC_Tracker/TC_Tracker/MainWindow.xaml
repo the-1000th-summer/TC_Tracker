@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <Label x:Name="label" Content="工作文件" HorizontalAlignment="Left" Margin="97,60,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="170,60,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="442" Height="25"/>
+        <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="644,60,0,0" VerticalAlignment="Top" Height="25" Width="78" Click="browseButton_Click"/>
+
     </Grid>
 </Window>

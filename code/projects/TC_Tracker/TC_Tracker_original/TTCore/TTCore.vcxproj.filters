@@ -48,7 +48,7 @@
     <ClInclude Include="..\..\core\include\json.hpp">
       <Filter>头文件\3rdPartyLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\core\include\NCFileInfo.h">
+    <ClInclude Include="..\..\core\include_original\NCFileInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,7 +65,7 @@
     <ClCompile Include="..\..\core\src\Utils.cpp">
       <Filter>源文件\Calculator</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\core\src\NCFileInfo.cpp">
+    <ClCompile Include="..\..\core\src_original\NCFileInfo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

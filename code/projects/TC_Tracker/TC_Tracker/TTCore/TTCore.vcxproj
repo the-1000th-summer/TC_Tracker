@@ -71,10 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>E:\University\TC_Tracker\code\projects\TC_Tracker\core\include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\University\TC_Tracker\code\projects\TC_Tracker\core\include;D:\netCDF4\netCDF4_C\real\netCDF 4.9.0\include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include</IncludePath>
+    <LibraryPath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\lib\release;$(LibraryPath);D:\netCDF4\netCDF4_C\real\netCDF 4.9.0\lib</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>E:\University\TC_Tracker\code\projects\TC_Tracker\core\include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\University\TC_Tracker\code\projects\TC_Tracker\core\include;D:\netCDF4\netCDF4_C\real\netCDF 4.9.0\include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include</IncludePath>
+    <LibraryPath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\lib\debug;$(LibraryPath);D:\netCDF4\netCDF4_C\real\netCDF 4.9.0\lib</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -116,6 +118,9 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>buildNCXXLib.lib;netcdf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -133,6 +138,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>buildNCXXLib.lib;netcdf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\core\include\NCFileInfo.h" />

@@ -170,19 +170,19 @@
     <ClInclude Include="..\..\core\include\date.h" />
     <ClInclude Include="..\..\core\include\json.hpp" />
     <ClInclude Include="..\..\core\include\multiArray.h" />
-    <ClInclude Include="..\..\core\include\NCFileInfo.h" />
     <ClInclude Include="..\..\core\include\Processor.h" />
     <ClInclude Include="..\..\core\include\TC1Time.h" />
     <ClInclude Include="..\..\core\include\Typhoon.h" />
     <ClInclude Include="..\..\core\include\Utils.h" />
+    <ClInclude Include="..\..\core\include_original\NCFileInfo.h" />
     <ClInclude Include="Core.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\core\src\NCFileInfo.cpp" />
     <ClCompile Include="..\..\core\src\Processor.cpp" />
     <ClCompile Include="..\..\core\src\TC1Time.cpp" />
     <ClCompile Include="..\..\core\src\Typhoon.cpp" />
     <ClCompile Include="..\..\core\src\Utils.cpp" />
+    <ClCompile Include="..\..\core\src_original\NCFileInfo.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
