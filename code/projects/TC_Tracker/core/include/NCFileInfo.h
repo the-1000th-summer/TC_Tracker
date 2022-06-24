@@ -12,7 +12,7 @@ public:
 
     NCFileInfo(const char* filePath);
     std::string getFilePath();
-    //void checkFileValid();
+    void checkFileValid();
 };
 
 

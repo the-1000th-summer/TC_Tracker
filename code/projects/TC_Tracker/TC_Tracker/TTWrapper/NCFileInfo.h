@@ -10,6 +10,7 @@ public ref class NCFileInfo : public ManagedObject<TTCore::NCFileInfo> {
 public:
     NCFileInfo(String^ filePath);
 
+    bool checkFileValid(String^% fileValidInfo);
     String^ echoFilePath();
 
 };

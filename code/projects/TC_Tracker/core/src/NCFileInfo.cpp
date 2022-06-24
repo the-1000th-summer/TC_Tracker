@@ -1,5 +1,5 @@
 #include <iostream>
-//#include <netcdf>
+#include <netcdf>
 
 #include "NCFileInfo.h"
 
@@ -14,20 +14,20 @@ std::string NCFileInfo::getFilePath() {
 }
 
 
-//void NCFileInfo::checkFileValid() {
-//    try {
-//        netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-//        f.close();
-//    }
-//    catch (const std::exception& e) {
-//        //std::cout << e.what() << std::endl;
-//        isFileValid = false;
-//        fileValidInfo = e.what();
-//        //iiFile->close();
-//        return;
-//        //return {false, e.what()};
-//    }
-//    isFileValid = true;
-//}
+void NCFileInfo::checkFileValid() {
+    try {
+        netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+        f.close();
+    }
+    catch (const std::exception& e) {
+        //std::cout << e.what() << std::endl;
+        isFileValid = false;
+        fileValidInfo = e.what();
+        //iiFile->close();
+        return;
+        //return {false, e.what()};
+    }
+    isFileValid = true;
+}
 
 }
