@@ -11,6 +11,8 @@
 		79618E592867129C00539BAE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79618E582867129C00539BAE /* ViewController.swift */; };
 		79618E5B2867129D00539BAE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79618E5A2867129D00539BAE /* Assets.xcassets */; };
 		79618E5E2867129D00539BAE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 79618E5C2867129D00539BAE /* Main.storyboard */; };
+		79618E66286736C000539BAE /* VarSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79618E65286736C000539BAE /* VarSelectViewController.swift */; };
+		79618E6828674D7700539BAE /* Var2SelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79618E6728674D7700539BAE /* Var2SelectViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +22,8 @@
 		79618E5A2867129D00539BAE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		79618E5D2867129D00539BAE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		79618E5F2867129D00539BAE /* TC_Tracker_mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TC_Tracker_mac.entitlements; sourceTree = "<group>"; };
+		79618E65286736C000539BAE /* VarSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VarSelectViewController.swift; sourceTree = "<group>"; };
+		79618E6728674D7700539BAE /* Var2SelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Var2SelectViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +60,8 @@
 				79618E582867129C00539BAE /* ViewController.swift */,
 				79618E5A2867129D00539BAE /* Assets.xcassets */,
 				79618E5C2867129D00539BAE /* Main.storyboard */,
+				79618E65286736C000539BAE /* VarSelectViewController.swift */,
+				79618E6728674D7700539BAE /* Var2SelectViewController.swift */,
 				79618E5F2867129D00539BAE /* TC_Tracker_mac.entitlements */,
 			);
 			path = TC_Tracker_mac;
@@ -133,6 +139,8 @@
 			files = (
 				79618E592867129C00539BAE /* ViewController.swift in Sources */,
 				79618E572867129C00539BAE /* AppDelegate.swift in Sources */,
+				79618E66286736C000539BAE /* VarSelectViewController.swift in Sources */,
+				79618E6828674D7700539BAE /* Var2SelectViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
