@@ -16,7 +16,9 @@ public:
     NCFileInfo(String^ filePath);
 
     bool checkFileValid(String^% fileValidInfo);
-    String^ echoFilePath();
+    int getZLvDimLenName(String^% zLvDimName);
+
+    bool checkIsWrfoutFile(String^% exceptionInfo);
 
     List<String^>^ getVarsName();
     void getVorDimsName(String^ vorVarName, List<String^>^ vorDimList);

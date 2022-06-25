@@ -4,6 +4,12 @@
              xmlns:local="clr-namespace:TC_Tracker"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <local:BooleanAndConverter x:Key="booleanAndConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <local:PrevPageBtnConverter x:Key="PrevPageBtnConverter"/>
+        <local:NextPageBtnConverter x:Key="NextPageBtnConverter"/>
+        <local:StartTrackLabelConverter x:Key="StartTrackLabelConverter"/>
+        <local:StopTrackLabelConverter x:Key="StopTrackLabelConverter"/>
     </Application.Resources>
 </Application>

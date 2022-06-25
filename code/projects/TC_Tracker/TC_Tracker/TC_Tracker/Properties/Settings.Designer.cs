@@ -34,5 +34,17 @@ namespace TC_Tracker.Properties {
                 this["selectDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool isRunning {
+            get {
+                return ((bool)(this["isRunning"]));
+            }
+            set {
+                this["isRunning"] = value;
+            }
+        }
     }
 }

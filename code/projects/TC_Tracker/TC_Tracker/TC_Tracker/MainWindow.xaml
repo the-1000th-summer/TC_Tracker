@@ -5,12 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TC_Tracker"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        x:Name="mainWin"
+        Title="TC Tracker" Height="450" Width="800"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize"
+        Closing="windowClosing">
     <Grid>
         <Label x:Name="label" Content="工作文件" HorizontalAlignment="Left" Margin="97,60,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="170,60,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="442" Height="25"/>
         <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="644,60,0,0" VerticalAlignment="Top" Height="25" Width="78" Click="browseButton_Click"/>
-        <Button x:Name="selVarButton" Content="选择变量..." HorizontalAlignment="Left" Margin="158,122,0,0" VerticalAlignment="Top" Height="34" Width="72" Click="varSelClicked"/>
+        <Button x:Name="selVarButton" Content="选择变量..." HorizontalAlignment="Left" Margin="158,122,0,0" VerticalAlignment="Top" Height="34" Width="72" Click="varSelClicked">
+            <Button.IsEnabled>
+                <MultiBinding Converter="{StaticResource booleanAndConverter}">
+                    <Binding ElementName="mainWin" Path="selectedFile" />
+                    <Binding ElementName="mainWin" Path="isNotTracking" />
+                    <Binding ElementName="mainWin" Path="isNotWrfoutFile" />
+                </MultiBinding>
+            </Button.IsEnabled>
+        </Button>
         <Label x:Name="label1" Content="时间变量名：" HorizontalAlignment="Left" Margin="106,177,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label1_Copy" Content="纬度变量名：" HorizontalAlignment="Left" Margin="106,207,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label1_Copy1" Content="经度变量名：" HorizontalAlignment="Left" Margin="106,237,0,0" VerticalAlignment="Top"/>

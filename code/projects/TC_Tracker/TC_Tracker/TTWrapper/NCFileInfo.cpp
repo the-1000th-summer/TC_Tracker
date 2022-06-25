@@ -19,6 +19,13 @@ bool NCFileInfo::checkFileValid(String^% fileValidInfo) {
     return m_Instance->isFileValid;
 }
 
+bool NCFileInfo::checkIsWrfoutFile(String^% exceptionInfo) {
+    std::string eInfo = "";
+    bool isWrfoutFile = m_Instance->checkIsWrfoutFile(eInfo);
+    exceptionInfo = gcnew String(eInfo.c_str());
+    return isWrfoutFile;
+}
+
 List<String^>^ NCFileInfo::getVarsName() {
     std::vector<std::string> varsName;
     m_Instance->getVarsName(varsName);
@@ -42,9 +49,15 @@ void NCFileInfo::getVorDimsName(String^ vorVarName, List<String^>^ vorDimList) {
     }
 }
 
-String^ NCFileInfo::echoFilePath() {
-    std::string filePath = m_Instance->getFilePath();
-    return gcnew String(filePath.c_str());
+/// 此函数获取z方向维度的名字和其长度
+/// @param[inout] z方向维度名字
+/// @return z方向维度长度
+int NCFileInfo::getZLvDimLenName(String^% zLvDimName) {
+    std::string dimName = "";
+    int zLvDimLen = m_Instance->getZLvDimLenName(dimName);
+    zLvDimName = gcnew String(dimName.c_str());
+    return zLvDimLen;
 }
+
 
 }

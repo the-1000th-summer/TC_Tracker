@@ -24,7 +24,7 @@ namespace TC_Tracker {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window {
+    public partial class MainWindow : Window, INotifyPropertyChanged {
 
         private string cSelDir {
             get => Properties.Settings.Default.selectDir;
@@ -123,7 +123,7 @@ namespace TC_Tracker {
             }
         }
 
-        private BackgroundWorker bgWorker;
+        //private BackgroundWorker bgWorker;
         //private List<Typhoon> realTCs = new List<Typhoon>();
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -131,11 +131,12 @@ namespace TC_Tracker {
         public MainWindow() {
             InitializeComponent();
 
+            ncFileTextBox.Text = cSelDir;
+            Properties.Settings.Default.isRunning = false;
+            Properties.Settings.Default.Save();
 
-            Console.WriteLine("sf");
-            NCFileInfo e = new NCFileInfo("sdfaaa");
-            String ee = e.echoFilePath();
-            Console.WriteLine(ee);
+
+            
         }
 
         private void browseButton_Click(object sender, RoutedEventArgs e) {
@@ -183,22 +184,22 @@ namespace TC_Tracker {
         }
 
         private void checkIsWrfoutFile() {
-            //    NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", "", "");
-            //    var exceptionInfo = "";
-            //    var isWrfoutFile = fileInfo.checkIsWrfoutFile(ref exceptionInfo);
+            NCFileInfo fileInfo = new NCFileInfo(cSelDir);
+            var exceptionInfo = "";
+            var isWrfoutFile = fileInfo.checkIsWrfoutFile(ref exceptionInfo);
 
-            //    if (isWrfoutFile) {
-            //        isNotWrfoutFile = false;
-            //        varNameSelected = true;
-            //        //timeNameTextBlock.
-            //        setVarNameLabel("XTIME", "XLAT", "XLONG", "---");
-            //        handleZLevelDim();
-            //    } else {
-            //        isNotWrfoutFile = true;
-            //        zDimLvCanSelect = false;
-            //        zLvComboBox.SelectedIndex = -1;
-            //        setVarNameLabel("未指定", "未指定", "未指定", "未指定");
-            //    }
+            if (isWrfoutFile) {
+                isNotWrfoutFile = false;
+                varNameSelected = true;
+                //timeNameTextBlock.
+                setVarNameLabel("XTIME", "XLAT", "XLONG", "---");
+                handleZLevelDim();
+            } else {
+                isNotWrfoutFile = true;
+                zDimLvCanSelect = false;
+                zLvComboBox.SelectedIndex = -1;
+                setVarNameLabel("未指定", "未指定", "未指定", "未指定");
+            }
         }
 
         private void setVarNameLabel(string timeLabelName, string latLabelName, string lonLabelName, string varNameLabelName) {
@@ -246,6 +247,18 @@ namespace TC_Tracker {
             //zLvComboBox.ItemsSource = zLvIndex;
             //zLvComboBox.SelectedIndex = 0;
             //zDimLvCanSelect = true;
+        }
+
+
+
+        private void windowClosing(object sender, CancelEventArgs e) {
+            if (!isNotTracking) {
+                if (MessageBox.Show("退出程序吗？任务仍在执行。", "退出程序吗？", MessageBoxButton.YesNo, MessageBoxImage.Question) ==
+                    MessageBoxResult.No) {
+                    e.Cancel = true;
+                    return;
+                }
+            }
         }
     }
 }
