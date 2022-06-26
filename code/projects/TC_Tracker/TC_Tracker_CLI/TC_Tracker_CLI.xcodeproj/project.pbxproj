@@ -17,12 +17,11 @@
 		79DB6D5926F0A6A70097DCC2 /* TC1Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79DB6D5526F0A6A70097DCC2 /* TC1Time.cpp */; };
 		79DB6D5A26F0A6A70097DCC2 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79DB6D5626F0A6A70097DCC2 /* Utils.cpp */; };
 		79DB6D5B26F0A6A70097DCC2 /* Typhoon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79DB6D5726F0A6A70097DCC2 /* Typhoon.cpp */; };
-		79DB6D5C26F0A6A70097DCC2 /* Processor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79DB6D5826F0A6A70097DCC2 /* Processor.cpp */; };
 		79DB6D6026F0AC090097DCC2 /* libnetcdf-cxx4.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79DB6D5F26F0AC090097DCC2 /* libnetcdf-cxx4.a */; };
 		79DB6D6226F0AC120097DCC2 /* libnetcdf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79DB6D6126F0AC120097DCC2 /* libnetcdf.a */; };
 		79DB6D6426F0ACE30097DCC2 /* libboost_serialization.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79DB6D6326F0ACE30097DCC2 /* libboost_serialization.a */; };
 		79DB6D6626F0AD4C0097DCC2 /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79DB6D6526F0AD4C0097DCC2 /* libboost_filesystem.a */; };
-		79F9D44226F37B1300F75059 /* NCFileInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79F9D44126F37B1300F75059 /* NCFileInfo.cpp */; };
+		79F5B9A528689781002BA4BE /* NCFileInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79F5B9A428689781002BA4BE /* NCFileInfo.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -57,15 +56,14 @@
 		79DB6D5526F0A6A70097DCC2 /* TC1Time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TC1Time.cpp; path = ../../core/src/TC1Time.cpp; sourceTree = "<group>"; };
 		79DB6D5626F0A6A70097DCC2 /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Utils.cpp; path = ../../core/src/Utils.cpp; sourceTree = "<group>"; };
 		79DB6D5726F0A6A70097DCC2 /* Typhoon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Typhoon.cpp; path = ../../core/src/Typhoon.cpp; sourceTree = "<group>"; };
-		79DB6D5826F0A6A70097DCC2 /* Processor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Processor.cpp; path = ../../core/src/Processor.cpp; sourceTree = "<group>"; };
 		79DB6D5D26F0A7200097DCC2 /* cxxopts.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cxxopts.hpp; sourceTree = "<group>"; };
 		79DB6D5F26F0AC090097DCC2 /* libnetcdf-cxx4.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libnetcdf-cxx4.a"; path = "../../../../../../../../../../opt/homebrew/lib/libnetcdf-cxx4.a"; sourceTree = "<group>"; };
 		79DB6D6126F0AC120097DCC2 /* libnetcdf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnetcdf.a; path = ../../../../../../../../../../opt/homebrew/lib/libnetcdf.a; sourceTree = "<group>"; };
 		79DB6D6326F0ACE30097DCC2 /* libboost_serialization.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_serialization.a; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_serialization.a; sourceTree = "<group>"; };
 		79DB6D6526F0AD4C0097DCC2 /* libboost_filesystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_filesystem.a; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_filesystem.a; sourceTree = "<group>"; };
+		79F5B9A428689781002BA4BE /* NCFileInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NCFileInfo.cpp; path = ../../core/src_original/NCFileInfo.cpp; sourceTree = "<group>"; };
+		79F5B9A62868B79C002BA4BE /* NCFileInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NCFileInfo.h; path = ../../core/include_original/NCFileInfo.h; sourceTree = "<group>"; };
 		79F9D43826F32E5B00F75059 /* libboost_program_options.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_program_options.a; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_program_options.a; sourceTree = "<group>"; };
-		79F9D44026F37B0200F75059 /* NCFileInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NCFileInfo.h; path = ../../core/include/NCFileInfo.h; sourceTree = "<group>"; };
-		79F9D44126F37B1300F75059 /* NCFileInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NCFileInfo.cpp; path = ../../core/src/NCFileInfo.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,10 +143,10 @@
 		79DB6D4F26F0A5EC0097DCC2 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				79F5B9A62868B79C002BA4BE /* NCFileInfo.h */,
 				792CD4E326F5D2640036E762 /* 3rdPartyLib */,
 				790AE2B126F73027007A6408 /* TCStruct */,
 				79F9D43B26F374F900F75059 /* Calculator */,
-				79F9D44026F37B0200F75059 /* NCFileInfo.h */,
 			);
 			name = include;
 			sourceTree = "<group>";
@@ -156,9 +154,9 @@
 		79DB6D5426F0A6860097DCC2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				79F5B9A428689781002BA4BE /* NCFileInfo.cpp */,
 				790AE2B226F73178007A6408 /* TCStruct */,
 				79F9D43C26F3750600F75059 /* Calculator */,
-				79F9D44126F37B1300F75059 /* NCFileInfo.cpp */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -190,7 +188,6 @@
 		79F9D43C26F3750600F75059 /* Calculator */ = {
 			isa = PBXGroup;
 			children = (
-				79DB6D5826F0A6A70097DCC2 /* Processor.cpp */,
 				79DB6D5626F0A6A70097DCC2 /* Utils.cpp */,
 				79A4884C2719BA4600D4BA02 /* VortexesDumper.cpp */,
 				7900DD852744AA9E00779E2B /* Linint2.cpp */,
@@ -255,11 +252,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				799923662743F4FC00191008 /* TCsP.pb.cc in Sources */,
-				79F9D44226F37B1300F75059 /* NCFileInfo.cpp in Sources */,
 				7900DD862744AA9E00779E2B /* Linint2.cpp in Sources */,
 				79DB6D4926F0A3530097DCC2 /* main.cpp in Sources */,
 				79DB6D5B26F0A6A70097DCC2 /* Typhoon.cpp in Sources */,
-				79DB6D5C26F0A6A70097DCC2 /* Processor.cpp in Sources */,
+				79F5B9A528689781002BA4BE /* NCFileInfo.cpp in Sources */,
 				79DB6D5A26F0A6A70097DCC2 /* Utils.cpp in Sources */,
 				79A4884D2719BA4600D4BA02 /* VortexesDumper.cpp in Sources */,
 				79DB6D5926F0A6A70097DCC2 /* TC1Time.cpp in Sources */,

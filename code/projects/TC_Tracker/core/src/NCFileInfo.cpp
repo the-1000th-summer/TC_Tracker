@@ -44,9 +44,6 @@ void NCFileInfo::getVorDimsName(const std::string& vorVarName, std::vector<std::
     }
 }
 
-/// 通过vor变量获取z方向维度名及其长度
-/// <param name="zLvDimName"></param>
-/// <returns></returns>
 int NCFileInfo::getZLvDimLenName(std::string& zLvDimName) {
     //netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
     //auto uVar = f.getVar(isWrfoutFile ? "U" : varNames.vorVarName);

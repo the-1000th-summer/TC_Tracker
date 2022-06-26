@@ -31,6 +31,10 @@ class ViewController: NSViewController {
         filePathTextField.stringValue = filePath
     }
     
+    private func checkFileValid() {
+//        NCFileInfo
+    }
+    
     private func showFileBrowser() -> String? {
         let dialog = NSOpenPanel();
 
