@@ -15,10 +15,11 @@
 
 
 - (instancetype)init NS_UNAVAILABLE;
-- (id)initWithArgs:(NSString *)filePath;
+- (id)initWithNcFilePath:(NSString *)filePath;
 - (void)dealloc;
 
-- (void)checkFileValid:(NSString *)fileValidInfo;
+- (bool)checkFileValid:(NSString **)fileValidInfo;
+- (NSMutableArray *)getVarsName;
 
 @end
 

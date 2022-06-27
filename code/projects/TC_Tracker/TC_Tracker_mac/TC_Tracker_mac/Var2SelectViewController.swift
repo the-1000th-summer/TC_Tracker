@@ -14,4 +14,9 @@ class Var2SelectViewController: NSViewController {
         // Do view setup here.
     }
     
+    
+    @IBAction func okBtnClicked(_ sender: NSButton) {
+        view.window?.performClose(sender)
+    }
+    
 }

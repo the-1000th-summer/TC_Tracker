@@ -17,17 +17,34 @@
 
 @implementation NCFileInfo_Wrapper
 
-- (id)initWithArgs:(NSString *)filePath {
-    m_instance->ncFilePath = [filePath cStringUsingEncoding:NSUTF8StringEncoding];
+- (id)initWithNcFilePath:(NSString *)filePath {
+    self = [super init];
+    if (self) {
+        m_instance = new TTCore::NCFileInfo([filePath cStringUsingEncoding:NSUTF8StringEncoding]);
+    }
     return self;
 }
 
 - (void)dealloc {
 //    m_instance = nil;
+    delete m_instance;
+//    [super dealloc];       // no need to call [super dealloc] when using ARC
 }
 
-- (void)checkFileValid:(NSString *)fileValidInfo {
-    
+- (bool)checkFileValid:(NSString **)fileValidInfo {
+    m_instance->checkFileValid();
+    *fileValidInfo = [NSString stringWithUTF8String:m_instance->fileValidInfo.c_str()];
+    return m_instance->isFileValid;
+}
+
+- (NSMutableArray *)getVarsName {
+    std::vector<std::string> varsName = m_instance->getVarsName();
+    NSMutableArray *nsstrings = [NSMutableArray new];
+    for (auto const &varName : varsName) {
+        id nsstr = [NSString stringWithUTF8String:varName.c_str()];
+        [nsstrings addObject:nsstr];
+    }
+    return nsstrings;
 }
 
 @end

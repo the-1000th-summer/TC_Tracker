@@ -7,19 +7,43 @@
 
 import Cocoa
 
-class VarSelectViewController: NSViewController {
+class VarSelectViewController: NSViewController, NSComboBoxDataSource {
 
     @IBOutlet var vorRadioBtn: NSButton!
     
-    @objc dynamic var vorNameIsEnabled = false
-    @objc dynamic var windNameIsEnabled = false
-    @objc dynamic var windNameLabelColor: NSColor {
+    @IBOutlet var vorNameComboBox: NSComboBox!
+    @IBOutlet var uwndNameComboBox: NSComboBox!
+    @IBOutlet var vwndNameComboBox: NSComboBox!
+    
+    @objc private dynamic var vorNameIsEnabled = false
+    @objc private dynamic var windNameIsEnabled = false
+    @objc private dynamic var nextStepBtnIsEnabled: Bool {
+        vorNameIsEnabled || windNameIsEnabled
+    }
+    @objc private dynamic var windNameLabelColor: NSColor {
         windNameIsEnabled ? .white : .gray
     }
+    
+    public var ncFilePath: String = ""
+    private var varsName: [String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
+        
+        vorNameComboBox.dataSource = self
+        uwndNameComboBox.dataSource = self
+        vwndNameComboBox.dataSource = self
+    }
+    
+    override func viewWillAppear() {
+        varsName = NCFileInfo_Wrapper(ncFilePath: ncFilePath).getVarsName().compactMap { $0 as? String }
+        if varsName.isEmpty {
+            let alert = NSAlert()
+            alert.messageText = "此文件无变量！请检查文件内容"
+            alert.runModal()
+        }
+        
     }
     
     @IBAction func radioButtonChanged(_ sender: NSButton) {
@@ -28,15 +52,41 @@ class VarSelectViewController: NSViewController {
     }
     
     @IBAction func nextStepBtnClicked(_ sender: NSButton) {
-        let secondVC = storyboard?.instantiateController(withIdentifier: "Var2SelectVC") as? Var2SelectViewController
-        view.window?.contentViewController = secondVC
+        
+        let comboBoxes = vorNameIsEnabled ? [vorNameComboBox] : [uwndNameComboBox, vwndNameComboBox]
+        
+        for comboBox in comboBoxes {
+            let selectedIndex = comboBox!.indexOfSelectedItem
+            if selectedIndex == -1 {
+                let comboBoxValue = comboBox!.stringValue
+                let alert = NSAlert()
+                alert.messageText = comboBoxValue.isEmpty ? "变量名不能为空！" : "\(comboBoxValue): 该变量名不存在，请重新选择变量名。"
+                alert.runModal()
+                return
+            }
+        }
+        
+        
+//        let secondVC = storyboard?.instantiateController(withIdentifier: "Var2SelectVC") as? Var2SelectViewController
+//        view.window?.contentViewController = secondVC
     }
     
     
+    func numberOfItems(in comboBox: NSComboBox) -> Int {
+        return varsName.count
+    }
+    
+    func comboBox(_ comboBox: NSComboBox, objectValueForItemAt index: Int) -> Any? {
+        return varsName[index]
+    }
+    
     override class func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String> {
-        if key == "windNameLabelColor" {
+        switch key {
+        case "windNameLabelColor":
             return ["windNameIsEnabled"]
-        } else {
+        case "nextStepBtnIsEnabled":
+            return ["vorNameIsEnabled", "windNameIsEnabled"]
+        default:
             return []
         }
     }

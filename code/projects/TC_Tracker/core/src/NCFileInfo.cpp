@@ -26,7 +26,8 @@ void NCFileInfo::checkFileValid() {
     isFileValid = true;
 }
 
-void NCFileInfo::getVarsName(std::vector<std::string>& varsName) {
+std::vector<std::string> NCFileInfo::getVarsName() {
+    std::vector<std::string> varsName;
     netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
     auto tt = f.getVars();
     for (auto const& imap : tt) {
@@ -34,6 +35,7 @@ void NCFileInfo::getVarsName(std::vector<std::string>& varsName) {
         varsName.push_back(imap.first);
     }
     f.close();
+    return varsName;
     //std::transform(tt.cbegin(), tt.end(), std::back_inserter(varsName), []( std::pair<std::string, netCDF::NcVar> &a) {return a.first;} );
 }
 void NCFileInfo::getVorDimsName(const std::string& vorVarName, std::vector<std::string>& varsName) {

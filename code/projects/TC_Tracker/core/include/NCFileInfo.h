@@ -23,7 +23,7 @@ public:
     int getZLvDimLenName(std::string& zLvDimName);
     bool checkIsWrfoutFile(std::string& exceptionInfo);
 
-    void getVarsName(std::vector<std::string>& varsName);
+    std::vector<std::string> getVarsName();
     void getVorDimsName(const std::string& vorVarName, std::vector<std::string>& varsName);
 };
 
