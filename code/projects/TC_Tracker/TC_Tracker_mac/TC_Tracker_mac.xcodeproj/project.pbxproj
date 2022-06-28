@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		792329542869DD3B009A5E00 /* VarSelectWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792329532869DD3B009A5E00 /* VarSelectWindowController.swift */; };
+		795DA7B9286B404F00909341 /* libboost_serialization.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 795DA7B8286B404F00909341 /* libboost_serialization.dylib */; };
+		795DA7BB286B405600909341 /* libboost_filesystem.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 795DA7BA286B405600909341 /* libboost_filesystem.dylib */; };
 		79618E572867129C00539BAE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79618E562867129C00539BAE /* AppDelegate.swift */; };
 		79618E592867129C00539BAE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79618E582867129C00539BAE /* ViewController.swift */; };
 		79618E5B2867129D00539BAE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79618E5A2867129D00539BAE /* Assets.xcassets */; };
@@ -21,6 +23,11 @@
 
 /* Begin PBXFileReference section */
 		792329532869DD3B009A5E00 /* VarSelectWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VarSelectWindowController.swift; sourceTree = "<group>"; };
+		795DA7B3286B3A7200909341 /* TCInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TCInfo.h; path = ../../core/include/TCInfo.h; sourceTree = "<group>"; };
+		795DA7B4286B3F6000909341 /* libboost_serialization.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_serialization.dylib; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_serialization.dylib; sourceTree = "<group>"; };
+		795DA7B6286B3F6A00909341 /* libboost_filesystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_filesystem.dylib; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_filesystem.dylib; sourceTree = "<group>"; };
+		795DA7B8286B404F00909341 /* libboost_serialization.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_serialization.dylib; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.78.0_1/lib/libboost_serialization.dylib; sourceTree = "<group>"; };
+		795DA7BA286B405600909341 /* libboost_filesystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_filesystem.dylib; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.78.0_1/lib/libboost_filesystem.dylib; sourceTree = "<group>"; };
 		79618E532867129C00539BAE /* TC_Tracker_mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TC_Tracker_mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		79618E562867129C00539BAE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		79618E582867129C00539BAE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -43,12 +50,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				79F5B9A22868940B002BA4BE /* libnetcdf-cxx4.dylib in Frameworks */,
+				795DA7B9286B404F00909341 /* libboost_serialization.dylib in Frameworks */,
+				795DA7BB286B405600909341 /* libboost_filesystem.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		795DA7B2286B3A3F00909341 /* TCStruct */ = {
+			isa = PBXGroup;
+			children = (
+				795DA7B3286B3A7200909341 /* TCInfo.h */,
+			);
+			name = TCStruct;
+			sourceTree = "<group>";
+		};
 		79618E4A2867129C00539BAE = {
 			isa = PBXGroup;
 			children = (
@@ -96,6 +113,7 @@
 		79618E6D2867539D00539BAE /* include */ = {
 			isa = PBXGroup;
 			children = (
+				795DA7B2286B3A3F00909341 /* TCStruct */,
 				79618E6C2867537F00539BAE /* NCFileInfo.h */,
 			);
 			name = include;
@@ -121,6 +139,10 @@
 		79F5B9A02868940B002BA4BE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				795DA7BA286B405600909341 /* libboost_filesystem.dylib */,
+				795DA7B8286B404F00909341 /* libboost_serialization.dylib */,
+				795DA7B6286B3F6A00909341 /* libboost_filesystem.dylib */,
+				795DA7B4286B3F6000909341 /* libboost_serialization.dylib */,
 				79F5B9A12868940B002BA4BE /* libnetcdf-cxx4.dylib */,
 			);
 			name = Frameworks;
@@ -353,7 +375,11 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/lib,
+					/opt/homebrew/Cellar/boost/1.76.0/lib,
+					/opt/homebrew/Cellar/boost/1.78.0_1/lib,
+				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.the1000thsummer.TC-Tracker-mac";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -383,7 +409,11 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/lib,
+					/opt/homebrew/Cellar/boost/1.76.0/lib,
+					/opt/homebrew/Cellar/boost/1.78.0_1/lib,
+				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.the1000thsummer.TC-Tracker-mac";
 				PRODUCT_NAME = "$(TARGET_NAME)";

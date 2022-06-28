@@ -8,7 +8,7 @@ namespace TTCore {
 
 
 NCFileInfo::NCFileInfo(const char* filePath) : ncFilePath(filePath) {}
-
+NCFileInfo::NCFileInfo(const char* filePath, const VarNames &varNames) : ncFilePath(filePath), varNames(varNames) {}
 
 void NCFileInfo::checkFileValid() {
     try {
@@ -60,7 +60,7 @@ int NCFileInfo::getZLvDimLenName(std::string& zLvDimName) {
 }
 
 
-bool NCFileInfo::checkIsWrfoutFile(std::string& exceptionInfo) {
+bool NCFileInfo::checkIfIsWrfoutFile(std::string& exceptionInfo) {
     netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
     for (const std::string& dimName : { "Time", "south_north", "west_east" }) {
         if (f.getDim(dimName).isNull()) {

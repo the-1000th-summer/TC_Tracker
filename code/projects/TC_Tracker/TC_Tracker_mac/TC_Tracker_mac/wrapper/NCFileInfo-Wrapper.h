@@ -16,11 +16,14 @@
 
 - (instancetype)init NS_UNAVAILABLE;
 - (id)initWithNcFilePath:(NSString *)filePath;
+- (id)initWithNcFilePath:(NSString *)filePath :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v;
 - (void)dealloc;
 
 - (bool)checkFileValid:(NSString **)fileValidInfo;
 - (NSMutableArray *)getVarsName;
 - (NSMutableArray *)getVorDimsName:(NSString *)vorVarName;
+- (bool)checkIfIsWrfoutFile:(NSString **)exceptionInfo;
+- (int)getZLvDimLenName: (NSString **)zLvDimName;
 
 @end
 

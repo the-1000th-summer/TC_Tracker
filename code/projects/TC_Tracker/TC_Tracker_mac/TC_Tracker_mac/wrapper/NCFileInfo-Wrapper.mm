@@ -25,6 +25,24 @@
     return self;
 }
 
+- (id)initWithNcFilePath:(NSString *)filePath :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v {
+    self = [super init];
+    if (self) {
+        auto filePathStr = [filePath cStringUsingEncoding:NSUTF8StringEncoding];
+        auto timeStr = [time cStringUsingEncoding:NSUTF8StringEncoding];
+        auto latStr = [lat cStringUsingEncoding:NSUTF8StringEncoding];
+        auto lonStr = [lon cStringUsingEncoding:NSUTF8StringEncoding];
+        auto vorStr = [vor cStringUsingEncoding:NSUTF8StringEncoding];
+        auto uStr = [u cStringUsingEncoding:NSUTF8StringEncoding];
+        auto vStr = [v cStringUsingEncoding:NSUTF8StringEncoding];
+        
+        auto varNames = VarNames(timeStr, latStr, lonStr, vorStr, uStr, vStr);
+        
+        m_instance = new TTCore::NCFileInfo(filePathStr, varNames);
+    }
+    return self;
+}
+
 - (void)dealloc {
 //    m_instance = nil;
     delete m_instance;
@@ -36,6 +54,7 @@
     *fileValidInfo = [NSString stringWithUTF8String:m_instance->fileValidInfo.c_str()];
     return m_instance->isFileValid;
 }
+
 
 - (NSMutableArray *)getVarsName {
     std::vector<std::string> varsName = m_instance->getVarsName();
@@ -55,6 +74,20 @@
         [nsstrings addObject:nsstr];
     }
     return nsstrings;
+}
+
+- (bool)checkIfIsWrfoutFile:(NSString **)exceptionInfo {
+    std::string eInfo = "";
+    bool isWrfoutFile = m_instance->checkIfIsWrfoutFile(eInfo);
+    *exceptionInfo = [NSString stringWithUTF8String:eInfo.c_str()];
+    return isWrfoutFile;
+}
+
+- (int)getZLvDimLenName: (NSString **)zLvDimName {
+    std::string dimName = "";
+    int zLvDimLen = m_instance->getZLvDimLenName(dimName);
+    *zLvDimName = [NSString stringWithUTF8String:dimName.c_str()];
+    return zLvDimLen;
 }
 
 @end

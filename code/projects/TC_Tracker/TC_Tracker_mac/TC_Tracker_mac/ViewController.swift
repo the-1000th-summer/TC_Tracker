@@ -7,12 +7,13 @@
 
 import Cocoa
 
-class ViewController: NSViewController {
+class ViewController: NSViewController, NSComboBoxDataSource {
 
     @IBOutlet var filePathTextField: NSTextField!
     @IBOutlet var vorLabel: NSTextField!
     @IBOutlet var uwndLabel: NSTextField!
     @IBOutlet var vwndLabel: NSTextField!
+    @IBOutlet var zLvComboBox: NSComboBox!
     
     
     @objc private dynamic var timeVarStr = "未指定"
@@ -33,11 +34,16 @@ class ViewController: NSViewController {
             vwndLabel.textColor = vwndVarStr.isEmpty ? .gray : .labelColor
         }
     }
+    @objc private dynamic var zVarStr = "未指定"
+    
+    @objc private dynamic var isWrfoutFile = false
+    private var zLvDimLen: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        zLvComboBox.dataSource = self
         NotificationCenter.default.addObserver(self, selector: #selector(getVarNames(_:)), name: NSNotification.Name(rawValue: "AllVarNamesGet"), object: nil)
     }
 
@@ -53,7 +59,7 @@ class ViewController: NSViewController {
 
         checkFileValid(filePath: filePath)
         
-        
+        checkIfIsWrfoutFile(ncFilePath: filePath)
     }
     
     @IBAction func varSelBtnClicked(_ sender: NSButton) {
@@ -65,6 +71,8 @@ class ViewController: NSViewController {
 //        NSApp.runModal(for: varSelectWC.window!)
 //        presentAsModalWindow(varSelectVC)
         presentAsSheet(varSelectVC)
+        
+        handleZLevelDim()
     }
     
     @objc private func getVarNames(_ notification: NSNotification) {
@@ -73,8 +81,17 @@ class ViewController: NSViewController {
 //        print("varNames:", notification.userInfo!["varNames"])
     }
     
-    private func checkIfIsWrfoutFile() {
+    private func checkIfIsWrfoutFile(ncFilePath: String) {
+        var eInfo: NSString?;
+        let isWrfoutFile = NCFileInfo_Wrapper(ncFilePath: ncFilePath).checkIfIsWrfoutFile(&eInfo)
         
+        self.isWrfoutFile = isWrfoutFile
+        if isWrfoutFile {
+            setVarName(time: "XTIME", lat: "XLAT", lon: "XLONG", vor: "", u: "U", v: "V")
+            handleZLevelDim()
+        } else {
+            setVarName(allStr: "未指定")
+        }
     }
     
     private func setVarName(time: String, lat: String, lon: String, vor: String, u: String, v: String) {
@@ -85,10 +102,18 @@ class ViewController: NSViewController {
         uwndVarStr = u
         vwndVarStr = v
     }
+    private func setVarName(allStr: String) {
+        timeVarStr = allStr
+        latVarStr = allStr
+        lonVarStr = allStr
+        vorVarStr = allStr
+        uwndVarStr = allStr
+        vwndVarStr = allStr
+    }
     
     private func checkFileValid(filePath: String) {
-        var fileValidInfo: NSString?;
-        let fileValid = NCFileInfo_Wrapper(ncFilePath: filePath).checkFileValid(&fileValidInfo);
+        var fileValidInfo: NSString?
+        let fileValid = NCFileInfo_Wrapper(ncFilePath: filePath).checkFileValid(&fileValidInfo)
         
         if !fileValid {
             let alert = NSAlert()
@@ -101,6 +126,19 @@ class ViewController: NSViewController {
         } else {
             filePathTextField.stringValue = filePath
         }
+    }
+    
+    private func handleZLevelDim() {
+        var zLvDimName: NSString?
+        zLvDimLen = Int(NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr).getZLvDimLenName(&zLvDimName))
+        
+        if zLvDimLen == 0 {
+            zVarStr = "(无)"
+            zLvComboBox.isEnabled = false
+            return
+        }
+        zVarStr = zLvDimName as? String ?? ""
+        
     }
     
     private func showFileBrowser() -> String? {
@@ -127,5 +165,12 @@ class ViewController: NSViewController {
         return nil
     }
     
+    func numberOfItems(in comboBox: NSComboBox) -> Int {
+        return zLvDimLen
+    }
+    
+    func comboBox(_ comboBox: NSComboBox, objectValueForItemAt index: Int) -> Any? {
+        return index + 1
+    }
 }
 
