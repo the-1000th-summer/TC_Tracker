@@ -47,5 +47,15 @@
     return nsstrings;
 }
 
+- (NSMutableArray *)getVorDimsName:(NSString *)vorVarName {
+    std::vector<std::string> dimsName = m_instance->getVorDimsName([vorVarName cStringUsingEncoding:NSUTF8StringEncoding]);
+    NSMutableArray *nsstrings = [NSMutableArray new];
+    for (auto const &dimName : dimsName) {
+        id nsstr = [NSString stringWithUTF8String:dimName.c_str()];
+        [nsstrings addObject:nsstr];
+    }
+    return nsstrings;
+}
+
 @end
 

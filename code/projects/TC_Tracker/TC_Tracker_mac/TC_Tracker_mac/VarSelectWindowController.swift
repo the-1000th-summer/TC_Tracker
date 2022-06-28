@@ -23,7 +23,7 @@ class VarSelectWindowController: NSWindowController, NSWindowDelegate {
     }
     
     func windowWillClose(_ notification: Notification) {
-        NSApp.stopModal()
+//        NSApp.stopModal()
     }
 
 }

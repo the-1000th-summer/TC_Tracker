@@ -44,6 +44,7 @@ class VarSelectViewController: NSViewController, NSComboBoxDataSource {
             alert.runModal()
         }
         
+        
     }
     
     @IBAction func radioButtonChanged(_ sender: NSButton) {
@@ -52,7 +53,15 @@ class VarSelectViewController: NSViewController, NSComboBoxDataSource {
     }
     
     @IBAction func nextStepBtnClicked(_ sender: NSButton) {
+        guard checkComboBoxes() else { return }
         
+        guard let secondVC = storyboard?.instantiateController(withIdentifier: "Var2SelectVC") as? Var2SelectViewController else { return }
+        secondVC.ncFilePath = ncFilePath
+        secondVC.vorOrWindNames = vorNameIsEnabled ? [vorNameComboBox.stringValue] : [uwndNameComboBox.stringValue, vwndNameComboBox.stringValue]
+        view.window?.contentViewController = secondVC
+    }
+    
+    private func checkComboBoxes() -> Bool {
         let comboBoxes = vorNameIsEnabled ? [vorNameComboBox] : [uwndNameComboBox, vwndNameComboBox]
         
         for comboBox in comboBoxes {
@@ -62,13 +71,10 @@ class VarSelectViewController: NSViewController, NSComboBoxDataSource {
                 let alert = NSAlert()
                 alert.messageText = comboBoxValue.isEmpty ? "变量名不能为空！" : "\(comboBoxValue): 该变量名不存在，请重新选择变量名。"
                 alert.runModal()
-                return
+                return false
             }
         }
-        
-        
-//        let secondVC = storyboard?.instantiateController(withIdentifier: "Var2SelectVC") as? Var2SelectViewController
-//        view.window?.contentViewController = secondVC
+        return true
     }
     
     

@@ -38,12 +38,14 @@ std::vector<std::string> NCFileInfo::getVarsName() {
     return varsName;
     //std::transform(tt.cbegin(), tt.end(), std::back_inserter(varsName), []( std::pair<std::string, netCDF::NcVar> &a) {return a.first;} );
 }
-void NCFileInfo::getVorDimsName(const std::string& vorVarName, std::vector<std::string>& varsName) {
+std::vector<std::string> NCFileInfo::getVorDimsName(const std::string& vorVarName) {
+    std::vector<std::string> varsName;
     netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
     auto vorVarDims = f.getVar(vorVarName).getDims();
     for (auto const& dim : vorVarDims) {
         varsName.push_back(dim.getName());
     }
+    return varsName;
 }
 
 int NCFileInfo::getZLvDimLenName(std::string& zLvDimName) {

@@ -20,6 +20,7 @@
 
 - (bool)checkFileValid:(NSString **)fileValidInfo;
 - (NSMutableArray *)getVarsName;
+- (NSMutableArray *)getVorDimsName:(NSString *)vorVarName;
 
 @end
 

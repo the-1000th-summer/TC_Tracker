@@ -24,7 +24,7 @@ public:
     bool checkIsWrfoutFile(std::string& exceptionInfo);
 
     std::vector<std::string> getVarsName();
-    void getVorDimsName(const std::string& vorVarName, std::vector<std::string>& varsName);
+    std::vector<std::string> getVorDimsName(const std::string& vorVarName);
 };
 
 
