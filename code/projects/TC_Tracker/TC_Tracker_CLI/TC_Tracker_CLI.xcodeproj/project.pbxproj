@@ -21,6 +21,7 @@
 		79DB6D6226F0AC120097DCC2 /* libnetcdf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79DB6D6126F0AC120097DCC2 /* libnetcdf.a */; };
 		79DB6D6426F0ACE30097DCC2 /* libboost_serialization.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79DB6D6326F0ACE30097DCC2 /* libboost_serialization.a */; };
 		79DB6D6626F0AD4C0097DCC2 /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79DB6D6526F0AD4C0097DCC2 /* libboost_filesystem.a */; };
+		79E91666286C03E0002CED06 /* Processor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79E91665286C03E0002CED06 /* Processor.cpp */; };
 		79F5B9A528689781002BA4BE /* NCFileInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79F5B9A428689781002BA4BE /* NCFileInfo.cpp */; };
 /* End PBXBuildFile section */
 
@@ -50,9 +51,7 @@
 		79DB6D4526F0A3530097DCC2 /* TC_Tracker_CLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TC_Tracker_CLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		79DB6D4826F0A3530097DCC2 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		79DB6D5026F0A6540097DCC2 /* Typhoon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Typhoon.h; path = ../../core/include/Typhoon.h; sourceTree = "<group>"; };
-		79DB6D5126F0A6540097DCC2 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = ../../core/include/Utils.h; sourceTree = "<group>"; };
 		79DB6D5226F0A6540097DCC2 /* TC1Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TC1Time.h; path = ../../core/include/TC1Time.h; sourceTree = "<group>"; };
-		79DB6D5326F0A6540097DCC2 /* Processor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Processor.h; path = ../../core/include/Processor.h; sourceTree = "<group>"; };
 		79DB6D5526F0A6A70097DCC2 /* TC1Time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TC1Time.cpp; path = ../../core/src/TC1Time.cpp; sourceTree = "<group>"; };
 		79DB6D5626F0A6A70097DCC2 /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Utils.cpp; path = ../../core/src/Utils.cpp; sourceTree = "<group>"; };
 		79DB6D5726F0A6A70097DCC2 /* Typhoon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Typhoon.cpp; path = ../../core/src/Typhoon.cpp; sourceTree = "<group>"; };
@@ -61,6 +60,9 @@
 		79DB6D6126F0AC120097DCC2 /* libnetcdf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnetcdf.a; path = ../../../../../../../../../../opt/homebrew/lib/libnetcdf.a; sourceTree = "<group>"; };
 		79DB6D6326F0ACE30097DCC2 /* libboost_serialization.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_serialization.a; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_serialization.a; sourceTree = "<group>"; };
 		79DB6D6526F0AD4C0097DCC2 /* libboost_filesystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_filesystem.a; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_filesystem.a; sourceTree = "<group>"; };
+		79E91665286C03E0002CED06 /* Processor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Processor.cpp; path = ../../core/src_original/Processor.cpp; sourceTree = "<group>"; };
+		79E91667286C03F6002CED06 /* Processor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Processor.h; path = ../../core/include_original/Processor.h; sourceTree = "<group>"; };
+		79E9166B286C42B2002CED06 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = ../../core/include_original/Utils.h; sourceTree = "<group>"; };
 		79F5B9A428689781002BA4BE /* NCFileInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NCFileInfo.cpp; path = ../../core/src_original/NCFileInfo.cpp; sourceTree = "<group>"; };
 		79F5B9A62868B79C002BA4BE /* NCFileInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NCFileInfo.h; path = ../../core/include_original/NCFileInfo.h; sourceTree = "<group>"; };
 		79F9D43826F32E5B00F75059 /* libboost_program_options.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_program_options.a; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_program_options.a; sourceTree = "<group>"; };
@@ -178,8 +180,8 @@
 		79F9D43B26F374F900F75059 /* Calculator */ = {
 			isa = PBXGroup;
 			children = (
-				79DB6D5326F0A6540097DCC2 /* Processor.h */,
-				79DB6D5126F0A6540097DCC2 /* Utils.h */,
+				79E9166B286C42B2002CED06 /* Utils.h */,
+				79E91667286C03F6002CED06 /* Processor.h */,
 				79A4884B2719BA1700D4BA02 /* VortexesDumper.h */,
 			);
 			name = Calculator;
@@ -188,6 +190,7 @@
 		79F9D43C26F3750600F75059 /* Calculator */ = {
 			isa = PBXGroup;
 			children = (
+				79E91665286C03E0002CED06 /* Processor.cpp */,
 				79DB6D5626F0A6A70097DCC2 /* Utils.cpp */,
 				79A4884C2719BA4600D4BA02 /* VortexesDumper.cpp */,
 				7900DD852744AA9E00779E2B /* Linint2.cpp */,
@@ -259,6 +262,7 @@
 				79DB6D5A26F0A6A70097DCC2 /* Utils.cpp in Sources */,
 				79A4884D2719BA4600D4BA02 /* VortexesDumper.cpp in Sources */,
 				79DB6D5926F0A6A70097DCC2 /* TC1Time.cpp in Sources */,
+				79E91666286C03E0002CED06 /* Processor.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

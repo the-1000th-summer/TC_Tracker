@@ -11,19 +11,39 @@
 #ifndef NCFileInfo_Wrapper_h
 #define NCFileInfo_Wrapper_h
 
+@interface LatLon : NSObject {
+    float lat;
+    float lon;
+}
+@end
+
+@interface Typhoon : NSObject {
+    int serialNo;
+    NSMutableArray<LatLon *> *maxVorCells;
+    NSMutableArray<LatLon *> *geoCenters;
+    int startTimeIndex;
+    int endTimeIndex;
+}
+
+
+@end
+
 @interface NCFileInfo_Wrapper : NSObject
 
 
 - (instancetype)init NS_UNAVAILABLE;
 - (id)initWithNcFilePath:(NSString *)filePath;
 - (id)initWithNcFilePath:(NSString *)filePath :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v;
+- (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(int)zLevelIndex :(NSString *)tempFileDir;
 - (void)dealloc;
 
 - (bool)checkFileValid:(NSString **)fileValidInfo;
 - (NSMutableArray *)getVarsName;
 - (NSMutableArray *)getVorDimsName:(NSString *)vorVarName;
 - (bool)checkIfIsWrfoutFile:(NSString **)exceptionInfo;
-- (int)getZLvDimLenName: (NSString **)zLvDimName;
+- (int)getZLvDimLenName:(NSString **)zLvDimName;
+
+- (void)startTracking;
 
 @end
 

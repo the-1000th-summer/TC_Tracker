@@ -1,14 +1,26 @@
 #include <iostream>
+#include <fstream>
+#include <vector>
 #include <netcdf>
+#include <algorithm>
+#include <filesystem>
+#include <cmath>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
 
+#include "json.hpp"
 #include "NCFileInfo.h"
-
+#include "Processor.h"
+#include "Typhoon.h"
+#include "TCsP.pb.h"
 
 namespace TTCore {
 
 
 NCFileInfo::NCFileInfo(const char* filePath) : ncFilePath(filePath) {}
 NCFileInfo::NCFileInfo(const char* filePath, const VarNames &varNames) : ncFilePath(filePath), varNames(varNames) {}
+NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, int threadNum, const char *dumpDirectory, const char *resourceBaseDir) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), noTempFiles(noTempFiles), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir) {}
 
 void NCFileInfo::checkFileValid() {
     try {
@@ -81,6 +93,32 @@ bool NCFileInfo::checkIfIsWrfoutFile(std::string& exceptionInfo) {
         }
     }
     return true;
+}
+
+
+void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled) {
+    
+//    netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+    
+    Processor p(isCanceled, ncFilePath, isWrfoutFile, varNames, zLevelIndex, threadNum, dumpDir, resourceBaseDir);
+    
+    p.recognizeTyphoon();
+    if (*isCanceled) return;
+    if (!noTempFiles)
+        p.dumpStep1(ncFilePath);
+    
+    p.getRealTC();
+    if (!noTempFiles)
+        p.dumpStep2(ncFilePath);
+    
+    p.removeNoise();
+
+    if (!noTempFiles)
+        p.dumpStep3(ncFilePath);
+    
+    //        p.copyRealTCs(tcs);
+    p.copyTCs(tcs);
+    p.copyLatLonData(lat_data, lon_data);
 }
 
 }

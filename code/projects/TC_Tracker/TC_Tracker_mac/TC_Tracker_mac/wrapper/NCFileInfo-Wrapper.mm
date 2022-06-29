@@ -9,6 +9,7 @@
 
 #import "NCFileInfo-Wrapper.h"
 #import "NCFileInfo.h"
+#include "Typhoon.h"
 
 @interface NCFileInfo_Wrapper() {
     TTCore::NCFileInfo *m_instance;
@@ -39,6 +40,28 @@
         auto varNames = VarNames(timeStr, latStr, lonStr, vorStr, uStr, vStr);
         
         m_instance = new TTCore::NCFileInfo(filePathStr, varNames);
+    }
+    return self;
+}
+
+- (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(int)zLevelIndex :(NSString *)tempFileDir {
+    self = [super init];
+    if (self) {
+        auto filePathStr = [filePath cStringUsingEncoding:NSUTF8StringEncoding];
+        auto timeStr = [time cStringUsingEncoding:NSUTF8StringEncoding];
+        auto latStr = [lat cStringUsingEncoding:NSUTF8StringEncoding];
+        auto lonStr = [lon cStringUsingEncoding:NSUTF8StringEncoding];
+        auto vorStr = [vor cStringUsingEncoding:NSUTF8StringEncoding];
+        auto uStr = [u cStringUsingEncoding:NSUTF8StringEncoding];
+        auto vStr = [v cStringUsingEncoding:NSUTF8StringEncoding];
+        auto tempFileDirStr = [tempFileDir cStringUsingEncoding:NSUTF8StringEncoding];
+        
+        auto varNames = VarNames(timeStr, latStr, lonStr, vorStr, uStr, vStr);
+        
+        NSString *resourcePath = [[NSBundle mainBundle] resourcePath];
+        auto resourcePathStr = [resourcePath cStringUsingEncoding:NSUTF8StringEncoding];
+        
+        m_instance = new TTCore::NCFileInfo(filePathStr, isWrfoutFile, varNames, zLevelIndex, true, 1, tempFileDirStr, resourcePathStr);
     }
     return self;
 }
@@ -88,6 +111,14 @@
     int zLvDimLen = m_instance->getZLvDimLenName(dimName);
     *zLvDimName = [NSString stringWithUTF8String:dimName.c_str()];
     return zLvDimLen;
+}
+
+- (void)startTracking {
+    TTCore::TCs tcs;
+    bool isCanceled = false;
+    m_instance->startTracking(tcs, &isCanceled);
+    std::cout << "sdf" << std::endl;
+    
 }
 
 @end

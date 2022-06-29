@@ -1,0 +1,348 @@
+#include <algorithm>
+#include <cmath>
+#include <ctime>
+#include <iomanip>
+#include <iostream>
+#include <iterator>
+#include <math.h>
+#include <ostream>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <netcdf>
+#include <sys/stat.h>
+#include <utility>
+#include <vector>
+#include <cmath>
+#include "Utils.h"
+#include "multiArray.h"
+
+namespace TTCore {
+
+float Constants::RECURSION_MIN_ReVOR = 30e-5;  // 随便设置的初始值
+//float Constants::HAS_TP_MIN_ReVOR = 100e-5;
+double Constants::LINK_TP_MAX_DIST = 56.67;    // 根据统计得到的1小时的移动距离的最大值
+
+bool UtilFunc::ifFileExists (const std::string& name) {
+    struct stat buffer;
+    return (stat (name.c_str(), &buffer) == 0);
+}
+
+
+/// 将UTC时间字符串转换成UNIX时间戳（1970年1月1日00:00开始所经过的秒数）
+/// @param[in] dataTime UTC时间字符串
+/// @return UNIX时间戳
+//std::time_t UtilFunc::getEpochTime(const std::string& dateTime, const std::string& dateTimeFormat){
+//    // Let's consider we are getting all the input in
+//    // this format: '2014-07-25T20:17:22Z' (T denotes
+//    // start of Time part, Z denotes UTC zone).
+//    // A better approach would be to pass in the format as well.
+//    // static const std::wstring dateTimeFormat{ L"%Y-%m-%dT%H:%M:%SZ" };
+//
+//    // Create a stream which we will use to parse the string,
+//    // which we provide to constructor of stream to fill the buffer.
+//    std::stringstream ss{ dateTime };
+//    std::tm dt{};
+//    // Now we read from buffer using get_time manipulator
+//    // and formatting the input appropriately.
+//    ss >> std::get_time(&dt, dateTimeFormat.c_str());
+//    if (ss.fail()) {
+//        throw std::runtime_error("parse time str failed.");
+//    }
+//
+//    // mktime() interprets its input as local time
+//    // Minus timezone to get UTC time
+//    auto localtime = std::mktime(&dt);
+//    return localtime + dt.tm_gmtoff;
+//}
+
+/// 将表示时间的数字转换成表示时间的tm结构
+/// @param[in] timeNum 表示时间的数字
+/// @param[out] dateTimeTm 表示时间的tm结构
+/// @param[in] timeUnits 时间单位
+//void UtilFunc::num2Date(double timeNum, tm &dateTimeTm, std::string timeUnits) {
+//    std::string unitLength = timeUnits.substr(0, timeUnits.find(" "));
+//    if (unitLength == "hours") {
+//        auto refTime_t = UtilFunc::getEpochTime(timeUnits, "hours since %Y-%m-%d %H:%M");
+//        time_t dateTime_t = refTime_t + 60*60*timeNum;   // 有可能会产生截断
+//        // 不安全
+//        //dateTimeTm = *std::gmtime(&dateTime_t);
+//        if (gmtime_s(&dateTimeTm, &dateTime_t) != 0)
+//            throw std::runtime_error("parse error");
+//    } else {
+//        throw std::runtime_error("not implemented yet.");
+//    }
+//}
+
+void UtilFunc::getTimeData(netCDF::NcFile &iFile) {
+    auto timeVar = iFile.getVar("time");
+    std::string timeUnits;
+    timeVar.getAtt("units").getValues(timeUnits);
+    std::cout << timeUnits << std::endl;
+}
+
+std::string UtilFunc::currentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+    return buf;
+}
+
+void UtilFunc::getLatLonData(netCDF::NcFile *iFile, const std::string& latVarName, const std::string& lonVarName, float *latArray, float *lonArray) {
+    iFile->getVar(latVarName).getVar(latArray);
+    iFile->getVar(lonVarName).getVar(lonArray);
+}
+
+void UtilFunc::getLatLonData(netCDF::NcFile *iFile, const std::string& latVarName, const std::string& lonVarName, std::vector<float> &latVec, std::vector<float> &lonVec) {
+    // MSVC 无法使用变长数组(VLA)
+    // float lat[iFile->getDim("lat").getSize()], lon[iFile->getDim("lon").getSize()];
+    auto latSize = iFile->getDim(latVarName).getSize();
+    auto lonSize = iFile->getDim(lonVarName).getSize();
+    auto lat = std::make_unique<float[]>(latSize);
+    auto lon = std::make_unique<float[]>(lonSize);
+    auto latGet = lat.get(), lonGet = lon.get();
+    
+    iFile->getVar(latVarName).getVar(latGet);
+    iFile->getVar(lonVarName).getVar(lonGet);
+    latVec.assign(latGet, latGet + latSize);
+    lonVec.assign(lonGet, lonGet + lonSize);
+}
+
+void UtilFunc::getLatLonData2d(netCDF::NcFile* iFile, unsigned long latGridNum, unsigned long lonGridNum, float* latArray2d, float* lonArray2d) {
+    iFile->getVar("XLAT").getVar({0,0,0}, {1,latGridNum,lonGridNum}, latArray2d);
+    iFile->getVar("XLONG").getVar({0,0,0}, {1,latGridNum,lonGridNum}, lonArray2d);
+}
+
+/// 此函数将相对涡度从文件中提取出来
+void UtilFunc::getVorField(netCDF::NcFile *iFile, float *vor) {
+    iFile->getVar("Vorticity").getVar(vor);
+}
+
+double UtilFunc::getTimeInterval(netCDF::NcVar &timeVar) {
+    double firstValue, secondValue;
+    timeVar.getVar({0}, {1}, &firstValue);
+    timeVar.getVar({1}, {1}, &secondValue);
+    return (secondValue - firstValue);
+}
+
+/// 获取单位时间间隔的小时数
+/// @param timeVar time变量对象
+double UtilFunc::getHourInterval(netCDF::NcVar &timeVar) {
+    double timeInterval = getTimeInterval(timeVar);
+    std::string timeUnits;
+    timeVar.getAtt("units").getValues(timeUnits);
+    std::string timeUnitLen = timeUnits.substr(0, timeUnits.find(" "));
+    if (timeUnitLen == "minutes") {
+        return timeInterval / 60.0;
+    } else if (timeUnitLen == "hours") {
+        return timeInterval;
+    } else if (timeUnitLen == "days") {
+        return timeInterval * 24.0;
+    } else if (timeUnitLen == "seconds") {
+        return timeInterval / 3600.0;
+    } else {
+        throw std::runtime_error("未知单位: " + timeUnitLen);
+    }
+}
+
+/// 此函数根据时间变量的属性将LINK_TP_MAX_DIST的值修改成正确的
+/// @param iFile netCDF文件的指针
+/// @param timeVarName time变量名
+void UtilFunc::modifyMaxDist(netCDF::NcFile* iFile, const std::string &timeVarName) {
+    auto timeVar = iFile->getVar(timeVarName);
+    Constants::LINK_TP_MAX_DIST *= UtilFunc::getTimeInterval(timeVar);
+    std::string timeUnits;
+    timeVar.getAtt("units").getValues(timeUnits);
+    std::string timeUnitLen = timeUnits.substr(0, timeUnits.find(" "));
+    if (timeUnitLen == "minutes") {
+        Constants::LINK_TP_MAX_DIST /= 60.0;
+    } else if (timeUnitLen == "hours") {
+        // 什么都不做
+    } else if (timeUnitLen == "days") {
+        Constants::LINK_TP_MAX_DIST *= 24.0;
+    } else if (timeUnitLen == "seconds") {
+        Constants::LINK_TP_MAX_DIST /= 3600.0;
+    } else {
+//        std::cout << "未知单位: " << timeUnitLen << std::endl;
+        throw std::runtime_error("unrecognized time units: "+timeUnitLen);
+    }
+    std::cout << "TC move dist per unit time THRESHOLD: " << Constants::LINK_TP_MAX_DIST << std::endl;
+}
+
+bool UtilFunc::checkIfHasVarAtt(netCDF::NcVar &ncVar, const std::string &attName) {
+    auto atts = ncVar.getAtts();
+    std::vector<std::string> attsName;
+    for (auto const &att : atts) {
+        attsName.push_back(att.first);
+    }
+    return std::find(attsName.begin(), attsName.end(), attName) != attsName.end();
+}
+
+
+/// 找出2d array的最大值和相应的index
+/// @param[in] vorField 涡度场（2d array）
+/// @return index（纬度index、经度index）和最大值
+// std::pair<std::pair<int, int>, float> UtilFunc::max_element_2d(float vorField[Constants::latGridNum][Constants::lonGridNum]) {
+//     /// 保存每行的最大值
+//     float maxElements[Constants::latGridNum];
+//     /// 保存每行的最大值对应的index
+//     int maxElemLonIndexes[Constants::latGridNum];
+//     for (int i = 0; i < Constants::latGridNum; ++i) {
+//         auto rowMaxElemIter = std::max_element(vorField[i], vorField[i] + Constants::lonGridNum);
+//         maxElements[i] = *rowMaxElemIter;
+//         maxElemLonIndexes[i] = std::distance(vorField[i], rowMaxElemIter);
+//     }
+//     auto maxElemIter = std::max_element(maxElements, maxElements + Constants::latGridNum);
+//     int maxElemLatIndex = std::distance(maxElements, maxElemIter);
+//     return std::pair<std::pair<int, int>, float> {{maxElemLatIndex, maxElemLonIndexes[maxElemLatIndex]}, *maxElemIter};
+// }
+
+/// 找出2d array的最大值和相应的index
+/// @param[in] vorField 涡度场（2d array）
+/// @return index（纬度index、经度index）和最大值
+// template <int latGridNum, int lonGridNum>
+// std::pair<std::pair<int, int>, float> UtilFunc::max_element_2d(float (&vorField)[latGridNum][lonGridNum]) {
+//     /// 保存每行的最大值
+//     float maxElements[latGridNum];
+//     /// 保存每行的最大值对应的index
+//     int maxElemLonIndexes[latGridNum];
+//     for (int i = 0; i < latGridNum; ++i) {
+//         auto rowMaxElemIter = std::max_element(vorField[i], vorField[i] + lonGridNum);
+//         maxElements[i] = *rowMaxElemIter;
+//         maxElemLonIndexes[i] = std::distance(vorField[i], rowMaxElemIter);
+//     }
+//     auto maxElemIter = std::max_element(maxElements, maxElements + latGridNum);
+//     int maxElemLatIndex = std::distance(maxElements, maxElemIter);
+//     return std::pair<std::pair<int, int>, float> {{maxElemLatIndex, maxElemLonIndexes[maxElemLatIndex]}, *maxElemIter};
+// }
+
+
+// template <int latGridNum, int lonGridNum>
+// std::pair<std::pair<int, int>, float> UtilFunc::minn_element_2d(float (&vorField)[latGridNum][lonGridNum]) {
+//     /// 保存每行的最大值
+//     float minElements[latGridNum];
+//     /// 保存每行的最大值对应的index
+//     int minElemLonIndexes[latGridNum];
+//     for (int i = 0; i < latGridNum; ++i) {
+//         auto rowMinElemIter = std::min_element(vorField[i], vorField[i] + lonGridNum);
+//         minElements[i] = *rowMinElemIter;
+//         minElemLonIndexes[i] = std::distance(vorField[i], rowMinElemIter);
+//     }
+//     auto minElemIter = std::min_element(minElements, minElements + latGridNum);
+//     int minElemLatIndex = std::distance(minElements, minElemIter);
+//     return std::pair<std::pair<int, int>, float> {{minElemLatIndex, minElemLonIndexes[minElemLatIndex]}, *minElemIter};
+// }
+
+/// 找出2d array的最小值和相应的index
+/// @param[in] vorField 涡度场（2d array）
+/// @param[in] latGridNum 行数
+/// @param[in] lonGridNum 列数
+/// @return index（纬度index、经度index）和最大值
+// std::pair<std::pair<int, int>, float> UtilFunc::min_element_2d(float **vorField, int latGridNum, int lonGridNum) {
+//     /// 保存每行的最大值
+//     float minElements[latGridNum];
+//     /// 保存每行的最大值对应的index
+//     int minElemLonIndexes[latGridNum];
+//     for (int i = 0; i < latGridNum; ++i) {
+//         auto rowMinElemIter = std::min_element(vorField[i], vorField[i] + lonGridNum);
+//         minElements[i] = *rowMinElemIter;
+//         minElemLonIndexes[i] = std::distance(vorField[i], rowMinElemIter);
+//     }
+//     auto minElemIter = std::min_element(minElements, minElements + latGridNum);
+//     int minElemLatIndex = std::distance(minElements, minElemIter);
+//     return std::pair<std::pair<int, int>, float> {{minElemLatIndex, minElemLonIndexes[minElemLatIndex]}, *minElemIter};
+// }
+
+/// 此方法计算涡旋包含的点的中心位置
+/// @param[in] vortexCellsIndex 涡旋包含的点的index
+/// @param[in] latArray 纬度array
+/// @param[in] lonArray 经度array
+std::pair<float, float> UtilFunc::getVortexCenterLatLon(const std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex, float *latArray, float *lonArray) {
+    float latAvg = 0, lonAvg = 0;
+    for (auto &cellIndex : vortexCellsIndex) {
+        latAvg += latArray[cellIndex.first];
+        lonAvg += lonArray[cellIndex.second]; 
+    }
+    return {latAvg / vortexCellsIndex.size(), lonAvg / vortexCellsIndex.size()};
+}
+
+std::pair<float, float> UtilFunc::getVortexCenterLatLon(const std::unordered_set<std::pair<int, int>, pair_hash>& vortexCellsIndex, TwoDArray& latArray2d, TwoDArray& lonArray2d) {
+    float latAvg = 0, lonAvg = 0;
+    for (auto& cellIndex : vortexCellsIndex) {
+        latAvg += latArray2d(cellIndex.first, cellIndex.second);
+        lonAvg += lonArray2d(cellIndex.first, cellIndex.second);
+    }
+    return { latAvg / vortexCellsIndex.size(), lonAvg / vortexCellsIndex.size() };
+}
+
+/// 此方法利用haversine公式计算两个点的真实距离(km)（大圆距离）
+/// @param[in] latArray 纬度array
+/// @param[in] lonArray 经度array
+/// @param[in] cell1Index 第一个cell
+/// @param[in] cell2Index 第二个cell
+float UtilFunc::cellDist(float *latArray, float *lonArray, std::pair<int, int> cell1Index, std::pair<int, int> cell2Index) {
+    // 两cell的纬度、经度（弧度形式）
+    double lat1 = sin(latArray[cell1Index.first]), lon1 = sin(lonArray[cell1Index.second]);
+    double lat2 = sin(latArray[cell2Index.first]), lon2 = sin(lonArray[cell2Index.second]);
+    return cellDist(lat1, lon1, lat2, lon2);
+}
+
+float UtilFunc::cellDist(float lat1, float lon1, float lat2, float lon2) {
+    double lat1_r = lat1 * M_PI / 180.0, lon1_r = lon1 * M_PI / 180.0;
+    double lat2_r = lat2 * M_PI / 180.0, lon2_r = lon2 * M_PI / 180.0;
+    double dlat = lat2_r - lat1_r, dlon = lon2_r - lon1_r;
+    double a = pow(sin(dlat / 2), 2) + cos(lat1_r) * cos(lat2_r) * pow(sin(dlon / 2), 2);
+    float c = 2 * asin(sqrt(a));
+    constexpr float r = 6371;
+    return c * r;
+}
+
+/// 计算得到一组cell中距离最远的两个cell
+std::pair<std::pair<int, int>, float> UtilFunc::getMaxDistance(std::vector<std::pair<int, int>> &cellsIndex) {
+    auto distArray = TwoDArray(cellsIndex.size(), cellsIndex.size());
+    size_t cellsNum = cellsIndex.size();
+    for (int i = 0; i < cellsNum; ++i) {
+        for (int j = 0; j < i; ++j) {
+            distArray(i,j) = euclideanDist2(cellsIndex[i], cellsIndex[j]); 
+        }
+    }
+    /// 长轴两个cell的index及它们之间的距离
+    return distArray.max();
+}
+
+
+std::pair<float, float> UtilFunc::getCellsCenterLatLon(const std::pair<int, int> &cell1Index, const std::pair<int, int> &cell2Index, const float *latArray, const float *lonArray) {
+    return {(latArray[cell1Index.first]+latArray[cell2Index.first])/2.0, (lonArray[cell1Index.second]+lonArray[cell2Index.second])/2.0};
+}
+
+/// 判断气旋是否一直向东移动
+bool UtilFunc::alwaysMoveEast(const std::vector<std::pair<int, int>> &cells) {
+    // MSVC 无法使用变长数组(VLA)
+    //int cellsLon[cells.size()];
+    auto cellsLon = std::make_unique<int[]>(cells.size());
+    auto cellsLonGet = cellsLon.get();
+    std::transform(cells.cbegin(), cells.cend(), cellsLonGet, [](const std::pair<int, int> &cell) {return cell.second;});
+    return std::is_sorted(cellsLonGet, cellsLonGet+cells.size());
+}
+
+/// 返回一组cell的平均纬度
+float UtilFunc::cellsLatAvg(const float *latArray, const std::vector<std::pair<int, int>> &cells) {
+    float avg = 0.0;
+    for (const auto &cell : cells)
+        avg += latArray[cell.first];
+    return avg / cells.size();
+}
+
+float UtilFunc::cellsLonAvg(const float* lonArray, const std::vector<std::pair<int, int>>& cells) {
+    float avg = 0.0;
+    for (const auto& cell : cells)
+        avg += lonArray[cell.second];
+    return avg / cells.size();
+}
+
+
+
+}

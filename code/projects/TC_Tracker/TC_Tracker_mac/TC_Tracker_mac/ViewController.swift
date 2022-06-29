@@ -14,6 +14,8 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBOutlet var uwndLabel: NSTextField!
     @IBOutlet var vwndLabel: NSTextField!
     @IBOutlet var zLvComboBox: NSComboBox!
+    @IBOutlet var isWrfoutIcon: NSImageView!
+    
     
     
     @objc private dynamic var timeVarStr = "未指定"
@@ -42,7 +44,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
+        isWrfoutIcon.imageScaling = .scaleAxesIndependently
         zLvComboBox.dataSource = self
         NotificationCenter.default.addObserver(self, selector: #selector(getVarNames(_:)), name: NSNotification.Name(rawValue: "AllVarNamesGet"), object: nil)
     }
@@ -75,6 +77,12 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         handleZLevelDim()
     }
     
+    @IBAction func startTrackBtnClicked(_ sender: NSButton) {
+        NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, zLvComboBox.intValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/").startTracking()
+        
+    }
+    
+    
     @objc private func getVarNames(_ notification: NSNotification) {
         guard let userInfo = notification.userInfo, let varNames = userInfo["varNames"] as? [String] else { return }
         setVarName(time: varNames[0], lat: varNames[1], lon: varNames[2], vor: varNames[3], u: varNames[4], v: varNames[5])
@@ -84,12 +92,13 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     private func checkIfIsWrfoutFile(ncFilePath: String) {
         var eInfo: NSString?;
         let isWrfoutFile = NCFileInfo_Wrapper(ncFilePath: ncFilePath).checkIfIsWrfoutFile(&eInfo)
-        
         self.isWrfoutFile = isWrfoutFile
         if isWrfoutFile {
             setVarName(time: "XTIME", lat: "XLAT", lon: "XLONG", vor: "", u: "U", v: "V")
+            isWrfoutIcon.image = NSImage(systemSymbolName: "checkmark.square", accessibilityDescription: nil)
             handleZLevelDim()
         } else {
+            isWrfoutIcon.image = NSImage(systemSymbolName: "multiply.square", accessibilityDescription: nil)
             setVarName(allStr: "未指定")
         }
     }
