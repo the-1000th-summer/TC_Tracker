@@ -60,9 +60,9 @@ std::vector<std::string> NCFileInfo::getVorDimsName(const std::string& vorVarNam
     return varsName;
 }
 
-int NCFileInfo::getZLvDimLenName(const std::string &theVarName, std::string& zLvDimName) {
+int NCFileInfo::getZLvDimLenName(std::string& zLvDimName) {
     netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-    auto theVar = f.getVar(theVarName);
+    auto theVar = f.getVar(varNames.theVarName());
     if (theVar.getDimCount() != 4)
         return 0;
     zLvDimName = theVar.getDim(1).getName();

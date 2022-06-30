@@ -26,7 +26,7 @@
     return self;
 }
 
-- (id)initWithNcFilePath:(NSString *)filePath :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v {
+- (id)initWithNcFilePath:(NSString *)filePath :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor {
     self = [super init];
     if (self) {
         auto filePathStr = [filePath cStringUsingEncoding:NSUTF8StringEncoding];
@@ -37,14 +37,14 @@
         auto uStr = [u cStringUsingEncoding:NSUTF8StringEncoding];
         auto vStr = [v cStringUsingEncoding:NSUTF8StringEncoding];
         
-        auto varNames = VarNames(timeStr, latStr, lonStr, vorStr, uStr, vStr);
+        auto varNames = VarNames(timeStr, latStr, lonStr, vorStr, uStr, vStr, dataIsVor);
         
         m_instance = new TTCore::NCFileInfo(filePathStr, varNames);
     }
     return self;
 }
 
-- (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(int)zLevelIndex :(NSString *)tempFileDir {
+- (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor :(int)zLevelIndex :(NSString *)tempFileDir {
     self = [super init];
     if (self) {
         auto filePathStr = [filePath cStringUsingEncoding:NSUTF8StringEncoding];
@@ -56,7 +56,7 @@
         auto vStr = [v cStringUsingEncoding:NSUTF8StringEncoding];
         auto tempFileDirStr = [tempFileDir cStringUsingEncoding:NSUTF8StringEncoding];
         
-        auto varNames = VarNames(timeStr, latStr, lonStr, vorStr, uStr, vStr);
+        auto varNames = VarNames(timeStr, latStr, lonStr, vorStr, uStr, vStr, dataIsVor);
         
         NSString *resourcePath = [[NSBundle mainBundle] resourcePath];
         auto resourcePathStr = [resourcePath cStringUsingEncoding:NSUTF8StringEncoding];
@@ -106,10 +106,9 @@
     return isWrfoutFile;
 }
 
-- (int)getZLvDimLenName:(NSString *)theVarName :(NSString **)zLvDimName; {
+- (int)getZLvDimLenName:(NSString **)zLvDimName; {
     std::string dimName = "";
-    auto theVarNameStr = [theVarName cStringUsingEncoding:NSUTF8StringEncoding];
-    int zLvDimLen = m_instance->getZLvDimLenName(theVarNameStr, dimName);
+    int zLvDimLen = m_instance->getZLvDimLenName(dimName);
     *zLvDimName = [NSString stringWithUTF8String:dimName.c_str()];
     return zLvDimLen;
 }

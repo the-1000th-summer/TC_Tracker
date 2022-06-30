@@ -42,7 +42,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @objc private dynamic var isWrfoutFile = false
     private var zLvDimLen: Int = 0
     /// 给getZLvDimLenName方法使用
-    private var theVarName: String {
+    private var theVarStr: String {
         vorVarStr.isEmpty ? uwndVarStr : vorVarStr
     }
     
@@ -84,7 +84,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBAction func startTrackBtnClicked(_ sender: NSButton) {
         if !checkZLvCombox() { return }
         
-        NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/").startTracking()
+        NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/").startTracking()
     }
     
     private func checkZLvCombox() -> Bool {
@@ -161,7 +161,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     
     private func handleZLevelDim() {
         var zLvDimName: NSString?
-        zLvDimLen = Int(NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr).getZLvDimLenName(theVarName, &zLvDimName))
+        zLvDimLen = Int(NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty).getZLvDimLenName(&zLvDimName))
         
         if zLvDimLen == 0 {
             zVarStr = "(无)"

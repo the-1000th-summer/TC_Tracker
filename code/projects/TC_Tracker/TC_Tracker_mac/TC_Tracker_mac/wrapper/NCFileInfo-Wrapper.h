@@ -33,15 +33,15 @@
 
 - (instancetype)init NS_UNAVAILABLE;
 - (id)initWithNcFilePath:(NSString *)filePath;
-- (id)initWithNcFilePath:(NSString *)filePath :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v;
-- (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(int)zLevelIndex :(NSString *)tempFileDir;
+- (id)initWithNcFilePath:(NSString *)filePath :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor;
+- (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor :(int)zLevelIndex :(NSString *)tempFileDir;
 - (void)dealloc;
 
 - (bool)checkFileValid:(NSString **)fileValidInfo;
 - (NSMutableArray *)getVarsName;
 - (NSMutableArray *)getVorDimsName:(NSString *)vorVarName;
 - (bool)checkIfIsWrfoutFile:(NSString **)exceptionInfo;
-- (int)getZLvDimLenName:(NSString *)theVarName :(NSString **)zLvDimName;
+- (int)getZLvDimLenName:(NSString **)zLvDimName;
 
 - (void)startTracking;
 

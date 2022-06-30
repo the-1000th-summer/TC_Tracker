@@ -18,6 +18,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/dll/runtime_symbol_info.hpp>
 #include <omp.h>
+
 #include "json.hpp"
 #include "multiArray.h"
 #include "Processor.h"
@@ -26,6 +27,7 @@
 #include "VortexesDumper.h"
 #include "TCsP.pb.h"
 #include "Linint2.h"
+#include "uv2vr_cfd.h"
 
 namespace TTCore {
 
@@ -85,10 +87,11 @@ TCInfo Processor::getTCInfo() {
 /// 此方法找出文件的各维度的长度
 void Processor::getDimLength() {
     if (!isWrfoutFile) {
-        auto vorVar = iiFile->getVar(varNames.vorVarName);
-        timeLength = vorVar.getDim(0).getSize();
-        latGridNum = vorVar.getDim(1).getSize();
-        lonGridNum = vorVar.getDim(2).getSize();
+        auto theVar = iiFile->getVar(varNames.theVarName());
+        auto theVarDimLen = theVar.getDimCount();
+        timeLength = theVar.getDim(0).getSize();
+        latGridNum = theVar.getDim(theVarDimLen - 2).getSize();
+        lonGridNum = theVar.getDim(theVarDimLen - 1).getSize();
     } else {
         timeLength = iiFile->getDim("Time").getSize();
         latGridNum = iiFile->getDim("south_north").getSize();
@@ -189,12 +192,37 @@ void Processor::recognizeTyphoon() {
             regridVorData(ref_latData, ref_lonData, vorField);
         } else {
             vorField.setDims(timeLength, latGridNum, lonGridNum);
-            if (zLevelIndex == -1) {
-                iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
+            if (!varNames.dataIsVor) {
+                auto uField = ThreeDArray(timeLength, latGridNum, lonGridNum);
+                auto vField = ThreeDArray(timeLength, latGridNum, lonGridNum);
+                auto uVar = iiFile->getVar(varNames.uwndVarName);
+                
+                if (zLevelIndex == -1) {
+                    uVar.getVar(uField.get());
+                    iiFile->getVar(varNames.vwndVarName).getVar(vField.get());
+                } else {
+                    uVar.getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { timeLength,1,latGridNum,lonGridNum }, uField.get());
+                    iiFile->getVar(varNames.vwndVarName).getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { timeLength,1,latGridNum,lonGridNum }, vField.get());
+                }
+                
+                float fillValue = 0.0;
+                if (UtilFunc::checkIfHasVarAtt(uVar, "_FillValue")) {
+                    uVar.getAtt("_FillValue").getValues(&fillValue);
+                } else {
+                    fillValue = 9.96921e+36;
+                }
+                    
+                for (int time_i = 0; time_i < timeLength; ++time_i) {
+                    uv2vr_cfd().calRV(uField[time_i], vField[time_i], latArr.get(), lonArr.get(), latGridNum, lonGridNum, fillValue, 2, vorField[time_i]);
+                }
+                
             } else {
-                iiFile->getVar(varNames.vorVarName).getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { timeLength,1,latGridNum,lonGridNum }, vorField.get());
+                if (zLevelIndex == -1) {
+                    iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
+                } else {
+                    iiFile->getVar(varNames.vorVarName).getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { timeLength,1,latGridNum,lonGridNum }, vorField.get());
+                }
             }
-            
         }
     }
     Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue(threadNum));

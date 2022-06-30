@@ -27,7 +27,7 @@ public:
     NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, int threadNum, const char *dumpDirectory, const char *resourceBaseDir);
     
     void checkFileValid();
-    int getZLvDimLenName(const std::string &theVarName, std::string& zLvDimName);
+    int getZLvDimLenName(std::string& zLvDimName);
     bool checkIfIsWrfoutFile(std::string& exceptionInfo);
 
     std::vector<std::string> getVarsName();

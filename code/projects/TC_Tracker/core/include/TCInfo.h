@@ -52,7 +52,7 @@ private:
 /// 存储输入nc文件的变量名字
 class VarNames {
 public:
-    VarNames(const std::string &timeVarName, const std::string &latVarName, const std::string &lonVarName, const std::string &vorVarName, const std::string &uwndVarName, const std::string &vwndVarName) : timeVarName(timeVarName), latVarName(latVarName), lonVarName(lonVarName), vorVarName(vorVarName), uwndVarName(uwndVarName), vwndVarName(vwndVarName) {}
+    VarNames(const std::string &timeVarName, const std::string &latVarName, const std::string &lonVarName, const std::string &vorVarName, const std::string &uwndVarName, const std::string &vwndVarName, bool dataIsVor) : timeVarName(timeVarName), latVarName(latVarName), lonVarName(lonVarName), vorVarName(vorVarName), uwndVarName(uwndVarName), vwndVarName(vwndVarName), dataIsVor(dataIsVor) {}
     VarNames() {}
     std::string timeVarName;
     std::string latVarName;
@@ -60,6 +60,13 @@ public:
     std::string vorVarName;
     std::string uwndVarName;
     std::string vwndVarName;
+    /// 存储的数据是否是涡度数据
+    bool dataIsVor;
+    
+    std::string theVarName() {
+        return dataIsVor ? vorVarName : uwndVarName;
+    }
+    
     void checkVarNames() {
         if (timeVarName.empty()) {
             std::cout << "Please enter time variable name:" << std::endl;
