@@ -106,9 +106,10 @@
     return isWrfoutFile;
 }
 
-- (int)getZLvDimLenName: (NSString **)zLvDimName {
+- (int)getZLvDimLenName:(NSString *)theVarName :(NSString **)zLvDimName; {
     std::string dimName = "";
-    int zLvDimLen = m_instance->getZLvDimLenName(dimName);
+    auto theVarNameStr = [theVarName cStringUsingEncoding:NSUTF8StringEncoding];
+    int zLvDimLen = m_instance->getZLvDimLenName(theVarNameStr, dimName);
     *zLvDimName = [NSString stringWithUTF8String:dimName.c_str()];
     return zLvDimLen;
 }

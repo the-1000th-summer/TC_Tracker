@@ -742,7 +742,7 @@
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WZl-z5-ivi">
                                 <rect key="frame" x="184" y="266" width="99" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="push" title="选择变量..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YSc-St-zqH">
+                                <buttonCell key="cell" type="push" title="选择变量..." bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YSc-St-zqH">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -917,10 +917,10 @@
                                 </comboBoxCell>
                             </comboBox>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HOX-nO-3ob">
-                                <rect key="frame" x="432" y="194" width="44" height="16"/>
+                                <rect key="frame" x="432" y="194" width="107" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="层数据" id="Cju-g5-Zmf">
-                                    <font key="font" metaFont="system"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="层数据(从0开始)" id="Cju-g5-Zmf">
+                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -946,7 +946,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="开始识别" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yrK-3o-ljz">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                    <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="startTrackBtnClicked:" target="XfG-lQ-9wD" id="FIs-MA-4VD"/>
@@ -957,6 +957,7 @@
                     <connections>
                         <outlet property="filePathTextField" destination="18R-nb-mD0" id="YEO-Tm-QOm"/>
                         <outlet property="isWrfoutIcon" destination="6Bi-Bo-kkc" id="HjI-DG-Zb6"/>
+                        <outlet property="selVarNameBtn" destination="WZl-z5-ivi" id="FAt-vh-8oQ"/>
                         <outlet property="uwndLabel" destination="rcm-tj-hYz" id="x9p-Nv-q5C"/>
                         <outlet property="vorLabel" destination="PiY-Z5-Hqt" id="RXa-dO-FY0"/>
                         <outlet property="vwndLabel" destination="K3W-Qr-qIr" id="CKk-VW-HGS"/>

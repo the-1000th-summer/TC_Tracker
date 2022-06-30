@@ -15,6 +15,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBOutlet var vwndLabel: NSTextField!
     @IBOutlet var zLvComboBox: NSComboBox!
     @IBOutlet var isWrfoutIcon: NSImageView!
+    @IBOutlet var selVarNameBtn: NSButton!
     
     
     
@@ -40,6 +41,10 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     
     @objc private dynamic var isWrfoutFile = false
     private var zLvDimLen: Int = 0
+    /// 给getZLvDimLenName方法使用
+    private var theVarName: String {
+        vorVarStr.isEmpty ? uwndVarStr : vorVarStr
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,13 +78,26 @@ class ViewController: NSViewController, NSComboBoxDataSource {
 //        NSApp.runModal(for: varSelectWC.window!)
 //        presentAsModalWindow(varSelectVC)
         presentAsSheet(varSelectVC)
-        
-        handleZLevelDim()
+
     }
     
     @IBAction func startTrackBtnClicked(_ sender: NSButton) {
-        NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, zLvComboBox.intValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/").startTracking()
+        if !checkZLvCombox() { return }
         
+        NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/").startTracking()
+    }
+    
+    private func checkZLvCombox() -> Bool {
+        if zLvDimLen == 0 { return true }
+        let selectedIndex = zLvComboBox.indexOfSelectedItem
+        if selectedIndex == -1 {
+            let comboBoxValue = zLvComboBox.stringValue
+            let alert = NSAlert()
+            alert.messageText = comboBoxValue.isEmpty ? "层数不能为空！" : "\(comboBoxValue): 输入的层数不合法。"
+            alert.runModal()
+            return false
+        }
+        return true
     }
     
     
@@ -87,6 +105,8 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         guard let userInfo = notification.userInfo, let varNames = userInfo["varNames"] as? [String] else { return }
         setVarName(time: varNames[0], lat: varNames[1], lon: varNames[2], vor: varNames[3], u: varNames[4], v: varNames[5])
 //        print("varNames:", notification.userInfo!["varNames"])
+        
+        handleZLevelDim()
     }
     
     private func checkIfIsWrfoutFile(ncFilePath: String) {
@@ -97,9 +117,11 @@ class ViewController: NSViewController, NSComboBoxDataSource {
             setVarName(time: "XTIME", lat: "XLAT", lon: "XLONG", vor: "", u: "U", v: "V")
             isWrfoutIcon.image = NSImage(systemSymbolName: "checkmark.square", accessibilityDescription: nil)
             handleZLevelDim()
+            selVarNameBtn.isEnabled = false
         } else {
             isWrfoutIcon.image = NSImage(systemSymbolName: "multiply.square", accessibilityDescription: nil)
             setVarName(allStr: "未指定")
+            selVarNameBtn.isEnabled = true
         }
     }
     
@@ -139,7 +161,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     
     private func handleZLevelDim() {
         var zLvDimName: NSString?
-        zLvDimLen = Int(NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr).getZLvDimLenName(&zLvDimName))
+        zLvDimLen = Int(NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr).getZLvDimLenName(theVarName, &zLvDimName))
         
         if zLvDimLen == 0 {
             zVarStr = "(无)"
@@ -179,7 +201,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     }
     
     func comboBox(_ comboBox: NSComboBox, objectValueForItemAt index: Int) -> Any? {
-        return index + 1
+        return index
     }
 }
 

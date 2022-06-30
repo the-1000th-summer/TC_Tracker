@@ -189,7 +189,12 @@ void Processor::recognizeTyphoon() {
             regridVorData(ref_latData, ref_lonData, vorField);
         } else {
             vorField.setDims(timeLength, latGridNum, lonGridNum);
-            iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
+            if (zLevelIndex == -1) {
+                iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
+            } else {
+                iiFile->getVar(varNames.vorVarName).getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { timeLength,1,latGridNum,lonGridNum }, vorField.get());
+            }
+            
         }
     }
     Constants::RECURSION_MIN_ReVOR = std::abs(vorField.avgMinValue(threadNum));

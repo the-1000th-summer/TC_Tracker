@@ -60,15 +60,15 @@ std::vector<std::string> NCFileInfo::getVorDimsName(const std::string& vorVarNam
     return varsName;
 }
 
-int NCFileInfo::getZLvDimLenName(std::string& zLvDimName) {
-    //netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
-    //auto uVar = f.getVar(isWrfoutFile ? "U" : varNames.vorVarName);
-    //if (uVar.getDimCount() != 4)
-        //return 0;
-    //zLvDimName = uVar.getDim(1).getName();
-    //std::cout << "ZName: " << zLvDimName << std::endl;
-    //return uVar.getDim(1).getSize();
-    return 1;
+int NCFileInfo::getZLvDimLenName(const std::string &theVarName, std::string& zLvDimName) {
+    netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+    auto theVar = f.getVar(theVarName);
+    if (theVar.getDimCount() != 4)
+        return 0;
+    zLvDimName = theVar.getDim(1).getName();
+    std::cout << "ZName: " << zLvDimName << std::endl;
+    return static_cast<int>(theVar.getDim(1).getSize());
+//    return 1;
 }
 
 
@@ -118,7 +118,9 @@ void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled) {
     
     //        p.copyRealTCs(tcs);
     p.copyTCs(tcs);
-    p.copyLatLonData(lat_data, lon_data);
+    
+    if (!isWrfoutFile)
+        p.copyLatLonData(lat_data, lon_data);
 }
 
 }

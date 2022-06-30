@@ -41,7 +41,7 @@
 - (NSMutableArray *)getVarsName;
 - (NSMutableArray *)getVorDimsName:(NSString *)vorVarName;
 - (bool)checkIfIsWrfoutFile:(NSString **)exceptionInfo;
-- (int)getZLvDimLenName:(NSString **)zLvDimName;
+- (int)getZLvDimLenName:(NSString *)theVarName :(NSString **)zLvDimName;
 
 - (void)startTracking;
 
