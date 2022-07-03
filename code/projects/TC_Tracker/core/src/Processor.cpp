@@ -28,6 +28,7 @@
 #include "TCsP.pb.h"
 #include "Linint2.h"
 #include "uv2vr_cfd.h"
+#include "rcm2rgrid.h"
 
 namespace TTCore {
 
@@ -175,9 +176,108 @@ void Processor::recognizeTyphoon() {
     auto vorField = ThreeDArray();
     
     if (isWrfoutFile) {
-//        vorField = std::make_unique<ThreeDArray>(timeLength, latGridNum, lonGridNum);
-        vorField.setDims(timeLength, latGridNum, lonGridNum);
-        calcRelativeVorField(iiFile.get(), vorField);
+        if (true) {
+            float gridRes = 0.5;
+            
+            auto minLatD = latArr2D.max(0).second / gridRes;
+            auto maxLatD = latArr2D.min(latGridNum-1).second / gridRes;
+            auto minLonD = lonArr2D.maxInColumn(0) / gridRes;
+            auto maxLonD = lonArr2D.minInColumn(lonGridNum-1) / gridRes;
+            
+            float minLatDIntegral, maxLatDIntegral;
+            float minLonDIntegral, maxLonDIntegral;
+            modf(minLatD, &minLatDIntegral);
+            modf(maxLatD, &maxLatDIntegral);
+            modf(minLonD, &minLonDIntegral);
+            modf(maxLonD, &maxLonDIntegral);
+            
+            const float minLat_rged = (minLatD <= 0) ? minLatDIntegral*gridRes : (minLatDIntegral+1)*gridRes;
+            const float maxLat_rged = (maxLatD < 0) ? (maxLatDIntegral-1)*gridRes : maxLatDIntegral*gridRes;
+            // 不考虑有lon负值的情况
+            const float minLon_rged = (minLonDIntegral + 1) * gridRes;
+            const float maxLon_rged = maxLonDIntegral * gridRes;
+            
+            std::vector<float> lat_rged;
+            std::vector<float> lon_rged;
+            float nowLat = minLat_rged;
+            while (true) {
+                lat_rged.push_back(nowLat);
+                nowLat += gridRes;
+                if (nowLat > maxLat_rged)
+                    break;
+            }
+            float nowLon = minLon_rged;
+            while (true) {
+                lon_rged.push_back(nowLon);
+                nowLon += gridRes;
+                if (nowLon > maxLon_rged)
+                    break;
+            }
+            
+            auto u_unstged = ThreeDArray(timeLength,latGridNum,lonGridNum);
+            auto v_unstged = ThreeDArray(timeLength,latGridNum,lonGridNum);
+            unstaggerU(iiFile.get(), u_unstged, v_unstged);
+            
+            auto u_regularGrid = ThreeDArray(timeLength, lat_rged.size(), lon_rged.size());
+            auto v_regularGrid = ThreeDArray(timeLength, lat_rged.size(), lon_rged.size());
+            int ier = 0;
+            for (int time_i = 0; time_i < timeLength; ++time_i)
+                NCL_cxx::rcm2rgrid<float>(lonArr2D.get(), latArr2D.get(), lonGridNum, latGridNum, lon_rged.data(), lat_rged.data(), lon_rged.size(), lat_rged.size(), u_unstged[time_i], u_regularGrid[time_i], 9.96921e+36, ier);
+            assert(ier == 0);
+            for (int time_i = 0; time_i < timeLength; ++time_i)
+                NCL_cxx::rcm2rgrid<float>(lonArr2D.get(), latArr2D.get(), lonGridNum, latGridNum, lon_rged.data(), lat_rged.data(), lon_rged.size(), lat_rged.size(), v_unstged[time_i], v_regularGrid[time_i], 9.96921e+36, ier);
+            assert(ier == 0);
+            
+            vorField.setDims(timeLength, lat_rged.size(), lon_rged.size());
+            for (int time_i = 0; time_i < timeLength; ++time_i) {
+                uv2vr_cfd().calRV(u_regularGrid[time_i], v_regularGrid[time_i], lat_rged.data(), lon_rged.data(), lat_rged.size(), lon_rged.size(), 9.96921e+36, 2, vorField[time_i]);
+            }
+            std::cout << "finish regrid" << std::endl;
+            wrfChangeToRegular = true;
+            latArr = std::make_unique<float[]>(lat_rged.size());
+            lonArr = std::make_unique<float[]>(lon_rged.size());
+            std::copy(lat_rged.begin(), lat_rged.end(), latArr.get());
+            std::copy(lon_rged.begin(), lon_rged.end(), lonArr.get());
+//            latArr2D.get() = nullptr;
+//            lonArr2D.get() = nullptr;
+            
+            netCDF::NcFile rgedFile("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrf_data/rged_wrfout.nc", netCDF::NcFile::replace);
+            
+            auto timeDim = rgedFile.addDim("time", timeLength);
+            auto latDim = rgedFile.addDim("lat", lat_rged.size());
+            auto lonDim = rgedFile.addDim("lon", lon_rged.size());
+            
+            auto timeVar = rgedFile.addVar("time", netCDF::NcType::nc_FLOAT, timeDim);
+            auto latVar = rgedFile.addVar("lat", netCDF::NcType::nc_FLOAT, latDim);
+            auto lonVar = rgedFile.addVar("lon", netCDF::NcType::nc_FLOAT, lonDim);
+            auto uVar = rgedFile.addVar("uwnd", netCDF::NcType::nc_FLOAT, {timeDim, latDim, lonDim});
+            auto vVar = rgedFile.addVar("vwnd", netCDF::NcType::nc_FLOAT, {timeDim, latDim, lonDim});
+            auto vorVar = rgedFile.addVar("vor", netCDF::NcType::nc_FLOAT, {timeDim, latDim, lonDim});
+            
+            // att
+            uVar.putAtt("units", "m/s");
+            vVar.putAtt("units", "m/s");
+            latVar.putAtt("units", "degree_north");
+            lonVar.putAtt("units", "degree_east");
+            
+            // pour data
+            std::vector<float> time_data;
+            for (int i = 0; i < timeLength; ++i)
+                time_data.push_back(i);
+            timeVar.putVar(time_data.data());
+            latVar.putVar(lat_rged.data());
+            lonVar.putVar(lon_rged.data());
+            uVar.putVar(u_regularGrid.get());
+            vVar.putVar(v_regularGrid.get());
+            vorVar.putVar(vorField.get());
+            
+            rgedFile.close();
+            
+            std::cout << "write data finished" << std::endl;
+        } else {
+            vorField.setDims(timeLength, latGridNum, lonGridNum);
+            calcRelativeVorField(iiFile.get(), vorField);
+        }
     } else {
         if (shouldRegrid(1.25)) {
             std::cout << "file should be regrid" << std::endl;
@@ -561,7 +661,7 @@ int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex) {
 //        }
         
         ++tpNum;
-        auto vortexCenterLatLon = isWrfoutFile ? UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr2D, lonArr2D) : UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr.get(), lonArr.get());
+        auto vortexCenterLatLon = isWrfoutFile && !wrfChangeToRegular ? UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr2D, lonArr2D) : UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr.get(), lonArr.get());
         vortexesCellsIndex.push_back(allCellsIndex);
         vortexesThisTime.push_back(TC1Time{maxVorCell.first, vortexCenterLatLon, set2Vector(allCellsIndex)});
         removeVortex(vorField, timeIndex, allCellsIndex);
@@ -748,14 +848,39 @@ void Processor::regridVorData(const std::vector<float> &ref_latData, const std::
     std::cout << "reading file from disk..." << std::endl;
     iiFile->getVar(varNames.vorVarName).getVar(tempVorField.get());
     std::cout << "start regridding..." << std::endl;
-    auto interp = Linint2();
-    interp.linint2(threadNum, timeLength, lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempVorField.get(), vorField.get(), false, -9999);
+//    auto interp = Linint2();
+    NCL_cxx::linint2(threadNum, timeLength, lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempVorField.get(), vorField.get(), false, -9999);
     // 将旧的lat和lon数据替换为regrid后的lat和lon
     latGridNum = ref_latGridNum; lonGridNum = ref_lonGridNum;
     latArr = std::make_unique<float[]>(latGridNum);   // reassign, 不会导致内存泄漏
     lonArr = std::make_unique<float[]>(lonGridNum);   // reassign, 不会导致内存泄漏
     std::copy(ref_latData.data(), ref_latData.data()+latGridNum, latArr.get());
     std::copy(ref_lonData.data(), ref_lonData.data()+lonGridNum, lonArr.get());
+}
+
+void Processor::unstaggerU(netCDF::NcFile *inFile, ThreeDArray &u_unstged, ThreeDArray &v_unstged) {
+    size_t nt = inFile->getDim("Time").getSize();
+    size_t ny = inFile->getDim("south_north").getSize();
+    size_t nx = inFile->getDim("west_east").getSize();
+    
+    auto u_staggered = ThreeDArray(nt, ny, nx + 1);
+    auto v_staggered = ThreeDArray(nt, ny + 1, nx);
+    if (zLevelIndex == -1) {
+        inFile->getVar("U").getVar({ 0,0,0 }, { nt,ny,nx + 1 }, u_staggered.get());
+        inFile->getVar("V").getVar({ 0,0,0 }, { nt,ny + 1,nx }, v_staggered.get());
+    } else {
+        inFile->getVar("U").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny,nx + 1 }, u_staggered.get());
+        inFile->getVar("V").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny + 1,nx }, v_staggered.get());
+    }
+    
+    for (int t_i = 0; t_i < nt; ++t_i) {
+        for (int y_i = 0; y_i < ny; ++y_i) {
+            for (int x_i = 0; x_i < nx; ++x_i) {
+                u_unstged(t_i,y_i,x_i) = 0.5*(u_staggered(t_i,y_i,x_i)+u_staggered(t_i,y_i,x_i+1));
+                v_unstged(t_i,y_i,x_i) = 0.5*(v_staggered(t_i,y_i,x_i)+v_staggered(t_i,y_i+1,x_i));
+            }
+        }
+    }
 }
 
 int Processor::getLastNotEmptyVecIndex() {

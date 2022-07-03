@@ -56,6 +56,7 @@ private:
     unsigned long latGridNum = 0;
     unsigned long lonGridNum = 0;
     bool isWrfoutFile = false;
+    bool wrfChangeToRegular = false;
     int threadNum = 1;
     std::string resourceBaseDir;
     
@@ -74,6 +75,7 @@ private:
     std::vector<float> getRgedLatArr(float spatialRes);
     std::vector<float> getRgedLonArr(float spatialRes);
     void regridVorData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, ThreeDArray &vorField);
+    void unstaggerU(netCDF::NcFile *inFile, ThreeDArray &u_unstged, ThreeDArray &v_unstged);
     
     int getLastNotEmptyVecIndex();
     void checkDirAndCreate(const std::string &folderName);

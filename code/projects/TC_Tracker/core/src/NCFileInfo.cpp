@@ -86,7 +86,7 @@ bool NCFileInfo::checkIfIsWrfoutFile(std::string& exceptionInfo) {
             return false;
         }
     }
-    for (const std::string& varName : { "U", "V", "MAPFAC_U", "MAPFAC_V", "MAPFAC_M" }) {
+    for (const std::string& varName : { "U", "V", "MAPFAC_U", "MAPFAC_V", "MAPFAC_M", "XLAT_U", "XLAT_V", "XLONG_U", "XLONG_V" }) {
         if (f.getVar(varName).isNull()) {
             exceptionInfo = "No variable: " + varName;
             return false;

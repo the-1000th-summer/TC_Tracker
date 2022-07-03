@@ -35,11 +35,41 @@ public:
         auto maxElemIndex = std::distance(data.get(), maxElemIter);
         return {{maxElemIndex/_columns, maxElemIndex%_columns}, *maxElemIter};
     }
+    std::pair<std::pair<int, int>, float> max(int rowIndex) const {
+        auto maxElemIter = std::max_element(data.get() + rowIndex*_columns, data.get() + (rowIndex+1)*_columns);
+        auto maxElemIndex = std::distance(data.get(), maxElemIter);
+        return {{maxElemIndex/_columns, maxElemIndex%_columns}, *maxElemIter};
+    }
+    float maxInColumn(int columnIndex) const {
+        float maxValue = data[columnIndex];
+        for (int row_i = 1; row_i < _rows; ++row_i) {
+            float theData = data[row_i * _columns + columnIndex];
+            if (theData > maxValue)
+                maxValue = theData;
+        }
+        return maxValue;
+    }
+    
     std::pair<std::pair<int, int>, float> min() const {
         auto minElemIter = std::min_element(data.get(), data.get() + _rows*_columns);
         auto minElemIndex = std::distance(data.get(), minElemIter);
         return {{minElemIndex/_columns, minElemIndex%_columns}, *minElemIter};
     }
+    std::pair<std::pair<int, int>, float> min(int rowIndex) const {
+        auto minElemIter = std::min_element(data.get() + rowIndex*_columns, data.get() + (rowIndex+1)*_columns);
+        auto minElemIndex = std::distance(data.get(), minElemIter);
+        return {{minElemIndex/_columns, minElemIndex%_columns}, *minElemIter};
+    }
+    float minInColumn(int columnIndex) const {
+        float minValue = data[columnIndex];
+        for (int row_i = 1; row_i < _rows; ++row_i) {
+            float theData = data[row_i * _columns + columnIndex];
+            if (theData < minValue)
+                minValue = theData;
+        }
+        return minValue;
+    }
+    
     // void printData() {
     //     for (int i = 0; i < 2; i++) {
     //         for (int j = 0; j < _columns; ++j) {
