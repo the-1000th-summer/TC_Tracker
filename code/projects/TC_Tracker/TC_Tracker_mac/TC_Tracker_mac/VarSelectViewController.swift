@@ -37,14 +37,14 @@ class VarSelectViewController: NSViewController, NSComboBoxDataSource {
     }
     
     override func viewWillAppear() {
+        super.viewWillAppear()
+        
         varsName = NCFileInfo_Wrapper(ncFilePath: ncFilePath).getVarsName().compactMap { $0 as? String }
         if varsName.isEmpty {
             let alert = NSAlert()
             alert.messageText = "此文件无变量！请检查文件内容"
             alert.runModal()
         }
-        
-        
     }
     
     @IBAction func radioButtonChanged(_ sender: NSButton) {

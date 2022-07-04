@@ -11,20 +11,32 @@
 #ifndef NCFileInfo_Wrapper_h
 #define NCFileInfo_Wrapper_h
 
-@interface LatLon : NSObject {
-    float lat;
-    float lon;
-}
+@interface YXIndex : NSObject
+
+@property (nonatomic, readonly) int yIndex;
+@property (nonatomic, readonly) int xIndex;
+- (id)initWithYIndex:(int)yIndex xIndex:(int)xIndex;
+
 @end
 
-@interface Typhoon : NSObject {
-    int serialNo;
-    NSMutableArray<LatLon *> *maxVorCells;
-    NSMutableArray<LatLon *> *geoCenters;
-    int startTimeIndex;
-    int endTimeIndex;
-}
+@interface LatLon : NSObject
 
+@property (nonatomic, readonly) float lat;
+@property (nonatomic, readonly) float lon;
+- (id)initWithLat:(float)lat lon:(float)lon;
+
+@end
+
+@interface Typhoon : NSObject
+
+@property (nonatomic, readwrite) int serialNo;
+@property (nonatomic, readwrite) NSMutableArray<YXIndex *> *maxVorCells;
+@property (nonatomic, readwrite) NSMutableArray<LatLon *> *geoCenters;
+@property (nonatomic, readwrite) int startTimeIndex;
+@property (nonatomic, readwrite) int endTimeIndex;
+
+
+//- (id) initWithSerialNo:(int)serialNo :(NSMutableArray<LatLon *>*)maxVorCells;
 
 @end
 
@@ -43,7 +55,8 @@
 - (bool)checkIfIsWrfoutFile:(NSString **)exceptionInfo;
 - (int)getZLvDimLenName:(NSString **)zLvDimName;
 
-- (void)startTracking;
+- (NSMutableArray<Typhoon *>*)startTracking;
+
 
 @end
 

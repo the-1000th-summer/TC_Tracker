@@ -176,7 +176,7 @@ void Processor::recognizeTyphoon() {
     auto vorField = ThreeDArray();
     
     if (isWrfoutFile) {
-        if (true) {
+        if (false) {
             float gridRes = 0.5;
             
             auto minLatD = latArr2D.max(0).second / gridRes;

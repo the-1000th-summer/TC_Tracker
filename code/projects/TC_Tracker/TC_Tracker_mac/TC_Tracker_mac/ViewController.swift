@@ -45,6 +45,8 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     private var theVarStr: String {
         vorVarStr.isEmpty ? uwndVarStr : vorVarStr
     }
+    private var realTCs: [Typhoon] = []
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -84,8 +86,20 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBAction func startTrackBtnClicked(_ sender: NSButton) {
         if !checkZLvCombox() { return }
         
-        NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/").startTracking()
+        realTCs = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/").startTracking().compactMap { $0 as? Typhoon }
+        
+        
+        
+        
+        
     }
+    
+    @IBAction func showWebBtnClicked(_ sender: NSButton) {
+        guard let resultVC = storyboard?.instantiateController(withIdentifier: "ResultView") as? ResultViewController else { return }
+        resultVC.tcsData = realTCs
+        presentAsModalWindow(resultVC);
+    }
+    
     
     private func checkZLvCombox() -> Bool {
         if zLvDimLen == 0 { return true }

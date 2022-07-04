@@ -11,9 +11,59 @@
 #import "NCFileInfo.h"
 #include "Typhoon.h"
 
+@interface YXIndex()
+@property (nonatomic, readwrite) int yIndex;
+@property (nonatomic, readwrite) int xIndex;
+@end
+
+@implementation YXIndex
+
+- (id)initWithYIndex:(int)yIndex xIndex:(int)xIndex {
+    self = [super init];
+    if (self) {
+        self.yIndex = yIndex;
+        self.xIndex = xIndex;
+    }
+    return self;
+}
+
+@end
+
+@interface LatLon()
+@property (nonatomic, readwrite) float lat;
+@property (nonatomic, readwrite) float lon;
+@end
+
+@implementation LatLon
+- (id)initWithLat:(float)lat lon:(float)lon {
+    self = [super init];
+    if (self) {
+        self.lat = lat;
+        self.lon = lon;
+    }
+    return self;
+}
+@end
+
+@implementation Typhoon
+
+//- (id) initWithSerialNo:(int)serialNo :(NSMutableArray<LatLon *>*)maxVorCells {
+//    self = [super init];
+//    if (self) {
+//        self->serialNo = serialNo;
+//        self->maxVorCells = maxVorCells;
+//    }
+//    return self;
+//}
+
+@end
+
 @interface NCFileInfo_Wrapper() {
     TTCore::NCFileInfo *m_instance;
 }
+
+
+- (void)copyToMangaged:(TTCore::TCs&)inTC :(NSMutableArray<Typhoon *>*) outTC;
 @end
 
 @implementation NCFileInfo_Wrapper
@@ -113,12 +163,42 @@
     return zLvDimLen;
 }
 
-- (void)startTracking {
+- (NSMutableArray<Typhoon *>*)startTracking {
     TTCore::TCs tcs;
     bool isCanceled = false;
     m_instance->startTracking(tcs, &isCanceled);
-    std::cout << "sdf" << std::endl;
     
+    std::cout << "unmanaged TC number: " << tcs.size() << std::endl;
+    
+    NSMutableArray<Typhoon *> *outTC = [NSMutableArray new];
+    [self copyToMangaged:tcs :outTC];
+    return outTC;
+    
+}
+
+- (void)copyToMangaged:(TTCore::TCs&)inTC:(NSMutableArray<Typhoon *>*) outTC {
+    auto tcs = inTC.getTcs();
+    int tcSize = inTC.size();
+    
+    for (int i = 0; i < tcSize; ++i) {
+        NSMutableArray<YXIndex *> *maxVorCells = [NSMutableArray new];
+        for (const auto &maxVorCell : tcs[i].maxVorCells) {
+            [maxVorCells addObject:[[YXIndex alloc] initWithYIndex:maxVorCell.first xIndex:maxVorCell.second]];
+        }
+        NSMutableArray<LatLon *> *geoCenters = [NSMutableArray new];
+        for (const auto &geoCenter : tcs[i].geoCenters) {
+            [geoCenters addObject:[[LatLon alloc] initWithLat:geoCenter.first lon:geoCenter.second]];
+        }
+        
+        Typhoon *newTC = [Typhoon new];
+        newTC.serialNo = tcs[i].serialNo;
+        newTC.maxVorCells = maxVorCells;
+        newTC.geoCenters = geoCenters;
+        newTC.startTimeIndex = tcs[i].startTimeIndex;
+        newTC.endTimeIndex = tcs[i].endTimeIndex;
+        
+        [outTC addObject:newTC];
+    }
 }
 
 @end

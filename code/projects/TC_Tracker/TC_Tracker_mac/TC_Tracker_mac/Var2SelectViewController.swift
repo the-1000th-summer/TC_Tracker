@@ -24,6 +24,8 @@ class Var2SelectViewController: NSViewController, NSComboBoxDataSource {
     }
     
     override func viewWillAppear() {
+        super.viewWillAppear()
+        
         dimsName = NCFileInfo_Wrapper(ncFilePath: ncFilePath).getVorDimsName(vorOrWindNames[0]).compactMap { $0 as? String }
         
         timeComboBox.dataSource = self

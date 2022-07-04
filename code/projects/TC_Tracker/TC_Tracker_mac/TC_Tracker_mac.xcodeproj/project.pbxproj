@@ -11,7 +11,9 @@
 		7907992A2870391600543C44 /* dmapgci.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 790799292870391600543C44 /* dmapgci.cpp */; };
 		7907992D2870392F00543C44 /* linmsg_dp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7907992C2870392F00543C44 /* linmsg_dp.cpp */; };
 		790799302870423500543C44 /* linint2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7907992F2870423500543C44 /* linint2.cpp */; };
+		791A4DB628716E3200BD6FDE /* ResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791A4DB528716E3200BD6FDE /* ResultViewController.swift */; };
 		792329542869DD3B009A5E00 /* VarSelectWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792329532869DD3B009A5E00 /* VarSelectWindowController.swift */; };
+		796187BF2872E15B00FDAC2C /* path.html in Resources */ = {isa = PBXBuildFile; fileRef = 796187BE2872E15B00FDAC2C /* path.html */; };
 		79618E572867129C00539BAE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79618E562867129C00539BAE /* AppDelegate.swift */; };
 		79618E592867129C00539BAE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79618E582867129C00539BAE /* ViewController.swift */; };
 		79618E5B2867129D00539BAE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79618E5A2867129D00539BAE /* Assets.xcassets */; };
@@ -44,12 +46,14 @@
 		7907992C2870392F00543C44 /* linmsg_dp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = linmsg_dp.cpp; path = ../../../../../../NCL_func_cxx/src/linmsg_dp.cpp; sourceTree = "<group>"; };
 		7907992E2870422A00543C44 /* linint2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = linint2.h; path = ../../../../../../NCL_func_cxx/include/linint2.h; sourceTree = "<group>"; };
 		7907992F2870423500543C44 /* linint2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = linint2.cpp; path = ../../../../../../NCL_func_cxx/src/linint2.cpp; sourceTree = "<group>"; };
+		791A4DB528716E3200BD6FDE /* ResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultViewController.swift; sourceTree = "<group>"; };
 		792329532869DD3B009A5E00 /* VarSelectWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VarSelectWindowController.swift; sourceTree = "<group>"; };
 		795DA7B3286B3A7200909341 /* TCInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TCInfo.h; path = ../../core/include/TCInfo.h; sourceTree = "<group>"; };
 		795DA7B4286B3F6000909341 /* libboost_serialization.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_serialization.dylib; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_serialization.dylib; sourceTree = "<group>"; };
 		795DA7B6286B3F6A00909341 /* libboost_filesystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_filesystem.dylib; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_filesystem.dylib; sourceTree = "<group>"; };
 		795DA7B8286B404F00909341 /* libboost_serialization.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_serialization.dylib; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.78.0_1/lib/libboost_serialization.dylib; sourceTree = "<group>"; };
 		795DA7BA286B405600909341 /* libboost_filesystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_filesystem.dylib; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.78.0_1/lib/libboost_filesystem.dylib; sourceTree = "<group>"; };
+		796187BE2872E15B00FDAC2C /* path.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = path.html; sourceTree = "<group>"; };
 		79618E532867129C00539BAE /* TC_Tracker_mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TC_Tracker_mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		79618E562867129C00539BAE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		79618E582867129C00539BAE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -160,6 +164,8 @@
 			children = (
 				79618E562867129C00539BAE /* AppDelegate.swift */,
 				79618E582867129C00539BAE /* ViewController.swift */,
+				791A4DB528716E3200BD6FDE /* ResultViewController.swift */,
+				796187BE2872E15B00FDAC2C /* path.html */,
 				79618E6B2867537100539BAE /* core */,
 				79618E722867542900539BAE /* wrapper */,
 				79618E6F286753BE00539BAE /* TC_Tracker_mac-Bridging-Header.h */,
@@ -332,6 +338,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				79618E5B2867129D00539BAE /* Assets.xcassets in Resources */,
+				796187BF2872E15B00FDAC2C /* path.html in Resources */,
 				79E9169B286C8138002CED06 /* data in Resources */,
 				79618E5E2867129D00539BAE /* Main.storyboard in Resources */,
 			);
@@ -345,6 +352,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				79618E71286753BE00539BAE /* NCFileInfo.cpp in Sources */,
+				791A4DB628716E3200BD6FDE /* ResultViewController.swift in Sources */,
 				79618E592867129C00539BAE /* ViewController.swift in Sources */,
 				790799302870423500543C44 /* linint2.cpp in Sources */,
 				792329542869DD3B009A5E00 /* VarSelectWindowController.swift in Sources */,

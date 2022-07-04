@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.WebKit2IBPlugin" version="20037"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -952,6 +953,17 @@
                                     <action selector="startTrackBtnClicked:" target="XfG-lQ-9wD" id="FIs-MA-4VD"/>
                                 </connections>
                             </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8I4-Um-Gsf">
+                                <rect key="frame" x="467" y="23" width="99" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="查看结果..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="K6C-Ra-yAX">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="showWebBtnClicked:" target="XfG-lQ-9wD" id="Rde-ZM-AAb"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
@@ -1096,6 +1108,37 @@
                 <userDefaultsController representsSharedInstance="YES" id="dfq-oF-yey"/>
             </objects>
             <point key="canvasLocation" x="695" y="742"/>
+        </scene>
+        <!--Result View Controller-->
+        <scene sceneID="FqM-DC-r7r">
+            <objects>
+                <viewController storyboardIdentifier="ResultView" id="Phu-EC-QGt" customClass="ResultViewController" customModule="TC_Tracker_mac" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="UTT-Ei-eSN">
+                        <rect key="frame" x="0.0" y="0.0" width="730" height="469"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x7W-dc-COQ">
+                                <rect key="frame" x="0.0" y="0.0" width="730" height="469"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="x7W-dc-COQ" secondAttribute="bottom" id="PUx-Cb-oQ4"/>
+                            <constraint firstItem="x7W-dc-COQ" firstAttribute="top" secondItem="UTT-Ei-eSN" secondAttribute="top" id="abl-UH-Tqv"/>
+                            <constraint firstAttribute="trailing" secondItem="x7W-dc-COQ" secondAttribute="trailing" id="g5p-k8-fpd"/>
+                            <constraint firstItem="x7W-dc-COQ" firstAttribute="leading" secondItem="UTT-Ei-eSN" secondAttribute="leading" id="h91-8G-sxy"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="webView" destination="x7W-dc-COQ" id="ofu-cS-AJo"/>
+                    </connections>
+                </viewController>
+                <customObject id="9wa-9c-vVu" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="421" y="1483.5"/>
         </scene>
         <!--Var2 Select View Controller-->
         <scene sceneID="xiI-HH-S5m">
