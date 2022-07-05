@@ -16,6 +16,8 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBOutlet var zLvComboBox: NSComboBox!
     @IBOutlet var isWrfoutIcon: NSImageView!
     @IBOutlet var selVarNameBtn: NSButton!
+    @IBOutlet var startTrackingBtn: NSButton!
+    @IBOutlet var showWebBtn: NSButton!
     
     
     
@@ -64,6 +66,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
 
     @IBAction func browseBtnClicked(_ sender: NSButton) {
         let filePath = showFileBrowser()
+        zLvComboBox.isEnabled = false
         guard let filePath = filePath else { return }
 
         checkFileValid(filePath: filePath)
@@ -72,8 +75,6 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     }
     
     @IBAction func varSelBtnClicked(_ sender: NSButton) {
-        print("show")
-        timeVarStr = "sadfa"
         guard let varSelectVC = storyboard?.instantiateController(withIdentifier: "VarSelectVC") as? VarSelectViewController else { return }
 //        varSelectVC?.view.window?.windowController?.showWindow(self)
         varSelectVC.ncFilePath = filePathTextField.stringValue
@@ -121,6 +122,8 @@ class ViewController: NSViewController, NSComboBoxDataSource {
 //        print("varNames:", notification.userInfo!["varNames"])
         
         handleZLevelDim()
+        
+        startTrackingBtn.isEnabled = true
     }
     
     private func checkIfIsWrfoutFile(ncFilePath: String) {
@@ -132,6 +135,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
             isWrfoutIcon.image = NSImage(systemSymbolName: "checkmark.square", accessibilityDescription: nil)
             handleZLevelDim()
             selVarNameBtn.isEnabled = false
+            startTrackingBtn.isEnabled = true
         } else {
             isWrfoutIcon.image = NSImage(systemSymbolName: "multiply.square", accessibilityDescription: nil)
             setVarName(allStr: "未指定")

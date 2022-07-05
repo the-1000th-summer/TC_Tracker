@@ -11,14 +11,33 @@ import WebKit
 class ResultViewController: NSViewController {
 
     @IBOutlet var webView: WKWebView!
+    @IBOutlet var nextPageBtn: NSButton!
+    
+    @objc private dynamic var pages: Int = 1
+    @objc private dynamic var currentPage: Int = 1 {
+        didSet {
+            draw(currentPage: currentPage)
+        }
+    }
+    @objc private dynamic var pageLabelString: String {
+        "\(currentPage) / \(pages)"
+    }
+    @objc private dynamic var prevPageBtnIsEnabled: Bool {
+        currentPage != 1
+    }
+    @objc private dynamic var nextPageBtnIsEnabled: Bool {
+        currentPage != pages
+    }
     
     public var tcsData: [Typhoon] = []
     private var tcsDataForJS: [[[String: Float]]] = []
-    private var pages: Int = 1
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
+//        nextPageBtn.wantsLayer = true
+//        nextPageBtn.layer?.backgroundColor = NSColor.black.cgColor
+        
         webView.navigationDelegate = self
         
         if let path = Bundle.main.url(forResource: "path", withExtension: "html"){
@@ -35,11 +54,22 @@ class ResultViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         
+        view.window?.styleMask.remove(.resizable)
+        
+        
         print("did appert")
 //        webView.evaluateJavaScript("changeBackgroundColor('red')") { (result, error) in
 //            print(error)
 //        }
     }
+    
+    @IBAction func prevPageBtnClicked(_ sender: NSButton) {
+        currentPage -= 1
+    }
+    @IBAction func nextPageBtnClicked(_ sender: NSButton) {
+        currentPage += 1
+    }
+    
     
     private func prepareData() {
         tcsDataForJS = tcsData.map {
@@ -77,13 +107,28 @@ class ResultViewController: NSViewController {
         alert.runModal()
     }
     
+    override func keyDown(with event: NSEvent) {
+        print(event.characters)
+    }
+    
+    override class func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String> {
+        switch key {
+        case "pageLabelString":
+            return ["currentPage", "pages"]
+        case "nextPageBtnIsEnabled":
+            return ["currentPage", "pages"]
+        case "prevPageBtnIsEnabled":
+            return ["currentPage"]
+        default:
+            return []
+        }
+    }
+    
 }
 
 extension ResultViewController: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("Finished navigating to url \(webView.url)")
-
         webView.evaluateJavaScript("drawBaseMap()", completionHandler: nil)
         draw(currentPage: 1)
     }

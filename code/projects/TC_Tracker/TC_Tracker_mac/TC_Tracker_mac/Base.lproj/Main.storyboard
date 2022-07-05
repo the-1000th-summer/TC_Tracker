@@ -687,7 +687,7 @@
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
                     <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
-                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="270"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
@@ -911,7 +911,7 @@
                             <comboBox verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PLm-En-v2U">
                                 <rect key="frame" x="362" y="188" width="67" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" usesDataSource="YES" numberOfVisibleItems="5" id="uCd-hX-AuT">
+                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" usesDataSource="YES" numberOfVisibleItems="5" id="uCd-hX-AuT">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -945,7 +945,7 @@
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rVK-hR-QC0">
                                 <rect key="frame" x="352" y="93" width="88" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="push" title="开始识别" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yrK-3o-ljz">
+                                <buttonCell key="cell" type="push" title="开始识别" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yrK-3o-ljz">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -970,6 +970,8 @@
                         <outlet property="filePathTextField" destination="18R-nb-mD0" id="YEO-Tm-QOm"/>
                         <outlet property="isWrfoutIcon" destination="6Bi-Bo-kkc" id="HjI-DG-Zb6"/>
                         <outlet property="selVarNameBtn" destination="WZl-z5-ivi" id="FAt-vh-8oQ"/>
+                        <outlet property="showWebBtn" destination="8I4-Um-Gsf" id="6Zg-RX-wvl"/>
+                        <outlet property="startTrackingBtn" destination="rVK-hR-QC0" id="kXP-Cu-8GO"/>
                         <outlet property="uwndLabel" destination="rcm-tj-hYz" id="x9p-Nv-q5C"/>
                         <outlet property="vorLabel" destination="PiY-Z5-Hqt" id="RXa-dO-FY0"/>
                         <outlet property="vwndLabel" destination="K3W-Qr-qIr" id="CKk-VW-HGS"/>
@@ -1114,31 +1116,83 @@
             <objects>
                 <viewController storyboardIdentifier="ResultView" id="Phu-EC-QGt" customClass="ResultViewController" customModule="TC_Tracker_mac" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="UTT-Ei-eSN">
-                        <rect key="frame" x="0.0" y="0.0" width="730" height="469"/>
+                        <rect key="frame" x="0.0" y="0.0" width="817" height="517"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x7W-dc-COQ">
-                                <rect key="frame" x="0.0" y="0.0" width="730" height="469"/>
+                                <rect key="frame" x="0.0" y="0.0" width="817" height="517"/>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="cw9-AY-Ofd">
+                                <rect key="frame" x="648" y="39.5" width="30" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="b2O-Cl-I1F"/>
+                                    <constraint firstAttribute="width" secondItem="cw9-AY-Ofd" secondAttribute="height" multiplier="10:7" id="fR5-2F-4JG"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="lBK-oy-6eC">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <imageReference key="image" image="chevron.left.square.fill" catalog="system" symbolScale="large"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
+                                <connections>
+                                    <action selector="prevPageBtnClicked:" target="Phu-EC-QGt" id="8HM-p4-k19"/>
+                                    <binding destination="Phu-EC-QGt" name="enabled" keyPath="prevPageBtnIsEnabled" id="kxK-3u-FA5"/>
+                                </connections>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="upa-v1-uGZ">
+                                <rect key="frame" x="735" y="39.5" width="30" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="4TL-Nb-G8L"/>
+                                    <constraint firstAttribute="width" secondItem="upa-v1-uGZ" secondAttribute="height" multiplier="6:5" id="xV8-N9-TmT"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="chevron.right.square.fill" catalog="system" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="TrX-oX-SLn">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
+                                <connections>
+                                    <action selector="nextPageBtnClicked:" target="Phu-EC-QGt" id="QXl-QU-hqc"/>
+                                    <binding destination="Phu-EC-QGt" name="enabled" keyPath="nextPageBtnIsEnabled" id="Ch6-j8-jyV"/>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="adC-e7-lLZ">
+                                <rect key="frame" x="688" y="46" width="37" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="aW3-OT-7Vo">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="Phu-EC-QGt" name="value" keyPath="pageLabelString" id="Q2w-bO-2GQ"/>
+                                </connections>
+                            </textField>
                         </subviews>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="upa-v1-uGZ" secondAttribute="trailing" constant="52" id="FgQ-t9-uJt"/>
                             <constraint firstAttribute="bottom" secondItem="x7W-dc-COQ" secondAttribute="bottom" id="PUx-Cb-oQ4"/>
+                            <constraint firstItem="adC-e7-lLZ" firstAttribute="leading" secondItem="cw9-AY-Ofd" secondAttribute="trailing" constant="12" id="QJt-QH-Oyv"/>
                             <constraint firstItem="x7W-dc-COQ" firstAttribute="top" secondItem="UTT-Ei-eSN" secondAttribute="top" id="abl-UH-Tqv"/>
+                            <constraint firstItem="cw9-AY-Ofd" firstAttribute="centerY" secondItem="upa-v1-uGZ" secondAttribute="centerY" id="cBj-hN-oGE"/>
                             <constraint firstAttribute="trailing" secondItem="x7W-dc-COQ" secondAttribute="trailing" id="g5p-k8-fpd"/>
                             <constraint firstItem="x7W-dc-COQ" firstAttribute="leading" secondItem="UTT-Ei-eSN" secondAttribute="leading" id="h91-8G-sxy"/>
+                            <constraint firstItem="upa-v1-uGZ" firstAttribute="leading" secondItem="adC-e7-lLZ" secondAttribute="trailing" constant="12" id="kWb-CP-xoN"/>
+                            <constraint firstItem="adC-e7-lLZ" firstAttribute="centerY" secondItem="upa-v1-uGZ" secondAttribute="centerY" id="pDL-5o-xRl"/>
+                            <constraint firstAttribute="bottom" secondItem="upa-v1-uGZ" secondAttribute="bottom" constant="42" id="t1T-Qx-7R3"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="nextPageBtn" destination="upa-v1-uGZ" id="m4i-pU-Sa7"/>
                         <outlet property="webView" destination="x7W-dc-COQ" id="ofu-cS-AJo"/>
                     </connections>
                 </viewController>
                 <customObject id="9wa-9c-vVu" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController id="yma-3s-ada"/>
             </objects>
-            <point key="canvasLocation" x="421" y="1483.5"/>
+            <point key="canvasLocation" x="437.5" y="1520.5"/>
         </scene>
         <!--Var2 Select View Controller-->
         <scene sceneID="xiI-HH-S5m">
@@ -1241,6 +1295,8 @@ DQ
         </scene>
     </scenes>
     <resources>
+        <image name="chevron.left.square.fill" catalog="system" width="19" height="18"/>
+        <image name="chevron.right.square.fill" catalog="system" width="15" height="14"/>
         <image name="questionmark.square" catalog="system" width="19" height="18"/>
     </resources>
 </document>
