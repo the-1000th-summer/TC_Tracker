@@ -55,7 +55,7 @@
 - (bool)checkIfIsWrfoutFile:(NSString **)exceptionInfo;
 - (int)getZLvDimLenName:(NSString **)zLvDimName;
 
-- (NSMutableArray<Typhoon *>*)startTracking;
+- (NSMutableArray<Typhoon *>*)startTrackingWithCallback :(void(*)(void*)) progressCallback andWith: (void(*)(bool result, void* target)) resultCallback withTarget: (void*) target;
 
 
 @end

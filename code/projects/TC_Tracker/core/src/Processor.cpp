@@ -159,7 +159,7 @@ void Processor::calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv) {
 }
 
 /// 第一步：找出有台风的日期，记录日期与台风信息
-void Processor::recognizeTyphoon() {
+void Processor::recognizeTyphoon(void(*progressCallback)(void*), void* target) {
     std::cout << "第一步(recognize_typhoon): 导入文件成功，开始识别。" << std::endl;
     
     /// 记录前一个时次的台风数目
@@ -330,8 +330,9 @@ void Processor::recognizeTyphoon() {
     //Constants::HAS_TP_MIN_ReVOR = isWrfoutFile ? 100e-5 : 8e-5;
     std::cout << "RECURSION_MIN_ReVOR: " << Constants::RECURSION_MIN_ReVOR << std::endl;
     
+    int completed_count = 0;
+    unsigned long itsPerCheck = timeLength / 20;
     
-//    unsigned long itsPerCheck = timeLength / 20;
 #   pragma omp parallel for num_threads(threadNum)
     for (int timeIndex = 0; timeIndex < timeLength; ++timeIndex) {
         // std::cout << vorVar.getName() << std::endl;
@@ -348,6 +349,13 @@ void Processor::recognizeTyphoon() {
         getVortexNum1Time(vorField, timeIndex);
 //        TCNum_prevTime = tpNum_timei;
         
+#    pragma omp atomic
+        ++completed_count;
+        
+        if (completed_count % itsPerCheck == 0) {
+#    pragma omp critical
+            progressCallback(target);
+        }
     }
 //    dumpVortexes(allVorsCellsIndex);
     std::cout << "Done step1" << std::endl;

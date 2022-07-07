@@ -13,6 +13,7 @@
 		790799302870423500543C44 /* linint2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7907992F2870423500543C44 /* linint2.cpp */; };
 		791A4DB628716E3200BD6FDE /* ResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791A4DB528716E3200BD6FDE /* ResultViewController.swift */; };
 		792329542869DD3B009A5E00 /* VarSelectWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792329532869DD3B009A5E00 /* VarSelectWindowController.swift */; };
+		7929A7F72876D60500DB7BB3 /* ProgressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7929A7F62876D60500DB7BB3 /* ProgressViewController.swift */; };
 		796187BF2872E15B00FDAC2C /* path.html in Resources */ = {isa = PBXBuildFile; fileRef = 796187BE2872E15B00FDAC2C /* path.html */; };
 		79618E572867129C00539BAE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79618E562867129C00539BAE /* AppDelegate.swift */; };
 		79618E592867129C00539BAE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79618E582867129C00539BAE /* ViewController.swift */; };
@@ -48,6 +49,7 @@
 		7907992F2870423500543C44 /* linint2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = linint2.cpp; path = ../../../../../../NCL_func_cxx/src/linint2.cpp; sourceTree = "<group>"; };
 		791A4DB528716E3200BD6FDE /* ResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultViewController.swift; sourceTree = "<group>"; };
 		792329532869DD3B009A5E00 /* VarSelectWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VarSelectWindowController.swift; sourceTree = "<group>"; };
+		7929A7F62876D60500DB7BB3 /* ProgressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewController.swift; sourceTree = "<group>"; };
 		795DA7B3286B3A7200909341 /* TCInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TCInfo.h; path = ../../core/include/TCInfo.h; sourceTree = "<group>"; };
 		795DA7B4286B3F6000909341 /* libboost_serialization.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_serialization.dylib; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_serialization.dylib; sourceTree = "<group>"; };
 		795DA7B6286B3F6A00909341 /* libboost_filesystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_filesystem.dylib; path = ../../../../../../../../../../opt/homebrew/Cellar/boost/1.76.0/lib/libboost_filesystem.dylib; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 				79618E562867129C00539BAE /* AppDelegate.swift */,
 				79618E582867129C00539BAE /* ViewController.swift */,
 				791A4DB528716E3200BD6FDE /* ResultViewController.swift */,
+				7929A7F62876D60500DB7BB3 /* ProgressViewController.swift */,
 				796187BE2872E15B00FDAC2C /* path.html */,
 				79618E6B2867537100539BAE /* core */,
 				79618E722867542900539BAE /* wrapper */,
@@ -366,6 +369,7 @@
 				79E91678286C456D002CED06 /* Typhoon.cpp in Sources */,
 				79618E66286736C000539BAE /* VarSelectViewController.swift in Sources */,
 				79079927287038F000543C44 /* rcm2rgrid.cpp in Sources */,
+				7929A7F72876D60500DB7BB3 /* ProgressViewController.swift in Sources */,
 				79618E6828674D7700539BAE /* Var2SelectViewController.swift in Sources */,
 				79E9167B286C4582002CED06 /* Processor.cpp in Sources */,
 				79E9168C286C576D002CED06 /* VortexesDumper.cpp in Sources */,

@@ -984,6 +984,33 @@
             </objects>
             <point key="canvasLocation" x="74" y="792.5"/>
         </scene>
+        <!--Progress View Controller-->
+        <scene sceneID="5rg-gv-Sh5">
+            <objects>
+                <viewController storyboardIdentifier="ProgressVC" id="wVZ-11-skp" customClass="ProgressViewController" customModule="TC_Tracker_mac" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="DdQ-Pc-1SI">
+                        <rect key="frame" x="0.0" y="0.0" width="454" height="150"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <progressIndicator fixedFrame="YES" maxValue="100" doubleValue="50" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="myX-dQ-O21">
+                                <rect key="frame" x="20" y="86" width="414" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            </progressIndicator>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ngb-3S-aID">
+                                <rect key="frame" x="380" y="13" width="61" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="取消" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="lIX-VB-BZT">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                </buttonCell>
+                            </button>
+                        </subviews>
+                    </view>
+                </viewController>
+                <customObject id="E66-iw-yhi" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="111" y="1137"/>
+        </scene>
         <!--Select Var-->
         <scene sceneID="dfQ-wd-14n">
             <objects>
@@ -1192,7 +1219,7 @@
                 <customObject id="9wa-9c-vVu" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="yma-3s-ada"/>
             </objects>
-            <point key="canvasLocation" x="437.5" y="1520.5"/>
+            <point key="canvasLocation" x="397" y="1553"/>
         </scene>
         <!--Var2 Select View Controller-->
         <scene sceneID="xiI-HH-S5m">

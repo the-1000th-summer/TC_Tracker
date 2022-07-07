@@ -22,7 +22,7 @@ public:
     TCInfo getTCInfo();
     void getDimLength();
     void calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv);
-    void recognizeTyphoon();
+    void recognizeTyphoon(void(*progressCallback)(void*), void* target);
     void getRealTC();
     void removeNoise();
 //    int getVortexNum1Time(ThreeDArray &vorField, int timeIndex, int TCNum_prevTime);

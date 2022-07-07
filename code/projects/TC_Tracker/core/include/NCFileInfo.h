@@ -33,7 +33,7 @@ public:
     std::vector<std::string> getVarsName();
     std::vector<std::string> getVorDimsName(const std::string& vorVarName);
     
-    void startTracking(TCs &tcs, bool* isCanceled);
+    void startTracking(TCs &tcs, bool* isCanceled, void(*progressCallback)(void*), void(*resultCallback)(bool result, void* target), void* target);
     
 private:
     std::string resourceBaseDir;

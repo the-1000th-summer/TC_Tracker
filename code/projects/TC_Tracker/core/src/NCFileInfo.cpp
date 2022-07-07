@@ -8,6 +8,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
+#include <chrono>
 
 #include "json.hpp"
 #include "NCFileInfo.h"
@@ -96,13 +97,13 @@ bool NCFileInfo::checkIfIsWrfoutFile(std::string& exceptionInfo) {
 }
 
 
-void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled) {
+void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled, void(*progressCallback)(void*), void(*resultCallback)(bool result, void* target), void* target) {
     
 //    netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
     
     Processor p(isCanceled, ncFilePath, isWrfoutFile, varNames, zLevelIndex, threadNum, dumpDir, resourceBaseDir);
     
-    p.recognizeTyphoon();
+    p.recognizeTyphoon(progressCallback, target);
     if (*isCanceled) return;
     if (!noTempFiles)
         p.dumpStep1(ncFilePath);

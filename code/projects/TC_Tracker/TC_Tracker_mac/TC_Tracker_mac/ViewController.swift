@@ -87,8 +87,12 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBAction func startTrackBtnClicked(_ sender: NSButton) {
         if !checkZLvCombox() { return }
         
-        realTCs = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/").startTracking().compactMap { $0 as? Typhoon }
         
+        let tracker = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/")!
+        
+        guard let progressVC = storyboard?.instantiateController(withIdentifier: "ProgressVC") as? ProgressViewController else { return }
+        progressVC.tracker = tracker
+        presentAsSheet(progressVC)
         
         
         
@@ -101,6 +105,10 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         presentAsModalWindow(resultVC);
     }
     
+    
+    public func setRealTCs(tcs: [Typhoon]) {
+        self.realTCs = tcs
+    }
     
     private func checkZLvCombox() -> Bool {
         if zLvDimLen == 0 { return true }
@@ -136,6 +144,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
             handleZLevelDim()
             selVarNameBtn.isEnabled = false
             startTrackingBtn.isEnabled = true
+            zLvComboBox.isEnabled = true
         } else {
             isWrfoutIcon.image = NSImage(systemSymbolName: "multiply.square", accessibilityDescription: nil)
             setVarName(allStr: "未指定")

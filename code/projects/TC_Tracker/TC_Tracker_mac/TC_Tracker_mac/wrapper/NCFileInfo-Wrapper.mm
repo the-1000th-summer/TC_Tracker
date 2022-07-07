@@ -163,10 +163,10 @@
     return zLvDimLen;
 }
 
-- (NSMutableArray<Typhoon *>*)startTracking {
+- (NSMutableArray<Typhoon *>*)startTrackingWithCallback :(void(*)(void*)) progressCallback andWith: (void(*)(bool result, void* target)) resultCallback withTarget: (void*) target {
     TTCore::TCs tcs;
     bool isCanceled = false;
-    m_instance->startTracking(tcs, &isCanceled);
+    m_instance->startTracking(tcs, &isCanceled, progressCallback, resultCallback, target);
     
     std::cout << "unmanaged TC number: " << tcs.size() << std::endl;
     

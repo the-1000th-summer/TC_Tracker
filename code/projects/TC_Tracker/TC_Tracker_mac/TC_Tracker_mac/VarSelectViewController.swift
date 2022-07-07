@@ -30,7 +30,6 @@ class VarSelectViewController: NSViewController, NSComboBoxDataSource {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
-        
         vorNameComboBox.dataSource = self
         uwndNameComboBox.dataSource = self
         vwndNameComboBox.dataSource = self
@@ -58,6 +57,8 @@ class VarSelectViewController: NSViewController, NSComboBoxDataSource {
         guard let secondVC = storyboard?.instantiateController(withIdentifier: "Var2SelectVC") as? Var2SelectViewController else { return }
         secondVC.ncFilePath = ncFilePath
         secondVC.vorOrWindNames = vorNameIsEnabled ? [vorNameComboBox.stringValue] : [uwndNameComboBox.stringValue, vwndNameComboBox.stringValue]
+        
+        // 切换view controller导致了在secondVC中presentingViewController为nil
         view.window?.contentViewController = secondVC
     }
     
