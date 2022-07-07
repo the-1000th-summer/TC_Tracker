@@ -18,8 +18,8 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBOutlet var selVarNameBtn: NSButton!
     @IBOutlet var startTrackingBtn: NSButton!
     @IBOutlet var showWebBtn: NSButton!
-    
-    
+    @IBOutlet var gridResTextField: NSTextField!
+    @IBOutlet var interpSwitch: NSSwitch!
     
     @objc private dynamic var timeVarStr = "未指定"
     @objc private dynamic var latVarStr = "未指定"
@@ -40,6 +40,13 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         }
     }
     @objc private dynamic var zVarStr = "未指定"
+    @objc private dynamic var shouldInterp = false
+    @objc private dynamic var shouldNotInterp: Bool {
+        return !shouldInterp
+    }
+    @objc private dynamic var interpLabel: String {
+        shouldInterp ? "插值到格点分辨率：" : "不插值"
+    }
     
     @objc private dynamic var isWrfoutFile = false
     private var zLvDimLen: Int = 0
@@ -54,6 +61,9 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         isWrfoutIcon.imageScaling = .scaleAxesIndependently
+        
+        setGridResFormat()
+        
         zLvComboBox.dataSource = self
         NotificationCenter.default.addObserver(self, selector: #selector(getVarNames(_:)), name: NSNotification.Name(rawValue: "AllVarNamesGet"), object: nil)
     }
@@ -67,6 +77,9 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBAction func browseBtnClicked(_ sender: NSButton) {
         let filePath = showFileBrowser()
         zLvComboBox.isEnabled = false
+        showWebBtn.isEnabled = false
+        interpSwitch.isEnabled = true
+        
         guard let filePath = filePath else { return }
 
         checkFileValid(filePath: filePath)
@@ -87,15 +100,14 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBAction func startTrackBtnClicked(_ sender: NSButton) {
         if !checkZLvCombox() { return }
         
+        selVarNameBtn.isEnabled = false
+        startTrackingBtn.isEnabled = false
         
         let tracker = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/")!
         
         guard let progressVC = storyboard?.instantiateController(withIdentifier: "ProgressVC") as? ProgressViewController else { return }
         progressVC.tracker = tracker
         presentAsSheet(progressVC)
-        
-        
-        
         
     }
     
@@ -132,6 +144,14 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         handleZLevelDim()
         
         startTrackingBtn.isEnabled = true
+    }
+    
+    private func setGridResFormat() {
+        let onlyDoubleFormatter = OnlyDoubleValueFormatter()
+        onlyDoubleFormatter.numberStyle = .decimal
+        onlyDoubleFormatter.usesGroupingSeparator = false
+        onlyDoubleFormatter.maximumFractionDigits = 2
+        gridResTextField.formatter = onlyDoubleFormatter
     }
     
     private func checkIfIsWrfoutFile(ncFilePath: String) {
@@ -229,6 +249,50 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     
     func comboBox(_ comboBox: NSComboBox, objectValueForItemAt index: Int) -> Any? {
         return index
+    }
+    
+    override class func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String> {
+        switch key {
+        case "shouldNotInterp":
+            return ["shouldInterp"]
+        case "interpLabel":
+            return ["shouldInterp"]
+        default:
+            return []
+        }
+    }
+}
+
+class OnlyDoubleValueFormatter: NumberFormatter {
+
+    override func isPartialStringValid(_ partialString: String, newEditingString newString: AutoreleasingUnsafeMutablePointer<NSString?>?, errorDescription error: AutoreleasingUnsafeMutablePointer<NSString?>?) -> Bool {
+
+        // Ability to reset your field (otherwise you can't delete the content)
+        // You can check if the field is empty later
+        if partialString.isEmpty {
+            return true
+        }
+
+        // Optional: limit input length
+        /*
+        if partialString.characters.count>3 {
+            return false
+        }
+        */
+        let numSubStrs = partialString.split(separator: ".")
+        if (numSubStrs.count == 2) {
+            if numSubStrs[1].count > 2 {
+                NSSound.beep()
+                return false
+            }
+        }
+
+        // Actual check
+        if Double(partialString) == nil {
+            NSSound.beep()
+            return false
+        }
+        return true
     }
 }
 

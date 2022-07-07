@@ -159,7 +159,7 @@ void Processor::calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv) {
 }
 
 /// 第一步：找出有台风的日期，记录日期与台风信息
-void Processor::recognizeTyphoon(void(*progressCallback)(void*), void* target) {
+void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target) {
     std::cout << "第一步(recognize_typhoon): 导入文件成功，开始识别。" << std::endl;
     
     /// 记录前一个时次的台风数目
@@ -241,39 +241,6 @@ void Processor::recognizeTyphoon(void(*progressCallback)(void*), void* target) {
 //            latArr2D.get() = nullptr;
 //            lonArr2D.get() = nullptr;
             
-            netCDF::NcFile rgedFile("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrf_data/rged_wrfout.nc", netCDF::NcFile::replace);
-            
-            auto timeDim = rgedFile.addDim("time", timeLength);
-            auto latDim = rgedFile.addDim("lat", lat_rged.size());
-            auto lonDim = rgedFile.addDim("lon", lon_rged.size());
-            
-            auto timeVar = rgedFile.addVar("time", netCDF::NcType::nc_FLOAT, timeDim);
-            auto latVar = rgedFile.addVar("lat", netCDF::NcType::nc_FLOAT, latDim);
-            auto lonVar = rgedFile.addVar("lon", netCDF::NcType::nc_FLOAT, lonDim);
-            auto uVar = rgedFile.addVar("uwnd", netCDF::NcType::nc_FLOAT, {timeDim, latDim, lonDim});
-            auto vVar = rgedFile.addVar("vwnd", netCDF::NcType::nc_FLOAT, {timeDim, latDim, lonDim});
-            auto vorVar = rgedFile.addVar("vor", netCDF::NcType::nc_FLOAT, {timeDim, latDim, lonDim});
-            
-            // att
-            uVar.putAtt("units", "m/s");
-            vVar.putAtt("units", "m/s");
-            latVar.putAtt("units", "degree_north");
-            lonVar.putAtt("units", "degree_east");
-            
-            // pour data
-            std::vector<float> time_data;
-            for (int i = 0; i < timeLength; ++i)
-                time_data.push_back(i);
-            timeVar.putVar(time_data.data());
-            latVar.putVar(lat_rged.data());
-            lonVar.putVar(lon_rged.data());
-            uVar.putVar(u_regularGrid.get());
-            vVar.putVar(v_regularGrid.get());
-            vorVar.putVar(vorField.get());
-            
-            rgedFile.close();
-            
-            std::cout << "write data finished" << std::endl;
         } else {
             vorField.setDims(timeLength, latGridNum, lonGridNum);
             calcRelativeVorField(iiFile.get(), vorField);
@@ -354,7 +321,7 @@ void Processor::recognizeTyphoon(void(*progressCallback)(void*), void* target) {
         
         if (completed_count % itsPerCheck == 0) {
 #    pragma omp critical
-            progressCallback(target);
+            progressCallback(static_cast<double>(completed_count)/timeLength*100, target);
         }
     }
 //    dumpVortexes(allVorsCellsIndex);

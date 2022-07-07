@@ -9,6 +9,9 @@ import Cocoa
 
 class ProgressViewController: NSViewController {
     
+    @IBOutlet var progressBar: NSProgressIndicator!
+    
+    
     public var tracker: NCFileInfo_Wrapper?
     private var realTCs: [Typhoon] = []
     
@@ -16,7 +19,7 @@ class ProgressViewController: NSViewController {
         super.viewDidLoad()
         // Do view setup here.
         
-        
+        progressBar.startAnimation(nil)
     }
     
     override func viewDidAppear() {
@@ -29,13 +32,26 @@ class ProgressViewController: NSViewController {
         let observer = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
         
         dispatchQueue.async {
-            let realTCs = tracker.startTracking(callback: { observer in
-                print("swift: one progress!")
-            }, andWith: { (result: Bool, observer) in
+            let realTCs = tracker.startTracking(stepPgCallback: { (stepIdx, observer) in
                 
+            }, andWith: { (progressValue, observer) in
+                let mySelf = Unmanaged<ProgressViewController>.fromOpaque(observer!).takeUnretainedValue()
+                DispatchQueue.main.async {
+//                    let oldValue = mySelf.progress.stringValue
+//                    mySelf.progress.stringValue = oldValue + "."
+                    if (mySelf.progressBar.isIndeterminate) {
+                        mySelf.progressBar.isIndeterminate = false
+                    }
+                    mySelf.progressBar.doubleValue = progressValue
+                }
             }, withTarget: observer).compactMap { $0 as? Typhoon }
             
             mainVC.setRealTCs(tcs: realTCs)
+            
+            DispatchQueue.main.async {
+                mainVC.showWebBtn.isEnabled = true
+                mainVC.dismiss(self)
+            }
         }
     }
     
