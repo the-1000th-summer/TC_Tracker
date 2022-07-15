@@ -153,6 +153,7 @@ double UtilFunc::getHourInterval(netCDF::NcVar &timeVar) {
 /// @param timeVarName time变量名
 void UtilFunc::modifyMaxDist(netCDF::NcFile* iFile, const std::string &timeVarName) {
     auto timeVar = iFile->getVar(timeVarName);
+    Constants::LINK_TP_MAX_DIST = 56.67;
     Constants::LINK_TP_MAX_DIST *= UtilFunc::getTimeInterval(timeVar);
     std::string timeUnits;
     timeVar.getAtt("units").getValues(timeUnits);

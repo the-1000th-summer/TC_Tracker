@@ -965,9 +965,9 @@
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="43T-bS-Hsi">
-                                <rect key="frame" x="360" y="125" width="124" height="16"/>
+                                <rect key="frame" x="360" y="125" width="121" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="插值到格点分辨率：" id="4JP-86-692">
-                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                    <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -1055,17 +1055,18 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="取消" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="lIX-VB-BZT">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                    <font key="font" metaFont="system"/>
                                 </buttonCell>
                             </button>
-                            <levelIndicator verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iRb-jZ-15z">
-                                <rect key="frame" x="127" y="112" width="96" height="18"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <levelIndicatorCell key="cell" alignment="left" maxValue="6" warningValue="2" criticalValue="2" id="AUM-oo-GMM"/>
+                            <levelIndicator verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iRb-jZ-15z">
+                                <rect key="frame" x="127" y="112" width="95" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="95" id="BAk-6m-86W"/>
+                                </constraints>
+                                <levelIndicatorCell key="cell" alignment="left" maxValue="5" warningValue="2" criticalValue="2" id="AUM-oo-GMM"/>
                             </levelIndicator>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W4Z-QX-HC2">
-                                <rect key="frame" x="288" y="114" width="37" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="W4Z-QX-HC2">
+                                <rect key="frame" x="270" y="114" width="37" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="bdO-8f-9Jq">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1073,8 +1074,16 @@
                                 </textFieldCell>
                             </textField>
                         </subviews>
+                        <constraints>
+                            <constraint firstItem="iRb-jZ-15z" firstAttribute="top" secondItem="DdQ-Pc-1SI" secondAttribute="top" constant="20" symbolic="YES" id="MbL-5Z-A0g"/>
+                            <constraint firstItem="iRb-jZ-15z" firstAttribute="leading" secondItem="DdQ-Pc-1SI" secondAttribute="leading" constant="127" id="fGv-MQ-YfN"/>
+                            <constraint firstItem="W4Z-QX-HC2" firstAttribute="leading" secondItem="iRb-jZ-15z" secondAttribute="trailing" constant="50" id="idg-UV-uv1"/>
+                            <constraint firstItem="W4Z-QX-HC2" firstAttribute="centerY" secondItem="iRb-jZ-15z" secondAttribute="centerY" id="ynm-L1-iyf"/>
+                        </constraints>
                     </view>
                     <connections>
+                        <outlet property="levelIndicator" destination="iRb-jZ-15z" id="yWj-qg-sf5"/>
+                        <outlet property="levelLabel" destination="W4Z-QX-HC2" id="idp-ob-byk"/>
                         <outlet property="progressBar" destination="myX-dQ-O21" id="bMa-oN-Yc7"/>
                     </connections>
                 </viewController>

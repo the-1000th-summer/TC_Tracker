@@ -16,7 +16,7 @@ namespace TTCore {
 class Processor {
 public:
 //    Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &timeVName="", const std::string & latVName="", const std::string & lonVName="", const std::string & vorVName="", int zLevelIndex = -1, const std::string & dumpDirectory = "");
-    Processor(bool* isCanceled, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, int threadNum, const std::string & dumpDirectory, const std::string &resourceBaseDir);
+    Processor(bool* isCanceled, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string & dumpDirectory, const std::string &resourceBaseDir);
     //Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
     ~Processor();
     TCInfo getTCInfo();
@@ -59,6 +59,7 @@ private:
     bool wrfChangeToRegular = false;
     int threadNum = 1;
     std::string resourceBaseDir;
+    double toGridRes;
     
     std::unique_ptr<float[]> latArr, lonArr;
     TwoDArray latArr2D = TwoDArray(0,0), lonArr2D = TwoDArray(0,0);

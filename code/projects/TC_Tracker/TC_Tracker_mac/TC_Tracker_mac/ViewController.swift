@@ -66,6 +66,8 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         
         zLvComboBox.dataSource = self
         NotificationCenter.default.addObserver(self, selector: #selector(getVarNames(_:)), name: NSNotification.Name(rawValue: "AllVarNamesGet"), object: nil)
+        
+        interpSwitch.isEnabled = false
     }
 
     override var representedObject: Any? {
@@ -99,11 +101,12 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     
     @IBAction func startTrackBtnClicked(_ sender: NSButton) {
         if !checkZLvCombox() { return }
-        
+        let (checkPassed, gridResValue) = checkGridResValue()
+        if !checkPassed { return }
         selVarNameBtn.isEnabled = false
         startTrackingBtn.isEnabled = false
         
-        let tracker = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/")!
+        let tracker = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, gridResValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/")!
         
         guard let progressVC = storyboard?.instantiateController(withIdentifier: "ProgressVC") as? ProgressViewController else { return }
         progressVC.tracker = tracker
@@ -133,6 +136,26 @@ class ViewController: NSViewController, NSComboBoxDataSource {
             return false
         }
         return true
+    }
+    
+    private func checkGridResValue() -> (Bool, Double) {
+        let gridResStr = gridResTextField.stringValue
+        if gridResStr.isEmpty {
+            if interpSwitch.state == .on {
+                let alert = NSAlert()
+                alert.messageText = "\(gridResStr): 格点分辨率不能为空。"
+                alert.runModal()
+                return (false, 0)
+            }
+            return (true, 0)
+        }
+        if Double(gridResStr) == nil {
+            let alert = NSAlert()
+            alert.messageText = "\(gridResStr): 输入的格点分辨率不合法。"
+            alert.runModal()
+            return (false, 0)
+        }
+        return (true, Double(gridResStr)!)
     }
     
     
@@ -214,6 +237,8 @@ class ViewController: NSViewController, NSComboBoxDataSource {
             zVarStr = "(无)"
             zLvComboBox.isEnabled = false
             return
+        } else {
+            zLvComboBox.isEnabled = true
         }
         zVarStr = zLvDimName as? String ?? ""
         
@@ -288,10 +313,15 @@ class OnlyDoubleValueFormatter: NumberFormatter {
         }
 
         // Actual check
-        if Double(partialString) == nil {
+        guard let theValue = Double(partialString) else {
             NSSound.beep()
             return false
         }
+        if theValue < 0 {
+            NSSound.beep()
+            return false
+        }
+        
         return true
     }
 }

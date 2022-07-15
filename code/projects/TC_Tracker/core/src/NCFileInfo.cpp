@@ -21,7 +21,7 @@ namespace TTCore {
 
 NCFileInfo::NCFileInfo(const char* filePath) : ncFilePath(filePath) {}
 NCFileInfo::NCFileInfo(const char* filePath, const VarNames &varNames) : ncFilePath(filePath), varNames(varNames) {}
-NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, int threadNum, const char *dumpDirectory, const char *resourceBaseDir) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), noTempFiles(noTempFiles), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir) {}
+NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, bool noTempFiles, int threadNum, const char *dumpDirectory, const char *resourceBaseDir) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), toGridRes(toGridRes), noTempFiles(noTempFiles), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir) {}
 
 void NCFileInfo::checkFileValid() {
     try {
@@ -100,18 +100,22 @@ bool NCFileInfo::checkIfIsWrfoutFile(std::string& exceptionInfo) {
 void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target) {
     
 //    netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
+    stepPgCallback(0, target);
     
-    Processor p(isCanceled, ncFilePath, isWrfoutFile, varNames, zLevelIndex, threadNum, dumpDir, resourceBaseDir);
+    Processor p(isCanceled, ncFilePath, isWrfoutFile, varNames, zLevelIndex, toGridRes, threadNum, dumpDir, resourceBaseDir);
     
     p.recognizeTyphoon(stepPgCallback, progressCallback, target);
     if (*isCanceled) return;
     if (!noTempFiles)
         p.dumpStep1(ncFilePath);
     
+    stepPgCallback(4, target);
+    progressCallback(-1, target);
     p.getRealTC();
     if (!noTempFiles)
         p.dumpStep2(ncFilePath);
     
+    stepPgCallback(5, target);
     p.removeNoise();
 
     if (!noTempFiles)

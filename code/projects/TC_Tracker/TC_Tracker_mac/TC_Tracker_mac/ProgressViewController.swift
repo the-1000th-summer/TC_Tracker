@@ -10,6 +10,8 @@ import Cocoa
 class ProgressViewController: NSViewController {
     
     @IBOutlet var progressBar: NSProgressIndicator!
+    @IBOutlet var levelIndicator: NSLevelIndicator!
+    @IBOutlet var levelLabel: NSTextField!
     
     
     public var tracker: NCFileInfo_Wrapper?
@@ -33,16 +35,42 @@ class ProgressViewController: NSViewController {
         
         dispatchQueue.async {
             let realTCs = tracker.startTracking(stepPgCallback: { (stepIdx, observer) in
-                
+                let mySelf = Unmanaged<ProgressViewController>.fromOpaque(observer!).takeUnretainedValue()
+                DispatchQueue.main.async {
+                    mySelf.levelIndicator.intValue = stepIdx
+                    let labelStr: String
+                    switch stepIdx {
+                    case 0:
+                        labelStr = "读取原始数据..."
+                    case 1:
+                        labelStr = "regridding..."
+                    case 2:
+                        labelStr = "计算涡度中..."
+                    case 3:
+                        labelStr = "获取原始涡旋..."
+                    case 4:
+                        labelStr = "连接涡旋..."
+                    case 5:
+                        labelStr = "去除噪声..."
+                    default:
+                        labelStr = ""
+                    }
+                    mySelf.levelLabel.stringValue = labelStr
+                }
             }, andWith: { (progressValue, observer) in
                 let mySelf = Unmanaged<ProgressViewController>.fromOpaque(observer!).takeUnretainedValue()
                 DispatchQueue.main.async {
-//                    let oldValue = mySelf.progress.stringValue
-//                    mySelf.progress.stringValue = oldValue + "."
-                    if (mySelf.progressBar.isIndeterminate) {
-                        mySelf.progressBar.isIndeterminate = false
+
+                    if progressValue >= 0 {
+                        if mySelf.progressBar.isIndeterminate {
+                            mySelf.progressBar.isIndeterminate = false
+                        }
+                        mySelf.progressBar.doubleValue = progressValue
+                    } else if !mySelf.progressBar.isIndeterminate {
+                        mySelf.progressBar.isIndeterminate = true
+                        mySelf.progressBar.startAnimation(nil)
                     }
-                    mySelf.progressBar.doubleValue = progressValue
+                    
                 }
             }, withTarget: observer).compactMap { $0 as? Typhoon }
             

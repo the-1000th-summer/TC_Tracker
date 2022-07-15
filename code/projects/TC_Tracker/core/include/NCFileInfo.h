@@ -21,10 +21,11 @@ public:
     bool isWrfoutFile = false;
     bool isFileValid = false;
     std::string fileValidInfo;
+    
 
     NCFileInfo(const char* filePath);
     NCFileInfo(const char* filePath, const VarNames &varNames);
-    NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, bool noTempFiles, int threadNum, const char *dumpDirectory, const char *resourceBaseDir);
+    NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, bool noTempFiles, int threadNum, const char *dumpDirectory, const char *resourceBaseDir);
     
     void checkFileValid();
     int getZLvDimLenName(std::string& zLvDimName);
@@ -38,6 +39,8 @@ public:
 private:
     std::string resourceBaseDir;
     std::vector<float> lat_data, lon_data;
+    
+    double toGridRes = 0.0;
 };
 
 

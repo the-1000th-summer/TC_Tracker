@@ -32,7 +32,7 @@
 
 namespace TTCore {
 
-Processor::Processor(bool* isCanceled, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, int threadNum, const std::string& dumpDirectory, const std::string &resourceBaseDir) : isCanceled(isCanceled), iFilePath(iFilePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir), iiFile{std::make_unique<netCDF::NcFile>(iFilePath, netCDF::NcFile::read)}, tcInfo(getTCInfo()) {
+Processor::Processor(bool* isCanceled, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string& dumpDirectory, const std::string &resourceBaseDir) : isCanceled(isCanceled), iFilePath(iFilePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), toGridRes(toGridRes), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir), iiFile{std::make_unique<netCDF::NcFile>(iFilePath, netCDF::NcFile::read)}, tcInfo(getTCInfo()) {
     
     threadNum ? threadNum : omp_get_max_threads();
     getDimLength();
@@ -176,13 +176,12 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
     auto vorField = ThreeDArray();
     
     if (isWrfoutFile) {
-        if (false) {
-            float gridRes = 0.5;
+        if (toGridRes > 0) {
             
-            auto minLatD = latArr2D.max(0).second / gridRes;
-            auto maxLatD = latArr2D.min(latGridNum-1).second / gridRes;
-            auto minLonD = lonArr2D.maxInColumn(0) / gridRes;
-            auto maxLonD = lonArr2D.minInColumn(lonGridNum-1) / gridRes;
+            auto minLatD = latArr2D.max(0).second / toGridRes;
+            auto maxLatD = latArr2D.min(latGridNum-1).second / toGridRes;
+            auto minLonD = lonArr2D.maxInColumn(0) / toGridRes;
+            auto maxLonD = lonArr2D.minInColumn(lonGridNum-1) / toGridRes;
             
             float minLatDIntegral, maxLatDIntegral;
             float minLonDIntegral, maxLonDIntegral;
@@ -191,28 +190,30 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             modf(minLonD, &minLonDIntegral);
             modf(maxLonD, &maxLonDIntegral);
             
-            const float minLat_rged = (minLatD <= 0) ? minLatDIntegral*gridRes : (minLatDIntegral+1)*gridRes;
-            const float maxLat_rged = (maxLatD < 0) ? (maxLatDIntegral-1)*gridRes : maxLatDIntegral*gridRes;
+            const float minLat_rged = (minLatD <= 0) ? minLatDIntegral*toGridRes : (minLatDIntegral+1)*toGridRes;
+            const float maxLat_rged = (maxLatD < 0) ? (maxLatDIntegral-1)*toGridRes : maxLatDIntegral*toGridRes;
             // 不考虑有lon负值的情况
-            const float minLon_rged = (minLonDIntegral + 1) * gridRes;
-            const float maxLon_rged = maxLonDIntegral * gridRes;
+            const float minLon_rged = (minLonDIntegral + 1) * toGridRes;
+            const float maxLon_rged = maxLonDIntegral * toGridRes;
             
             std::vector<float> lat_rged;
             std::vector<float> lon_rged;
             float nowLat = minLat_rged;
             while (true) {
                 lat_rged.push_back(nowLat);
-                nowLat += gridRes;
+                nowLat += toGridRes;
                 if (nowLat > maxLat_rged)
                     break;
             }
             float nowLon = minLon_rged;
             while (true) {
                 lon_rged.push_back(nowLon);
-                nowLon += gridRes;
+                nowLon += toGridRes;
                 if (nowLon > maxLon_rged)
                     break;
             }
+            
+            stepPgCallback(1, target);     // start regrid
             
             auto u_unstged = ThreeDArray(timeLength,latGridNum,lonGridNum);
             auto v_unstged = ThreeDArray(timeLength,latGridNum,lonGridNum);
@@ -227,12 +228,17 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             for (int time_i = 0; time_i < timeLength; ++time_i)
                 NCL_cxx::rcm2rgrid<float>(lonArr2D.get(), latArr2D.get(), lonGridNum, latGridNum, lon_rged.data(), lat_rged.data(), lon_rged.size(), lat_rged.size(), v_unstged[time_i], v_regularGrid[time_i], 9.96921e+36, ier);
             assert(ier == 0);
+            std::cout << "finish regrid wrfout uv" << std::endl;
+            
+            stepPgCallback(2, target);    // start cal rv
             
             vorField.setDims(timeLength, lat_rged.size(), lon_rged.size());
             for (int time_i = 0; time_i < timeLength; ++time_i) {
                 uv2vr_cfd().calRV(u_regularGrid[time_i], v_regularGrid[time_i], lat_rged.data(), lon_rged.data(), lat_rged.size(), lon_rged.size(), 9.96921e+36, 2, vorField[time_i]);
             }
-            std::cout << "finish regrid" << std::endl;
+            std::cout << "finish cal wrfout rv" << std::endl;
+            
+            // treat regridded data as regular grid data
             wrfChangeToRegular = true;
             latArr = std::make_unique<float[]>(lat_rged.size());
             lonArr = std::make_unique<float[]>(lon_rged.size());
@@ -241,12 +247,13 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
 //            latArr2D.get() = nullptr;
 //            lonArr2D.get() = nullptr;
             
-        } else {
+        } else {     // should not regrid
             vorField.setDims(timeLength, latGridNum, lonGridNum);
+            stepPgCallback(2, target);    // start cal rv
             calcRelativeVorField(iiFile.get(), vorField);
         }
-    } else {
-        if (shouldRegrid(1.25)) {
+    } else {        // not wrfout file
+        if (toGridRes > 0 && shouldRegrid(1.25)) {
             std::cout << "file should be regrid" << std::endl;
             auto ref_latData = getRgedLatArr(1.25);
             auto ref_lonData = getRgedLonArr(1.25);
@@ -255,9 +262,11 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             std::cout << "\nref lon data:" << std::endl;
             for (float i : ref_lonData) { std::cout << i << " "; }
             std::cout << std::endl;
+            
+            stepPgCallback(1, target);      // start regrid
             vorField.setDims(timeLength, ref_latData.size(), ref_lonData.size());
             regridVorData(ref_latData, ref_lonData, vorField);
-        } else {
+        } else {          // should not regrid
             vorField.setDims(timeLength, latGridNum, lonGridNum);
             if (!varNames.dataIsVor) {
                 auto uField = ThreeDArray(timeLength, latGridNum, lonGridNum);
@@ -278,7 +287,8 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
                 } else {
                     fillValue = 9.96921e+36;
                 }
-                    
+                
+                stepPgCallback(2, target);         // start cal rv
                 for (int time_i = 0; time_i < timeLength; ++time_i) {
                     uv2vr_cfd().calRV(uField[time_i], vField[time_i], latArr.get(), lonArr.get(), latGridNum, lonGridNum, fillValue, 2, vorField[time_i]);
                 }
@@ -300,6 +310,8 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
     int completed_count = 0;
     unsigned long itsPerCheck = timeLength / 20;
     
+    
+    stepPgCallback(3, target);         // start getVortexNum1Time
 #   pragma omp parallel for num_threads(threadNum)
     for (int timeIndex = 0; timeIndex < timeLength; ++timeIndex) {
         // std::cout << vorVar.getName() << std::endl;
@@ -325,6 +337,7 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
         }
     }
 //    dumpVortexes(allVorsCellsIndex);
+    progressCallback(100, target);
     std::cout << "Done step1" << std::endl;
 }
 
