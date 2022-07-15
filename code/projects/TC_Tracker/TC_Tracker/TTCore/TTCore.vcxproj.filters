@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Calculator">
+      <UniqueIdentifier>{13688cf7-07d1-4a42-a1f2-c5fd1ab6c77e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Calculator">
+      <UniqueIdentifier>{4d8ef19d-48d7-427f-a471-3f603851a5e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Calculator\ncl_cxx">
+      <UniqueIdentifier>{19e168a9-f7ba-4bb9-9eda-1920d9c9789f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Calculator\ncl_cxx">
+      <UniqueIdentifier>{ea97547c-4a51-43e7-91b6-6f970e9aded7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core.h">
@@ -21,10 +33,64 @@
     <ClInclude Include="..\..\core\include\NCFileInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TCsP.pb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\Utils.h">
+      <Filter>Header Files\Calculator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\Processor.h">
+      <Filter>Header Files\Calculator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\uv2vr_cfd.h">
+      <Filter>Header Files\Calculator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\VortexesDumper.h">
+      <Filter>Header Files\Calculator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\dmapgci.h">
+      <Filter>Header Files\Calculator\ncl_cxx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\linint2.h">
+      <Filter>Header Files\Calculator\ncl_cxx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\linmsg_dp.h">
+      <Filter>Header Files\Calculator\ncl_cxx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\rcm2rgrid.h">
+      <Filter>Header Files\Calculator\ncl_cxx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\core\src\NCFileInfo.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TCsP.pb.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\core\src\Utils.cpp">
+      <Filter>Source Files\Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\core\src\Processor.cpp">
+      <Filter>Source Files\Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\core\src\uv2vr_cfd.cpp">
+      <Filter>Source Files\Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\core\src\VortexesDumper.cpp">
+      <Filter>Source Files\Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\dmapgci.cpp">
+      <Filter>Source Files\Calculator\ncl_cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\linint2.cpp">
+      <Filter>Source Files\Calculator\ncl_cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\linmsg_dp.cpp">
+      <Filter>Source Files\Calculator\ncl_cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\rcm2rgrid.cpp">
+      <Filter>Source Files\Calculator\ncl_cxx</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+message TCsP {
+    message IndexPair {
+        int32 latIndex = 1;
+        int32 lonIndex = 2;
+    }
+    message LatLonPair {
+        float lat = 1;
+        float lon = 2;
+    }
+    message VorCellsIndex {
+        repeated IndexPair vorCellsIndex = 1;
+    }
+    message Typhoon {
+        repeated IndexPair maxVorCells = 1;
+        repeated LatLonPair geoCenters = 2;
+        int32 startTimeIndex = 3;
+        int32 endTimeIndex = 4;
+        repeated VorCellsIndex vorsCellsIndex = 5;
+    }
+    repeated Typhoon typhoons = 1;
+    string timeUnits = 2;
+    bool time_noleap = 3;
+    int32 firstTimeValue = 4;
+    int32 timeHourInterval = 5;
+    repeated float lats = 6;
+    repeated float lons = 7;
+}

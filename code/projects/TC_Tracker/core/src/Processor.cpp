@@ -29,7 +29,10 @@
 #include "Linint2.h"
 #include "uv2vr_cfd.h"
 #include "rcm2rgrid.h"
-
+// for MS compiler
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846264338327950288
+#endif
 namespace TTCore {
 
 Processor::Processor(bool* isCanceled, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string& dumpDirectory, const std::string &resourceBaseDir) : isCanceled(isCanceled), iFilePath(iFilePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), toGridRes(toGridRes), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir), iiFile{std::make_unique<netCDF::NcFile>(iFilePath, netCDF::NcFile::read)}, tcInfo(getTCInfo()) {
@@ -160,7 +163,7 @@ void Processor::calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv) {
 
 /// 第一步：找出有台风的日期，记录日期与台风信息
 void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target) {
-    std::cout << "第一步(recognize_typhoon): 导入文件成功，开始识别。" << std::endl;
+    std::cout << "step 1 (recognize_typhoon): successfully read data，start tracking..." << std::endl;
     
     /// 记录前一个时次的台风数目
 //    int TCNum_prevTime = 0;
@@ -343,7 +346,7 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
 
 /// 第二步：跟踪第一步生成的每个时次的气旋，生成真正的气旋对象。
 void Processor::getRealTC() {
-    std::cout << "开始跟踪" << std::endl;
+    std::cout << "start get real TC" << std::endl;
     UtilFunc::modifyMaxDist(iiFile.get(), isWrfoutFile ? "XTIME" : varNames.timeVarName);
     
     /// 当前时次和前一时次是否有气旋

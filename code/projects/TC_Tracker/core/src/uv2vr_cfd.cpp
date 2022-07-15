@@ -10,6 +10,10 @@
 #include <numeric>
 #include <cmath>
 #include <memory>
+// for MS compiler
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846264338327950288
+#endif
 
 /// 使用中央差分法计算相对涡度: rv = dv/dx-du/dy+(u/a)tan(lat)
 /// @param[in] u u风场 (2d array)

@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>E:\University\TC_Tracker\code\projects\TC_Tracker\core\include;D:\netCDF4\netCDF4_C\real\netCDF 4.9.0\include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include</IncludePath>
-    <LibraryPath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\lib\release;$(LibraryPath);D:\netCDF4\netCDF4_C\real\netCDF 4.9.0\lib</LibraryPath>
+    <IncludePath>E:\University\TC_Tracker\code\projects\TC_Tracker\core\include;$(ProjectDir);E:\p_learn\cpp_learn\NCL_func_cxx\include</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>E:\University\TC_Tracker\code\projects\TC_Tracker\core\include;D:\netCDF4\netCDF4_C\real\netCDF 4.9.0\include;E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\include</IncludePath>
-    <LibraryPath>E:\p_learn\CSharpLearn\TC_Tracker\project\lib\ncxx\lib\debug;$(LibraryPath);D:\netCDF4\netCDF4_C\real\netCDF 4.9.0\lib</LibraryPath>
+    <IncludePath>E:\University\TC_Tracker\code\projects\TC_Tracker\core\include;$(ProjectDir);E:\p_learn\cpp_learn\NCL_func_cxx\include</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -112,14 +112,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>buildNCXXLib.lib;netcdf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -130,7 +131,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,15 +141,33 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>buildNCXXLib.lib;netcdf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\dmapgci.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\linint2.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\linmsg_dp.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\rcm2rgrid.h" />
     <ClInclude Include="..\..\core\include\NCFileInfo.h" />
+    <ClInclude Include="..\..\core\include\Processor.h" />
+    <ClInclude Include="..\..\core\include\Utils.h" />
+    <ClInclude Include="..\..\core\include\uv2vr_cfd.h" />
+    <ClInclude Include="..\..\core\include\VortexesDumper.h" />
     <ClInclude Include="Core.h" />
+    <ClInclude Include="TCsP.pb.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\dmapgci.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\linint2.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\linmsg_dp.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\rcm2rgrid.cpp" />
     <ClCompile Include="..\..\core\src\NCFileInfo.cpp" />
+    <ClCompile Include="..\..\core\src\Processor.cpp" />
+    <ClCompile Include="..\..\core\src\Utils.cpp" />
+    <ClCompile Include="..\..\core\src\uv2vr_cfd.cpp" />
+    <ClCompile Include="..\..\core\src\VortexesDumper.cpp" />
+    <ClCompile Include="TCsP.pb.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

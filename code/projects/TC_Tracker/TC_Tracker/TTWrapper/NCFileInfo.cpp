@@ -21,14 +21,13 @@ bool NCFileInfo::checkFileValid(String^% fileValidInfo) {
 
 bool NCFileInfo::checkIsWrfoutFile(String^% exceptionInfo) {
     std::string eInfo = "";
-    bool isWrfoutFile = m_Instance->checkIsWrfoutFile(eInfo);
+    bool isWrfoutFile = m_Instance->checkIfIsWrfoutFile(eInfo);
     exceptionInfo = gcnew String(eInfo.c_str());
     return isWrfoutFile;
 }
 
 List<String^>^ NCFileInfo::getVarsName() {
-    std::vector<std::string> varsName;
-    m_Instance->getVarsName(varsName);
+    auto varsName = m_Instance->getVarsName();
 
     //Debug::WriteLine("varsName::"+varsName);
     //List<String> ^csVarsName = gcnew List<String>;
@@ -42,8 +41,7 @@ List<String^>^ NCFileInfo::getVarsName() {
 }
 
 void NCFileInfo::getVorDimsName(String^ vorVarName, List<String^>^ vorDimList) {
-    std::vector<std::string> vorDimVec;
-    m_Instance->getVorDimsName(string2Char(vorVarName), vorDimVec);
+    auto vorDimVec = m_Instance->getVorDimsName(string2Char(vorVarName));
     for (auto& vorDimName : vorDimVec) {
         vorDimList->Add(gcnew String(vorDimName.c_str()));
     }

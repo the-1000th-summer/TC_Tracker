@@ -16,6 +16,10 @@
 #include <cmath>
 #include "Utils.h"
 #include "multiArray.h"
+// for MS compiler
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846264338327950288
+#endif
 
 namespace TTCore {
 
@@ -85,7 +89,7 @@ std::string UtilFunc::currentDateTime() {
     time_t     now = time(0);
     struct tm  tstruct;
     char       buf[80];
-    tstruct = *localtime(&now);
+    localtime_s(&tstruct, &now);
     
     strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
     return buf;
