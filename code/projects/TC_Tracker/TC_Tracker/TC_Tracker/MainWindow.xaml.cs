@@ -55,10 +55,57 @@ namespace TC_Tracker {
         //    }
         //}
 
-        private string timeVarStr = "";
-        private string latVarStr = "";
-        private string lonVarStr = "";
-        private string vorVarStr = "";
+        private string _timeVarStr = "未指定";
+        public string timeVarStr {
+            get => _timeVarStr;
+            set {
+                _timeVarStr = value;
+                RaisePropertyChanged("latVarStr");
+            }
+        }
+        private string _latVarStr = "未指定";
+        public string latVarStr {
+            get => _latVarStr;
+            set {
+                _latVarStr = value;
+                RaisePropertyChanged("latVarStr");
+            }
+        }
+        private string _lonVarStr = "未指定";
+        public string lonVarStr {
+            get => _lonVarStr;
+            set {
+                _lonVarStr = value;
+                RaisePropertyChanged("lonVarStr");
+            }
+        }
+        private string _vorVarStr = "未指定";
+        public string vorVarStr {
+            get => _vorVarStr;
+            set {
+                _vorVarStr = value;
+                vorLabel.Foreground = string.IsNullOrEmpty(value) ? Brushes.Gray : Brushes.Black;
+                RaisePropertyChanged("vorVarStr");
+            }
+        }
+        private string _uwndVarStr = "未指定";
+        public string uwndVarStr {
+            get => _uwndVarStr;
+            set {
+                _uwndVarStr = value;
+                uwndLabel.Foreground = string.IsNullOrEmpty(value) ? Brushes.Gray : Brushes.Black;
+                RaisePropertyChanged("uwndVarStr");
+            }
+        }
+        private string _vwndVarStr = "未指定";
+        public string vwndVarStr {
+            get => _vwndVarStr;
+            set {
+                _vwndVarStr = value;
+                vwndLabel.Foreground = string.IsNullOrEmpty(value) ? Brushes.Gray : Brushes.Black;
+                RaisePropertyChanged("vwndVarStr");
+            }
+        }
 
         private bool _isNotTracking = true;
         public bool isNotTracking {
@@ -74,14 +121,6 @@ namespace TC_Tracker {
             set {
                 _canStop = value;
                 RaisePropertyChanged("canStop");
-            }
-        }
-        private bool _selectedFile = false;
-        public bool selectedFile {
-            get { return _selectedFile; }
-            set {
-                _selectedFile = value;
-                RaisePropertyChanged("selectedFile");
             }
         }
         private bool _varNameSelected = false;
@@ -117,6 +156,20 @@ namespace TC_Tracker {
             }
         }
 
+        private bool _shouldInterp = false;
+        public bool shouldInterp {
+            get => _shouldInterp;
+            set {
+                _shouldInterp = value;
+                RaisePropertyChanged("shouldInterp");
+            }
+        }
+        public Visibility interpTextBoxVisibility {
+            get {
+                return shouldInterp ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
         private void RaisePropertyChanged(string propertyName) {
             if (PropertyChanged != null) {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
@@ -131,23 +184,40 @@ namespace TC_Tracker {
         public MainWindow() {
             InitializeComponent();
 
-            ncFileTextBox.Text = cSelDir;
             Properties.Settings.Default.isRunning = false;
             Properties.Settings.Default.Save();
 
-
-            
+            PropertyChanged += mainWin_PropertyChanged;
         }
 
         private void browseButton_Click(object sender, RoutedEventArgs e) {
             Console.WriteLine("browse button clicked!");
 
+            var filePath = showFileBrowser();
+            if (filePath == "") { return; }
+
+            cSelDir = filePath;
+            zLvComboBox.IsEnabled = false;
+            showWebBtn.IsEnabled = false;
+
+            if (!checkFileValidAndUpdateUI(filePath)) {
+                interpCheckBox.IsEnabled = false;
+                return;
+            }
+
+            interpCheckBox.IsEnabled = true;
+
+            checkIfIsWrfoutFile();
+        }
+
+        private String showFileBrowser() {
             var dialog = new CommonOpenFileDialog();
 
             var savedSDir = cSelDir;
             dialog.InitialDirectory = string.IsNullOrEmpty(savedSDir) ? "C:\\Users" : savedSDir;
             dialog.RestoreDirectory = true;
             //dialog.IsFolderPicker = true;
+
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
                 trackFinished = false;
                 var filePath = dialog.FileName;
@@ -155,14 +225,10 @@ namespace TC_Tracker {
 
                 ncFileTextBox.Text = filePath;
                 //changeUIAccV(validateDir(dirTextBox.Text));
-                if (!checkFileValidAndUpdateUI(filePath)) {
-                    selectedFile = false;
-                    return;
-                }
-                cSelDir = filePath;
-                selectedFile = true;
-                checkIsWrfoutFile();
+
+                return filePath;
             }
+            return "";
         }
 
         private bool checkFileValidAndUpdateUI(string selectDir) {
@@ -179,11 +245,11 @@ namespace TC_Tracker {
         }
 
         private void notValidUI() {
-            selVarButton.IsEnabled = false;
+            selVarNameBtn.IsEnabled = false;
             setVarNameLabel("未指定", "未指定", "未指定", "未指定");
         }
 
-        private void checkIsWrfoutFile() {
+        private void checkIfIsWrfoutFile() {
             NCFileInfo fileInfo = new NCFileInfo(cSelDir);
             var exceptionInfo = "";
             var isWrfoutFile = fileInfo.checkIsWrfoutFile(ref exceptionInfo);
@@ -194,19 +260,31 @@ namespace TC_Tracker {
                 //timeNameTextBlock.
                 setVarNameLabel("XTIME", "XLAT", "XLONG", "---");
                 handleZLevelDim();
+
+                selVarNameBtn.IsEnabled = false;
+                startTrackingBtn.IsEnabled = true;
+                zLvComboBox.IsEnabled = true;
+
             } else {
                 isNotWrfoutFile = true;
                 zDimLvCanSelect = false;
                 zLvComboBox.SelectedIndex = -1;
                 setVarNameLabel("未指定", "未指定", "未指定", "未指定");
+
+                selVarNameBtn.IsEnabled = true;
             }
         }
 
         private void setVarNameLabel(string timeLabelName, string latLabelName, string lonLabelName, string varNameLabelName) {
-            timeNameTextBlock.Text = timeLabelName;
-            latNameTextBlock.Text = latLabelName;
-            lonNameTextBlock.Text = lonLabelName;
-            vorNameTextBlock.Text = varNameLabelName;
+            timeVarStr = timeLabelName;
+            latVarStr = latLabelName;
+            lonVarStr = lonLabelName;
+            vorVarStr = varNameLabelName;
+            
+        }
+
+        private void setVarName(string allStr) {
+            
         }
 
         /// <summary>
@@ -258,6 +336,12 @@ namespace TC_Tracker {
                     e.Cancel = true;
                     return;
                 }
+            }
+        }
+
+        private void mainWin_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == "shouldInterp") {
+                RaisePropertyChanged("interpTextBoxVisibility");
             }
         }
     }

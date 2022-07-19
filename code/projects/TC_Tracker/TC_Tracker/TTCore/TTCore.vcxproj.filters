@@ -25,15 +25,21 @@
     <Filter Include="Source Files\Calculator\ncl_cxx">
       <UniqueIdentifier>{ea97547c-4a51-43e7-91b6-6f970e9aded7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\TCStruct">
+      <UniqueIdentifier>{4e5a5924-dfe0-4759-b07b-e53f59287b48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TCStruct">
+      <UniqueIdentifier>{c3d5e956-a068-4a2d-856a-473855ec4b36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\3rdPartyLib">
+      <UniqueIdentifier>{8b3b77ee-d9e1-4286-88cb-d890a398df84}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\core\include\NCFileInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TCsP.pb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\core\include\Utils.h">
@@ -60,12 +66,27 @@
     <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\rcm2rgrid.h">
       <Filter>Header Files\Calculator\ncl_cxx</Filter>
     </ClInclude>
+    <ClInclude Include="TCsP.pb.h">
+      <Filter>Header Files\TCStruct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\multiArray.h">
+      <Filter>Header Files\TCStruct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\TC1Time.h">
+      <Filter>Header Files\TCStruct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\TCInfo.h">
+      <Filter>Header Files\TCStruct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\Typhoon.h">
+      <Filter>Header Files\TCStruct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\core\include\json.hpp">
+      <Filter>Header Files\3rdPartyLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\core\src\NCFileInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TCsP.pb.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\core\src\Utils.cpp">
@@ -91,6 +112,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\rcm2rgrid.cpp">
       <Filter>Source Files\Calculator\ncl_cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="TCsP.pb.cc">
+      <Filter>Source Files\TCStruct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\core\src\TC1Time.cpp">
+      <Filter>Source Files\TCStruct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\core\src\Typhoon.cpp">
+      <Filter>Source Files\TCStruct</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

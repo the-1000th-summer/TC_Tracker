@@ -14,27 +14,31 @@
         <Label x:Name="label" Content="工作文件" HorizontalAlignment="Left" Margin="97,60,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="170,60,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="442" Height="25"/>
         <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="644,60,0,0" VerticalAlignment="Top" Height="25" Width="78" Click="browseButton_Click"/>
-        <Button x:Name="selVarButton" Content="选择变量..." HorizontalAlignment="Left" Margin="158,122,0,0" VerticalAlignment="Top" Height="34" Width="72" Click="varSelClicked">
-            <Button.IsEnabled>
-                <MultiBinding Converter="{StaticResource booleanAndConverter}">
-                    <Binding ElementName="mainWin" Path="selectedFile" />
-                    <Binding ElementName="mainWin" Path="isNotTracking" />
-                    <Binding ElementName="mainWin" Path="isNotWrfoutFile" />
-                </MultiBinding>
-            </Button.IsEnabled>
-        </Button>
-        <Label x:Name="label1" Content="时间变量名：" HorizontalAlignment="Left" Margin="106,177,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label1_Copy" Content="纬度变量名：" HorizontalAlignment="Left" Margin="106,207,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label1_Copy1" Content="经度变量名：" HorizontalAlignment="Left" Margin="106,237,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label1_Copy2" Content="涡度变量名：" HorizontalAlignment="Left" Margin="106,267,0,0" VerticalAlignment="Top"/>
-        <TextBlock x:Name="timeNameTextBlock" HorizontalAlignment="Left" Margin="193,182,0,0" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
-        <TextBlock x:Name="latNameTextBlock" HorizontalAlignment="Left" Margin="193,212,0,0" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
-        <TextBlock x:Name="lonNameTextBlock" HorizontalAlignment="Left" Margin="193,242,0,0" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
-        <TextBlock x:Name="vorNameTextBlock" HorizontalAlignment="Left" Margin="193,272,0,0" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
+        <Button x:Name="selVarNameBtn" Content="选择变量..." HorizontalAlignment="Left" Margin="158,122,0,0" VerticalAlignment="Top" Height="34" Width="72" Click="varSelClicked" IsEnabled="False"/>
+        <Label x:Name="label1" Content="时间变量名：" HorizontalAlignment="Right" Margin="0,177,610,0" VerticalAlignment="Top"/>
+        <Label x:Name="label1_Copy" Content="纬度变量名：" HorizontalAlignment="Right" Margin="0,207,610,0" VerticalAlignment="Top"/>
+        <Label x:Name="label1_Copy1" Content="经度变量名：" HorizontalAlignment="Right" Margin="0,237,610,0" VerticalAlignment="Top"/>
+        <Label x:Name="vorLabel" Content="涡度变量名：" HorizontalAlignment="Right" Margin="0,267,610,0" VerticalAlignment="Top"/>
+        <Label x:Name="uwndLabel" Content="u风变量名：" HorizontalAlignment="Right" Margin="0,297,610,0" VerticalAlignment="Top"/>
+        <Label x:Name="vwndLabel" Content="v风变量名：" HorizontalAlignment="Right" Margin="0,327,610,0" VerticalAlignment="Top"/>
+
+        <Label x:Name="timeNameLabel" HorizontalAlignment="Left" Margin="188,177,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=timeVarStr}"/>
+        <Label x:Name="latNameLabel" HorizontalAlignment="Left" Margin="188,207,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=latVarStr}"/>
+        <Label x:Name="lonNameLabel" HorizontalAlignment="Left" Margin="188,237,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=lonVarStr}"/>
+        <Label x:Name="vorNameLabel" HorizontalAlignment="Left" Margin="188,267,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=vorVarStr}"/>
+        <Label x:Name="uwndNameLabel" HorizontalAlignment="Left" Margin="188,297,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=uwndVarStr}"/>
+        <Label x:Name="vwndNameLabel" HorizontalAlignment="Left" Margin="188,327,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=vwndVarStr}"/>
         <Label x:Name="label2" Content="z方向维度名：" HorizontalAlignment="Left" Margin="361,182,0,0" VerticalAlignment="Top"/>
-        <TextBlock x:Name="zLvNameTextBlock" HorizontalAlignment="Left" Margin="449,187,0,0" TextWrapping="Wrap" Text="未指定" VerticalAlignment="Top"/>
+        <Label x:Name="zLvNameTextBlock" Content="未指定" HorizontalAlignment="Left" Margin="449,182,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label3" Content="选取第                    层数据" HorizontalAlignment="Left" Margin="355,210,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="zLvComboBox" HorizontalAlignment="Left" Margin="404,213,0,0" VerticalAlignment="Top" Width="56" Height="20"/>
+        <ComboBox x:Name="zLvComboBox" HorizontalAlignment="Left" Margin="404,213,0,0" VerticalAlignment="Top" Width="56" Height="20" IsEnabled="False"/>
+        <Button x:Name="showWebBtn" Content="查看结果..." HorizontalAlignment="Left" Margin="636,327,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="interpCheckBox" Content="" HorizontalAlignment="Left" Margin="429,378,0,0" VerticalAlignment="Top" IsChecked="{Binding ElementName=mainWin, Path=shouldInterp, Mode=TwoWay}"/>
+        <TextBox x:Name="interpTextBox" HorizontalAlignment="Left" Margin="492,377,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" Visibility="{Binding ElementName=mainWin, Path=interpTextBoxVisibility}"/>
+        <Button x:Name="startTrackingBtn" Content="开始识别" HorizontalAlignment="Left" Margin="449,327,0,0" VerticalAlignment="Top"/>
+
+
+
 
     </Grid>
 </Window>

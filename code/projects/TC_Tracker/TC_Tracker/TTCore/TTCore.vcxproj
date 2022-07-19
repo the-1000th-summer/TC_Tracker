@@ -149,8 +149,13 @@
     <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\linint2.h" />
     <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\linmsg_dp.h" />
     <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\rcm2rgrid.h" />
+    <ClInclude Include="..\..\core\include\json.hpp" />
+    <ClInclude Include="..\..\core\include\multiArray.h" />
     <ClInclude Include="..\..\core\include\NCFileInfo.h" />
     <ClInclude Include="..\..\core\include\Processor.h" />
+    <ClInclude Include="..\..\core\include\TC1Time.h" />
+    <ClInclude Include="..\..\core\include\TCInfo.h" />
+    <ClInclude Include="..\..\core\include\Typhoon.h" />
     <ClInclude Include="..\..\core\include\Utils.h" />
     <ClInclude Include="..\..\core\include\uv2vr_cfd.h" />
     <ClInclude Include="..\..\core\include\VortexesDumper.h" />
@@ -164,6 +169,8 @@
     <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\rcm2rgrid.cpp" />
     <ClCompile Include="..\..\core\src\NCFileInfo.cpp" />
     <ClCompile Include="..\..\core\src\Processor.cpp" />
+    <ClCompile Include="..\..\core\src\TC1Time.cpp" />
+    <ClCompile Include="..\..\core\src\Typhoon.cpp" />
     <ClCompile Include="..\..\core\src\Utils.cpp" />
     <ClCompile Include="..\..\core\src\uv2vr_cfd.cpp" />
     <ClCompile Include="..\..\core\src\VortexesDumper.cpp" />
