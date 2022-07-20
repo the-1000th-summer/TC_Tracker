@@ -172,7 +172,7 @@ namespace TC_Tracker {
 
         private void RaisePropertyChanged(string propertyName) {
             if (PropertyChanged != null) {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 
@@ -284,7 +284,7 @@ namespace TC_Tracker {
         }
 
         private void setVarName(string allStr) {
-            
+            setVarNameLabel(allStr, allStr, allStr, allStr);
         }
 
         /// <summary>
@@ -293,18 +293,17 @@ namespace TC_Tracker {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void varSelClicked(object sender, RoutedEventArgs e) {
-            var varSelView = new VarSelector();
+            var varSelView = new VarSelectWindow();
             varSelView.Owner = this;
             varSelView.ShowDialog();
-            if (!varSelView.selectOK) {
-                varNameSelected = false;
-                return;
-            }
-            timeVarStr = (string)varSelView.comboBox_time.SelectedValue;
-            latVarStr = (string)varSelView.comboBox_lat.SelectedValue;
-            lonVarStr = (string)varSelView.comboBox_lon.SelectedValue;
-            vorVarStr = (string)varSelView.comboBox_vor.SelectedValue;
-            setVarNameLabel(timeVarStr, latVarStr, lonVarStr, vorVarStr);
+            //if (!varSelView.selectOK) {
+            //    varNameSelected = false;
+            //    return;
+            //}
+            //timeVarStr = (string)varSelView.comboBox_time.SelectedValue;
+            //latVarStr = (string)varSelView.comboBox_lat.SelectedValue;
+            //lonVarStr = (string)varSelView.comboBox_lon.SelectedValue;
+            //vorVarStr = (string)varSelView.comboBox_vor.SelectedValue;
             handleZLevelDim();
             varNameSelected = true;
         }

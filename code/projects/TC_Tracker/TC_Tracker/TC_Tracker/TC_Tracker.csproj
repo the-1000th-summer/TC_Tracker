@@ -111,14 +111,28 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="otherWindow\Var2SelectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="otherWindow\VarSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="otherWindow\VarSelectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="otherWindow\Var2SelectWindow.xaml.cs">
+      <DependentUpon>Var2SelectWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="otherWindow\VarSelector.xaml.cs">
       <DependentUpon>VarSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="otherWindow\VarSelectWindow.xaml.cs">
+      <DependentUpon>VarSelectWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

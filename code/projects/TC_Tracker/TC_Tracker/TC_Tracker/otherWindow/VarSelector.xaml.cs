@@ -18,7 +18,7 @@ namespace TC_Tracker.otherWindow {
     /// <summary>
     /// Interaction logic for VarSelector.xaml
     /// </summary>
-    public partial class VarSelector : Window {
+    public partial class VarSelector : Page {
         private string cSelDir {
             get => Properties.Settings.Default.selectDir;
         }
@@ -26,57 +26,63 @@ namespace TC_Tracker.otherWindow {
 
         public VarSelector() {
             InitializeComponent();
+            //ShowsNavigationUI = false;
             NCFileInfo fileInfo = new NCFileInfo(cSelDir);
             //fileInfo.openFile();
             var varsName = fileInfo.getVarsName();
             //aa.Clear();
             if (varsName.Count == 0) {
                 MessageBox.Show("此文件无变量！请检查文件内容。");
-                this.SourceInitialized += new EventHandler(MyForm_CloseOnStart);
+                //this.SourceInitialized += new EventHandler(MyForm_CloseOnStart);
                 return;
             }
             //Debug.WriteLine(aa);
-            comboBox_vor.ItemsSource = varsName;
-            comboBox_vor.SelectedIndex = 0;
+            //comboBox_vor.ItemsSource = varsName;
+            //comboBox_vor.SelectedIndex = 0;
         }
 
         private void nextStepButton_Click(object sender, RoutedEventArgs e) {
-            nextStepButton.IsEnabled = false;
-            button_OK.IsEnabled = true;
-            showComboBoxes();
+            var secondPage = new Var2SelectWindow();
+            NavigationService.Navigate(secondPage);
 
-            List<String> vorDimNames = new List<string>();
-            NCFileInfo fileInfo = new NCFileInfo(cSelDir);
-            fileInfo.getVorDimsName((string)comboBox_vor.SelectedValue, vorDimNames);
+            //    nextStepButton.IsEnabled = false;
+            //    button_OK.IsEnabled = true;
+            //    showComboBoxes();
 
-            comboBox_time.ItemsSource = vorDimNames;
-            comboBox_lat.ItemsSource = vorDimNames;
-            comboBox_lon.ItemsSource = vorDimNames;
-            comboBox_time.SelectedIndex = 0;
-            comboBox_lat.SelectedIndex = vorDimNames.Count - 2;
-            comboBox_lon.SelectedIndex = vorDimNames.Count - 1;
+            //    List<String> vorDimNames = new List<string>();
+            //    NCFileInfo fileInfo = new NCFileInfo(cSelDir);
+            //    fileInfo.getVorDimsName((string)comboBox_vor.SelectedValue, vorDimNames);
+
+            //    comboBox_time.ItemsSource = vorDimNames;
+            //    comboBox_lat.ItemsSource = vorDimNames;
+            //    comboBox_lon.ItemsSource = vorDimNames;
+            //    comboBox_time.SelectedIndex = 0;
+            //    comboBox_lat.SelectedIndex = vorDimNames.Count - 2;
+            //    comboBox_lon.SelectedIndex = vorDimNames.Count - 1;
+
         }
 
-        private void showComboBoxes() {
-            timeLabel.Visibility = Visibility.Visible;
-            latLabel.Visibility = Visibility.Visible;
-            lonLabel.Visibility = Visibility.Visible;
-            comboBox_time.Visibility = Visibility.Visible;
-            comboBox_lat.Visibility = Visibility.Visible;
-            comboBox_lon.Visibility = Visibility.Visible;
-        }
+        //private void showComboBoxes() {
+        //    timeLabel.Visibility = Visibility.Visible;
+        //    latLabel.Visibility = Visibility.Visible;
+        //    lonLabel.Visibility = Visibility.Visible;
+        //    comboBox_time.Visibility = Visibility.Visible;
+        //    comboBox_lat.Visibility = Visibility.Visible;
+        //    comboBox_lon.Visibility = Visibility.Visible;
+        //}
 
         private void MyForm_CloseOnStart(object sender, EventArgs e) {
-            this.Close();
+            //this.Close();
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e) {
             selectOK = true;
-            this.Close();
+            //this.Close();
         }
 
         private void Cancelbutton_Click(object sender, RoutedEventArgs e) {
-            this.Close();
+            Window varSelWindow = (Window)(this.Parent);
+            varSelWindow.Close();
         }
     }
 }
