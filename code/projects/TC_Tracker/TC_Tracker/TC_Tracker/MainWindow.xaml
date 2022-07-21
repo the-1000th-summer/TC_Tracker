@@ -13,7 +13,7 @@
     <Grid>
         <Label x:Name="label" Content="工作文件" HorizontalAlignment="Left" Margin="97,60,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="170,60,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="442" Height="25"/>
-        <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="644,60,0,0" VerticalAlignment="Top" Height="25" Width="78" Click="browseButton_Click"/>
+        <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="644,60,0,0" VerticalAlignment="Top" Height="25" Width="78" Click="browseButtonClicked"/>
         <Button x:Name="selVarNameBtn" Content="选择变量..." HorizontalAlignment="Left" Margin="158,122,0,0" VerticalAlignment="Top" Height="34" Width="72" Click="varSelClicked" IsEnabled="False"/>
         <Label x:Name="label1" Content="时间变量名：" HorizontalAlignment="Right" Margin="0,177,610,0" VerticalAlignment="Top"/>
         <Label x:Name="label1_Copy" Content="纬度变量名：" HorizontalAlignment="Right" Margin="0,207,610,0" VerticalAlignment="Top"/>

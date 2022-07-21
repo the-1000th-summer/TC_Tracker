@@ -18,9 +18,17 @@ namespace TC_Tracker.otherWindow {
     /// Interaction logic for VarSelectWindow.xaml
     /// </summary>
     public partial class VarSelectWindow : NavigationWindow {
+        public delegate void SendName(List<string> name);
+        public event SendName onVarNamesSend;
+
         public VarSelectWindow() {
             InitializeComponent();
             ShowsNavigationUI = false;
+            
+        }
+
+        public void getVarNames(List<string> allVarNames) {
+            onVarNamesSend(allVarNames);
         }
     }
 }

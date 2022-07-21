@@ -26,11 +26,8 @@ namespace TC_Tracker.otherWindow {
 
         public VarSelector() {
             InitializeComponent();
-            //ShowsNavigationUI = false;
             NCFileInfo fileInfo = new NCFileInfo(cSelDir);
-            //fileInfo.openFile();
             var varsName = fileInfo.getVarsName();
-            //aa.Clear();
             if (varsName.Count == 0) {
                 MessageBox.Show("此文件无变量！请检查文件内容。");
                 //this.SourceInitialized += new EventHandler(MyForm_CloseOnStart);
@@ -50,8 +47,8 @@ namespace TC_Tracker.otherWindow {
             //    showComboBoxes();
 
             //    List<String> vorDimNames = new List<string>();
-            //    NCFileInfo fileInfo = new NCFileInfo(cSelDir);
-            //    fileInfo.getVorDimsName((string)comboBox_vor.SelectedValue, vorDimNames);
+            //NCFileInfo fileInfo = new NCFileInfo(cSelDir);
+            //fileInfo.getVorDimsName((string)comboBox_vor.SelectedValue, vorDimNames);
 
             //    comboBox_time.ItemsSource = vorDimNames;
             //    comboBox_lat.ItemsSource = vorDimNames;

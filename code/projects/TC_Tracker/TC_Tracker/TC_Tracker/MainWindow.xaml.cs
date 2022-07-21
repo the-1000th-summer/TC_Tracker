@@ -60,7 +60,7 @@ namespace TC_Tracker {
             get => _timeVarStr;
             set {
                 _timeVarStr = value;
-                RaisePropertyChanged("latVarStr");
+                RaisePropertyChanged(nameof(timeVarStr));
             }
         }
         private string _latVarStr = "未指定";
@@ -68,7 +68,7 @@ namespace TC_Tracker {
             get => _latVarStr;
             set {
                 _latVarStr = value;
-                RaisePropertyChanged("latVarStr");
+                RaisePropertyChanged(nameof(latVarStr));
             }
         }
         private string _lonVarStr = "未指定";
@@ -76,7 +76,7 @@ namespace TC_Tracker {
             get => _lonVarStr;
             set {
                 _lonVarStr = value;
-                RaisePropertyChanged("lonVarStr");
+                RaisePropertyChanged(nameof(lonVarStr));
             }
         }
         private string _vorVarStr = "未指定";
@@ -85,7 +85,7 @@ namespace TC_Tracker {
             set {
                 _vorVarStr = value;
                 vorLabel.Foreground = string.IsNullOrEmpty(value) ? Brushes.Gray : Brushes.Black;
-                RaisePropertyChanged("vorVarStr");
+                RaisePropertyChanged(nameof(vorVarStr));
             }
         }
         private string _uwndVarStr = "未指定";
@@ -94,7 +94,7 @@ namespace TC_Tracker {
             set {
                 _uwndVarStr = value;
                 uwndLabel.Foreground = string.IsNullOrEmpty(value) ? Brushes.Gray : Brushes.Black;
-                RaisePropertyChanged("uwndVarStr");
+                RaisePropertyChanged(nameof(uwndVarStr));
             }
         }
         private string _vwndVarStr = "未指定";
@@ -103,7 +103,7 @@ namespace TC_Tracker {
             set {
                 _vwndVarStr = value;
                 vwndLabel.Foreground = string.IsNullOrEmpty(value) ? Brushes.Gray : Brushes.Black;
-                RaisePropertyChanged("vwndVarStr");
+                RaisePropertyChanged(nameof(vwndVarStr));
             }
         }
 
@@ -121,14 +121,6 @@ namespace TC_Tracker {
             set {
                 _canStop = value;
                 RaisePropertyChanged("canStop");
-            }
-        }
-        private bool _varNameSelected = false;
-        public bool varNameSelected {
-            get { return _varNameSelected; }
-            set {
-                _varNameSelected = value;
-                RaisePropertyChanged("varNameSelected");
             }
         }
         private bool _zDimLvCanSelect = false;
@@ -190,7 +182,7 @@ namespace TC_Tracker {
             PropertyChanged += mainWin_PropertyChanged;
         }
 
-        private void browseButton_Click(object sender, RoutedEventArgs e) {
+        private void browseButtonClicked(object sender, RoutedEventArgs e) {
             Console.WriteLine("browse button clicked!");
 
             var filePath = showFileBrowser();
@@ -246,7 +238,7 @@ namespace TC_Tracker {
 
         private void notValidUI() {
             selVarNameBtn.IsEnabled = false;
-            setVarNameLabel("未指定", "未指定", "未指定", "未指定");
+            setVarName("未指定");
         }
 
         private void checkIfIsWrfoutFile() {
@@ -256,9 +248,8 @@ namespace TC_Tracker {
 
             if (isWrfoutFile) {
                 isNotWrfoutFile = false;
-                varNameSelected = true;
                 //timeNameTextBlock.
-                setVarNameLabel("XTIME", "XLAT", "XLONG", "---");
+                setVarName("XTIME", "XLAT", "XLONG", "", "U", "V");
                 handleZLevelDim();
 
                 selVarNameBtn.IsEnabled = false;
@@ -269,22 +260,23 @@ namespace TC_Tracker {
                 isNotWrfoutFile = true;
                 zDimLvCanSelect = false;
                 zLvComboBox.SelectedIndex = -1;
-                setVarNameLabel("未指定", "未指定", "未指定", "未指定");
+                setVarName("未指定");
 
                 selVarNameBtn.IsEnabled = true;
             }
         }
 
-        private void setVarNameLabel(string timeLabelName, string latLabelName, string lonLabelName, string varNameLabelName) {
-            timeVarStr = timeLabelName;
-            latVarStr = latLabelName;
-            lonVarStr = lonLabelName;
-            vorVarStr = varNameLabelName;
-            
+        private void setVarName(string time, string lat, string lon, string vor, string u, string v) {
+            timeVarStr = time;
+            latVarStr = lat;
+            lonVarStr = lon;
+            vorVarStr = vor;
+            uwndVarStr = u;
+            vwndVarStr = v;
         }
 
         private void setVarName(string allStr) {
-            setVarNameLabel(allStr, allStr, allStr, allStr);
+            setVarName(allStr, allStr, allStr, allStr, allStr, allStr);
         }
 
         /// <summary>
@@ -293,19 +285,19 @@ namespace TC_Tracker {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void varSelClicked(object sender, RoutedEventArgs e) {
-            var varSelView = new VarSelectWindow();
-            varSelView.Owner = this;
-            varSelView.ShowDialog();
-            //if (!varSelView.selectOK) {
-            //    varNameSelected = false;
-            //    return;
-            //}
-            //timeVarStr = (string)varSelView.comboBox_time.SelectedValue;
-            //latVarStr = (string)varSelView.comboBox_lat.SelectedValue;
-            //lonVarStr = (string)varSelView.comboBox_lon.SelectedValue;
-            //vorVarStr = (string)varSelView.comboBox_vor.SelectedValue;
+            var varSelWindow = new VarSelectWindow();
+            varSelWindow.Owner = this;
+            varSelWindow.onVarNamesSend += getVarNames;
+            varSelWindow.ShowDialog();
+
+        }
+
+        private void getVarNames(List<string> varNames) {
+            setVarName(varNames[0], varNames[1], varNames[2], varNames[3], varNames[4], varNames[5]);
+
             handleZLevelDim();
-            varNameSelected = true;
+
+            startTrackingBtn.IsEnabled = true;
         }
 
         private void handleZLevelDim() {

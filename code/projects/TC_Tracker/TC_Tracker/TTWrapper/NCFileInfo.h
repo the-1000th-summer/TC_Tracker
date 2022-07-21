@@ -21,7 +21,7 @@ public:
     bool checkIsWrfoutFile(String^% exceptionInfo);
 
     List<String^>^ getVarsName();
-    void getVorDimsName(String^ vorVarName, List<String^>^ vorDimList);
+    List<String^>^ getVorDimsName(String^ vorVarName);
 
 };
 

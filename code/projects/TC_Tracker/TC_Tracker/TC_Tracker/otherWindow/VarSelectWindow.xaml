@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TC_Tracker.otherWindow"
         mc:Ignorable="d"
-        Title="VarSelectWindow" Height="450" Width="800"
-        Source="VarSelector.xaml">
+        Title="VarSelectWindow" Height="280" Width="430"
+        Source="VarSelectPage1.xaml"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
 </NavigationWindow>

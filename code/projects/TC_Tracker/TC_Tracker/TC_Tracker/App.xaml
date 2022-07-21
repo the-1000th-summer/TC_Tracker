@@ -6,6 +6,7 @@
     <Application.Resources>
         <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <local:BooleanAndConverter x:Key="booleanAndConverter" />
+        <local:BooleanOrConverter x:Key="booleanOrConverter" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <local:PrevPageBtnConverter x:Key="PrevPageBtnConverter"/>
         <local:NextPageBtnConverter x:Key="NextPageBtnConverter"/>

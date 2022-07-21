@@ -5,10 +5,39 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TC_Tracker.otherWindow"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="VarSelectPage1">
+      x:Name="varSelectPg1"
+      d:DesignHeight="250" d:DesignWidth="400"
+      Title="VarSelectPage1"
+      Loaded="pageLoaded">
 
     <Grid>
-        
+        <Grid.Resources>
+            <Style TargetType="{x:Type ComboBox}">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled"
+                 Value="False">
+                        <Setter Property="Foreground"
+                    Value="Gray"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Resources>
+        <RadioButton x:Name="vorRadioButton" Content="涡度变量" HorizontalAlignment="Left" Margin="49,37,0,0" VerticalAlignment="Top"/>
+        <RadioButton x:Name="windRadioButton" Content="风场变量" HorizontalAlignment="Left" Margin="49,90,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="vorNameComboBox" HorizontalAlignment="Left" Margin="234,34,0,0" VerticalAlignment="Top" Width="120" IsEnabled="{Binding ElementName=vorRadioButton, Path=IsChecked}"/>
+        <Label x:Name="label" Content="u方向变量" HorizontalAlignment="Left" Margin="152,83,0,0" VerticalAlignment="Top" IsEnabled="{Binding ElementName=windRadioButton, Path=IsChecked}"/>
+        <Label x:Name="label1" Content="v方向变量" HorizontalAlignment="Left" Margin="153,124,0,0" VerticalAlignment="Top" IsEnabled="{Binding ElementName=windRadioButton, Path=IsChecked}"/>
+        <ComboBox x:Name="uwndNameComboBox" HorizontalAlignment="Left" Margin="234,85,0,0" VerticalAlignment="Top" Width="120" IsEnabled="{Binding ElementName=windRadioButton, Path=IsChecked}"/>
+        <ComboBox x:Name="vwndNamecomboBox" HorizontalAlignment="Left" Margin="234,126,0,0" VerticalAlignment="Top" Width="120" IsEnabled="{Binding ElementName=windRadioButton, Path=IsChecked}"/>
+        <Button x:Name="nextStepBtn" Content="下一步" HorizontalAlignment="Left" Margin="294,184,0,0" VerticalAlignment="Top" Width="60" Click="nextStepBtnClicked">
+            <Button.IsEnabled>
+                <MultiBinding Converter="{StaticResource booleanOrConverter}">
+                    <Binding ElementName="vorRadioButton" Path="IsChecked" />
+                    <Binding ElementName="windRadioButton" Path="IsChecked" />
+                </MultiBinding>
+            </Button.IsEnabled>
+        </Button>
+        <Button x:Name="cancelBtn" Content="取消" HorizontalAlignment="Left" Margin="234,184,0,0" VerticalAlignment="Top" Width="45" Click="cancelBtnClicked"/>
+
     </Grid>
 </Page>

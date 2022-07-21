@@ -119,6 +119,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="otherWindow\VarSelectPage1.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="otherWindow\VarSelectPage2.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="otherWindow\VarSelectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -130,6 +138,12 @@
     </Compile>
     <Compile Include="otherWindow\VarSelector.xaml.cs">
       <DependentUpon>VarSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="otherWindow\VarSelectPage1.xaml.cs">
+      <DependentUpon>VarSelectPage1.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="otherWindow\VarSelectPage2.xaml.cs">
+      <DependentUpon>VarSelectPage2.xaml</DependentUpon>
     </Compile>
     <Compile Include="otherWindow\VarSelectWindow.xaml.cs">
       <DependentUpon>VarSelectWindow.xaml</DependentUpon>
