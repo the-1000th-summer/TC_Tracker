@@ -9,6 +9,14 @@ NCFileInfo::NCFileInfo(String^ filePath) : ManagedObject(new TTCore::NCFileInfo(
 
 }
 
+NCFileInfo::NCFileInfo(String^ filePath, String^ time, String^ lat, String^ lon, String^ vor, String^ u, String^ v, bool dataIsVor) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), VarNames(string2Char(time), string2Char(lat), string2Char(lon), string2Char(vor), string2Char(u), string2Char(v), dataIsVor))) {
+    
+}
+
+NCFileInfo::NCFileInfo(String^ filePath, bool isWrfoutFile, String^ time, String^ lat, String^ lon, String^ vor, String^ u, String^ v, bool dataIsVor, int zLevelIndex, double toGridRes, String^ tempFileDir) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, VarNames(string2Char(time), string2Char(lat), string2Char(lon), string2Char(vor), string2Char(u), string2Char(v), dataIsVor), zLevelIndex, toGridRes, true, 1, string2Char(tempFileDir), "")) {
+    
+}
+
 bool NCFileInfo::checkFileValid(String^% fileValidInfo) {
     m_Instance->checkFileValid();
     std::string unmanaged = m_Instance->fileValidInfo;

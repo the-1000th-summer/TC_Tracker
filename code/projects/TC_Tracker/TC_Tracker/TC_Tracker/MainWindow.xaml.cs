@@ -123,14 +123,6 @@ namespace TC_Tracker {
                 RaisePropertyChanged("canStop");
             }
         }
-        private bool _zDimLvCanSelect = false;
-        public bool zDimLvCanSelect {
-            get { return _zDimLvCanSelect; }
-            set {
-                _zDimLvCanSelect = value;
-                RaisePropertyChanged("zDimLvCanSelect");
-            }
-        }
         private bool _trackFinished = false;
         public bool trackFinished {
             get { return _trackFinished; }
@@ -139,14 +131,14 @@ namespace TC_Tracker {
                 RaisePropertyChanged("trackFinished");
             }
         }
-        private bool _isNotWrfoutFile = true;
-        public bool isNotWrfoutFile {
-            get { return _isNotWrfoutFile; }
-            set {
-                _isNotWrfoutFile = value;
-                RaisePropertyChanged("isNotWrfoutFile");
-            }
-        }
+        private bool isWrfoutFile = false;
+        //public bool isWrfoutFile {
+        //    get { return _isWrfoutFile; }
+        //    set {
+        //        _isWrfoutFile = value;
+        //        RaisePropertyChanged(nameof(isWrfoutFile));
+        //    }
+        //}
 
         private bool _shouldInterp = false;
         public bool shouldInterp {
@@ -167,6 +159,8 @@ namespace TC_Tracker {
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        private int zLvDimLen = 0;
 
         //private BackgroundWorker bgWorker;
         //private List<Typhoon> realTCs = new List<Typhoon>();
@@ -198,6 +192,7 @@ namespace TC_Tracker {
             }
 
             interpCheckBox.IsEnabled = true;
+            zLvNameTextBlock.Content = "";
 
             checkIfIsWrfoutFile();
         }
@@ -244,10 +239,10 @@ namespace TC_Tracker {
         private void checkIfIsWrfoutFile() {
             NCFileInfo fileInfo = new NCFileInfo(cSelDir);
             var exceptionInfo = "";
-            var isWrfoutFile = fileInfo.checkIsWrfoutFile(ref exceptionInfo);
+            isWrfoutFile = fileInfo.checkIsWrfoutFile(ref exceptionInfo);
 
             if (isWrfoutFile) {
-                isNotWrfoutFile = false;
+                
                 //timeNameTextBlock.
                 setVarName("XTIME", "XLAT", "XLONG", "", "U", "V");
                 handleZLevelDim();
@@ -257,8 +252,7 @@ namespace TC_Tracker {
                 zLvComboBox.IsEnabled = true;
 
             } else {
-                isNotWrfoutFile = true;
-                zDimLvCanSelect = false;
+
                 zLvComboBox.SelectedIndex = -1;
                 setVarName("未指定");
 
@@ -301,21 +295,20 @@ namespace TC_Tracker {
         }
 
         private void handleZLevelDim() {
-            //NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, s_TempFileDir);
-            //var zLvDimName = "";
-            //var zLvDimLen = fileInfo.getZLvDimLenName(ref zLvDimName);
+            var zLvDimName = "";
+            zLvDimLen = (new NCFileInfo(cSelDir, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !string.IsNullOrEmpty(vorVarStr))).getZLvDimLenName(ref zLvDimName);
 
-            //if (zLvDimLen == 0) {    // 无z维度
-            //    zLvNameTextBlock.Text = "(无)";
-            //    zLvComboBox.SelectedIndex = -1;
-            //    zDimLvCanSelect = false;
-            //    return;
-            //}
-            //zLvNameTextBlock.Text = zLvDimName;
-            //List<int> zLvIndex = Enumerable.Range(1, zLvDimLen).ToList();
-            //zLvComboBox.ItemsSource = zLvIndex;
-            //zLvComboBox.SelectedIndex = 0;
-            //zDimLvCanSelect = true;
+            zLvComboBox.SelectedIndex = -1;
+
+            if (zLvDimLen == 0) {    // 无z维度
+                zLvNameTextBlock.Content = "(无)";
+                zLvNameTextBlock.IsEnabled = false;
+                return;
+            }
+            zLvComboBox.IsEnabled = true;
+            zLvNameTextBlock.Content = zLvDimName;
+            List<int> zLvIndex = Enumerable.Range(1, zLvDimLen-1).ToList();
+            zLvComboBox.ItemsSource = zLvIndex;
         }
 
 
@@ -334,6 +327,47 @@ namespace TC_Tracker {
             if (e.PropertyName == "shouldInterp") {
                 RaisePropertyChanged("interpTextBoxVisibility");
             }
+        }
+
+        private void startTrackBtnClicked(object sender, RoutedEventArgs e) {
+            if (!checkZLvComboBox()) { return; }
+
+            (var checkPassed, var gridResValue) = checkGridResValue();
+            if (!checkPassed) { return; }
+            selVarNameBtn.IsEnabled = false;
+            startTrackingBtn.IsEnabled = false;
+
+            var tracker = new NCFileInfo(cSelDir, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !string.IsNullOrEmpty(vorVarStr), (zLvDimLen == 0) ? -1 : Int32.Parse(zLvComboBox.SelectedItem.ToString()), gridResValue, "E:\\University\\TC_Tracker\\data\\out");
+
+            var progressWin = new ProgressWindow();
+            progressWin.Owner = this;
+            progressWin.ShowDialog();
+        }
+
+        private bool checkZLvComboBox() {
+            if (zLvDimLen == 0) { return true; }
+            var selectedIndex = zLvComboBox.SelectedIndex;
+            if (selectedIndex == -1) {
+                MessageBox.Show("层数不能为空！");
+                return false;
+            }
+            return true;
+        }
+
+        private Tuple<bool, double> checkGridResValue() {
+            var gridResStr = gridResTextBox.Text;
+
+            if (string.IsNullOrEmpty(gridResStr)) {
+                if (interpCheckBox.IsChecked ?? false) {
+                    MessageBox.Show("格点分辨率不能为空！");
+                    return Tuple.Create(false, 0.0);
+                }
+            }
+            if (double.TryParse(gridResStr, out var gridRes)) {
+                MessageBox.Show("输入的格点分辨率不合法。");
+                return Tuple.Create(false, 0.0);
+            }
+            return Tuple.Create(true, gridRes);
         }
     }
 }

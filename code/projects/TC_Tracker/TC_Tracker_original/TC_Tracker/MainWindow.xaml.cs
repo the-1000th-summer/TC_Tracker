@@ -280,7 +280,6 @@ namespace TC_Tracker {
             var selectedIndex = zLvComboBox.SelectedIndex;
             await Task.Factory.StartNew(() => {
                 // Launching a cancelable operation performed by a managed C++Cli Object :
-
                 Console.WriteLine(selectedIndex);
                 NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, selectedIndex, s_TempFileDir, true);
                 fileInfo.startTracking(realTCs, m_Ct);
