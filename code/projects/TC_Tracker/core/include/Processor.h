@@ -13,6 +13,9 @@
 
 namespace TTCore {
 
+using CppCallBack = void(__stdcall*)(int stepIdx, void*);
+using CppCallBack2 = void(__stdcall*)(double progressValue, void*);
+
 class Processor {
 public:
 //    Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &timeVName="", const std::string & latVName="", const std::string & lonVName="", const std::string & vorVName="", int zLevelIndex = -1, const std::string & dumpDirectory = "");
@@ -83,6 +86,8 @@ private:
     void getLandPolygons();
     bool pnpoly(const std::vector<std::pair<float, float>>& polygon, float testLat, float testLon);
     bool pnpolys(float testLat, float testLon);
+
+    CppCallBack cppCall;
 };
 
 //void to_json(json& j, const TC1Time& r);

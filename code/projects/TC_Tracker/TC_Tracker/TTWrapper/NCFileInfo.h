@@ -10,6 +10,18 @@ using namespace System::Threading;
 
 namespace myCLI {
 
+public delegate void CliCallBack(int pp);
+public delegate void CliCallBack2(double pp);
+
+public ref class Typhoon {
+public:
+    // Typhoon();
+    int serialNo;
+    List<Tuple<float, float>^>^ maxVorCells = gcnew List<Tuple<float, float>^>();
+    List<Tuple<float, float>^>^ geoCenters = gcnew List<Tuple<float, float>^>();
+    int startTimeIndex;
+    int endTimeIndex;
+};
 
 public ref class NCFileInfo : public ManagedObject<TTCore::NCFileInfo> {
 public:
@@ -24,6 +36,8 @@ public:
 
     List<String^>^ getVarsName();
     List<String^>^ getVorDimsName(String^ vorVarName);
+
+    void startTracking(List<Typhoon^>^ realTCs, CancellationToken cancelToken, CliCallBack^ pFun, CliCallBack2^ pFun2);
 
 };
 

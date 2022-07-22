@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TC_Tracker"
         mc:Ignorable="d"
-        Title="ProgressWindow" Height="450" Width="800"
+        Title="ProgressWindow" Height="250" Width="500"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         ResizeMode="NoResize">
     <Grid>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="553,311,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="203,0,0,0" VerticalAlignment="Center"/>
+        <Label x:Name="label" Content="Label" HorizontalAlignment="Left" Margin="266,104,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

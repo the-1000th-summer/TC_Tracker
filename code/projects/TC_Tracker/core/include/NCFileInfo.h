@@ -6,6 +6,7 @@
 
 #include "Typhoon.h"
 #include "TCInfo.h"
+#include "Processor.h"
 
 namespace TTCore {
 

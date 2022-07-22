@@ -339,7 +339,7 @@ namespace TC_Tracker {
 
             var tracker = new NCFileInfo(cSelDir, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !string.IsNullOrEmpty(vorVarStr), (zLvDimLen == 0) ? -1 : Int32.Parse(zLvComboBox.SelectedItem.ToString()), gridResValue, "E:\\University\\TC_Tracker\\data\\out");
 
-            var progressWin = new ProgressWindow();
+            var progressWin = new ProgressWindow(tracker);
             progressWin.Owner = this;
             progressWin.ShowDialog();
         }
