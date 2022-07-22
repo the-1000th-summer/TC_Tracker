@@ -67,13 +67,13 @@ int NCFileInfo::getZLvDimLenName(String^% zLvDimName) {
     return zLvDimLen;
 }
 
-void NCFileInfo::startTracking(List<Typhoon^>^ realTCs, CancellationToken cancelToken, CliCallBack^ pFun, CliCallBack2^ pFun2) {
-    TTCore::CppCallBack cliCall = (TTCore::CppCallBack)Marshal::GetFunctionPointerForDelegate(pFun).ToPointer();
-    TTCore::CppCallBack2 cliCall2 = (TTCore::CppCallBack2)Marshal::GetFunctionPointerForDelegate(pFun2).ToPointer();
+void NCFileInfo::startTracking(List<Typhoon^>^ realTCs, CancellationToken cancelToken, StepPgCallback^ stepPgCallback, ProgressCallback^ progressCallback) {
+    TTCore::CppCallBack stepPgCallbackPt = (TTCore::CppCallBack)Marshal::GetFunctionPointerForDelegate(stepPgCallback).ToPointer();
+    TTCore::CppCallBack2 progressCallbackPt = (TTCore::CppCallBack2)Marshal::GetFunctionPointerForDelegate(progressCallback).ToPointer();
 
     TTCore::TCs tcs;
     bool isCanceled = false;
-    m_Instance->startTracking(tcs, &isCanceled, cliCall, cliCall2, nullptr);
+    m_Instance->startTracking(tcs, &isCanceled, stepPgCallbackPt, progressCallbackPt, nullptr);
 }
 
 

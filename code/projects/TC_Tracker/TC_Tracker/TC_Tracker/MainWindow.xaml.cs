@@ -161,6 +161,7 @@ namespace TC_Tracker {
         }
 
         private int zLvDimLen = 0;
+        private List<Typhoon> realTCs = new List<Typhoon>();
 
         //private BackgroundWorker bgWorker;
         //private List<Typhoon> realTCs = new List<Typhoon>();
@@ -368,6 +369,18 @@ namespace TC_Tracker {
                 return Tuple.Create(false, 0.0);
             }
             return Tuple.Create(true, gridRes);
+        }
+
+        public void setRealTCs(List<Typhoon> tcs) {
+            realTCs = tcs;
+        }
+
+        private void showWebBtnClicked(object sender, RoutedEventArgs e) {
+            var resultView = new ResultWindow();
+            //resultView.tcsData = realTCs.GetRange(0,1);
+            //resultView.tcsData = realTCs;
+            resultView.Owner = this;
+            resultView.ShowDialog();
         }
     }
 }

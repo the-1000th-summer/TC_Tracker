@@ -27,8 +27,6 @@ namespace TC_Tracker {
         private System.Threading.CancellationTokenSource m_Cts;
         private System.Threading.CancellationToken m_Ct;
 
-        private string aa = "label";
-
         public ProgressWindow() {
             InitializeComponent();
         }
@@ -39,6 +37,7 @@ namespace TC_Tracker {
             //    label.Content = label.Content + "!";
             //});
             asyncRun();
+            
         }
 
         private async void asyncRun() {
@@ -46,30 +45,60 @@ namespace TC_Tracker {
             m_Ct = m_Cts.Token;
 
             await Task.Factory.StartNew(() => {
-                tracker.startTracking(realTCs, m_Ct, myCallBack, myCallBack2);
+                tracker.startTracking(realTCs, m_Ct, stepPgCallBack, progressCallBack);
+
+                MainWindow mainW = (MainWindow)Owner;
+                mainW.setRealTCs(realTCs);
+
+                Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => {
+                    mainW.showWebBtn.IsEnabled = true;
+                    Close();
+                }));
             });
         }
 
-        private void myCallBack(int a) {
-            Dispatcher.BeginInvoke(DispatcherPriority.Input, new ThreadStart(() => {
-                label.Content = label.Content + "!";
+        private void stepPgCallBack(int stepIdx) {
+            var labelStr = "";
+            switch (stepIdx) {
+            case 0:
+                labelStr = "读取原始数据...";
+                break;
+            case 1:
+                labelStr = "regridding...";
+                break;
+            case 2:
+                labelStr = "计算涡度中...";
+                break;
+            case 3:
+                labelStr = "获取原始涡旋...";
+                break;
+            case 4:
+                labelStr = "连接涡旋...";
+                break;
+            case 5:
+                labelStr = "去除噪声...";
+                break;
+            default:
+                labelStr = "";
+                break;
+            }
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => {
+                levelIndicator.Value = stepIdx * 20;
+                levelLabel.Content = labelStr;
             }));
-            //label.Content = label.Content + "!";
-            //aa += "!";
-            //progress.Report(aa);
-            Console.Write("In my CallBack: ");
-            Console.WriteLine(a);
         }
 
-        private void myCallBack2(double a) {
-            Dispatcher.BeginInvoke(DispatcherPriority.Input, new ThreadStart(() => {
-                label.Content = label.Content + "!";
+        private void progressCallBack(double progressValue) {
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => {
+                if (progressValue >= 0) {
+                    if (progressBar.IsIndeterminate) {
+                        progressBar.IsIndeterminate = false;
+                    }
+                    progressBar.Value = progressValue;
+                } else if (!progressBar.IsIndeterminate) {
+                    progressBar.IsIndeterminate = true;
+                }
             }));
-            //label.Content = label.Content + "!";
-            //aa += "!";
-            //progress.Report(aa);
-            Console.Write("In my CallBack2: ");
-            Console.WriteLine(a);
         }
 
     }

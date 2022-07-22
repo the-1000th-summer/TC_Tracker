@@ -10,8 +10,8 @@ using namespace System::Threading;
 
 namespace myCLI {
 
-public delegate void CliCallBack(int pp);
-public delegate void CliCallBack2(double pp);
+public delegate void StepPgCallback(int pp);
+public delegate void ProgressCallback(double pp);
 
 public ref class Typhoon {
 public:
@@ -37,7 +37,7 @@ public:
     List<String^>^ getVarsName();
     List<String^>^ getVorDimsName(String^ vorVarName);
 
-    void startTracking(List<Typhoon^>^ realTCs, CancellationToken cancelToken, CliCallBack^ pFun, CliCallBack2^ pFun2);
+    void startTracking(List<Typhoon^>^ realTCs, CancellationToken cancelToken, StepPgCallback^ stepPgCallback, ProgressCallback^ progressCallback);
 
 };
 

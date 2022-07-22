@@ -10,8 +10,10 @@
         WindowStyle="None"
         ResizeMode="NoResize">
     <Grid>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="203,0,0,0" VerticalAlignment="Center"/>
-        <Label x:Name="label" Content="Label" HorizontalAlignment="Left" Margin="266,104,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="cancelBtn" Content="取消" HorizontalAlignment="Left" Margin="398,190,0,0" VerticalAlignment="Top" Width="47"/>
+        <Label x:Name="levelLabel" Content="Label" HorizontalAlignment="Left" Margin="324,37,0,0" VerticalAlignment="Top"/>
+        <ProgressBar Name="progressBar" HorizontalAlignment="Center" Height="26" VerticalAlignment="Top" Width="390" Margin="0,125,0,0" IsIndeterminate="True"/>
+        <ProgressBar Name="levelIndicator" HorizontalAlignment="Left" Height="10" Margin="127,49,0,0" VerticalAlignment="Top" Width="100"/>
 
     </Grid>
 </Window>

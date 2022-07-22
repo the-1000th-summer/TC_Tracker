@@ -1,0 +1,27 @@
+﻿<Window x:Class="TC_Tracker.otherWindow.ResultWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TC_Tracker.otherWindow"
+        mc:Ignorable="d"
+        Title="ResultWindow" Height="450" Width="800"
+        MouseDown="Window_MouseDown">
+    <Grid Name="myGrid">
+        <WebBrowser Name="webBrowser" HorizontalAlignment="Left" VerticalAlignment="Top"  Margin="0,0,-6,-6"/>
+        <Popup Name="myPopup" IsOpen="True" Placement="Center"   AllowsTransparency="True" Width="{Binding ActualWidth,
+                               ElementName=WebBrowser1,
+                               Mode=OneWay}"
+               Height="{Binding ActualHeight, 
+                                ElementName=WebBrowser1,
+                                Mode=OneWay}"  
+               PlacementTarget="{Binding ElementName=WebBrowser1}" >
+            <Button x:Name="exit" HorizontalAlignment="Left" Margin="39,34,0,0" VerticalAlignment="Top" Width="75" Height="71" BorderBrush="{x:Null}" Panel.ZIndex="999">
+            </Button>
+        </Popup>
+        
+        
+        
+
+    </Grid>
+</Window>
