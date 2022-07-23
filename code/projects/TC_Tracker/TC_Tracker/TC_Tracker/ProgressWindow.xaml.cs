@@ -44,7 +44,7 @@ namespace TC_Tracker {
             m_Cts = new System.Threading.CancellationTokenSource();
             m_Ct = m_Cts.Token;
 
-            await Task.Factory.StartNew(() => {
+            await Task.Run(() => {
                 tracker.startTracking(realTCs, m_Ct, stepPgCallBack, progressCallBack);
 
                 Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => {

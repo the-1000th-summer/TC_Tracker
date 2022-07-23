@@ -68,6 +68,9 @@ int NCFileInfo::getZLvDimLenName(String^% zLvDimName) {
 }
 
 void NCFileInfo::startTracking(List<Typhoon^>^ realTCs, CancellationToken cancelToken, StepPgCallback^ stepPgCallback, ProgressCallback^ progressCallback) {
+    GCHandle gch1 = GCHandle::Alloc(stepPgCallback);
+    GCHandle gch2 = GCHandle::Alloc(progressCallback);
+
     TTCore::CppCallBack stepPgCallbackPt = (TTCore::CppCallBack)Marshal::GetFunctionPointerForDelegate(stepPgCallback).ToPointer();
     TTCore::CppCallBack2 progressCallbackPt = (TTCore::CppCallBack2)Marshal::GetFunctionPointerForDelegate(progressCallback).ToPointer();
 
@@ -76,6 +79,9 @@ void NCFileInfo::startTracking(List<Typhoon^>^ realTCs, CancellationToken cancel
     m_Instance->startTracking(tcs, &isCanceled, stepPgCallbackPt, progressCallbackPt, nullptr);
 
     copyToManaged(tcs, realTCs);
+
+    gch1.Free();
+    gch2.Free();
 }
 
 void NCFileInfo::copyToManaged(TTCore::TCs& inTC, List<Typhoon^>^ outTC) {

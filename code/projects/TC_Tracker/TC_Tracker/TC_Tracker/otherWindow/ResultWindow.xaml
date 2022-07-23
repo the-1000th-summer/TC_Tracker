@@ -5,17 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TC_Tracker.otherWindow"
         mc:Ignorable="d"
-        Title="ResultWindow" Height="450" Width="800"
-        MouseDown="Window_MouseDown">
+        Title="ResultWindow" Height="450" Width="800">
     <Grid Name="myGrid">
         <WebBrowser Name="webBrowser" HorizontalAlignment="Left" VerticalAlignment="Top" LoadCompleted="loadCompletedHandler" />
-        <Popup Name="myPopup" IsOpen="True" Placement="Center"   AllowsTransparency="True" Width="{Binding ActualWidth,
-                               ElementName=WebBrowser1,
-                               Mode=OneWay}"
-               Height="{Binding ActualHeight, 
-                                ElementName=WebBrowser1,
-                                Mode=OneWay}"  
-               PlacementTarget="{Binding ElementName=WebBrowser1}" >
+        <Popup Name="myPopup" IsOpen="True" Placement="Center"   AllowsTransparency="True" >
             <Button x:Name="button" Content="Button"/>
         </Popup>
         <Label x:Name="label" Content="Label" HorizontalAlignment="Left" Margin="666,328,0,0" VerticalAlignment="Top"/>
