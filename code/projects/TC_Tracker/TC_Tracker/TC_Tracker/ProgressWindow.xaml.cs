@@ -47,10 +47,10 @@ namespace TC_Tracker {
             await Task.Factory.StartNew(() => {
                 tracker.startTracking(realTCs, m_Ct, stepPgCallBack, progressCallBack);
 
-                MainWindow mainW = (MainWindow)Owner;
-                mainW.setRealTCs(realTCs);
-
                 Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => {
+                    MainWindow mainW = (MainWindow)Owner;
+                    mainW.setRealTCs(realTCs);
+
                     mainW.showWebBtn.IsEnabled = true;
                     Close();
                 }));

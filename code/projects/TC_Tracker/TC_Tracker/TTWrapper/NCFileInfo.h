@@ -38,6 +38,7 @@ public:
     List<String^>^ getVorDimsName(String^ vorVarName);
 
     void startTracking(List<Typhoon^>^ realTCs, CancellationToken cancelToken, StepPgCallback^ stepPgCallback, ProgressCallback^ progressCallback);
+    void copyToManaged(TTCore::TCs& inTC, List<Typhoon^>^ outTC);
 
 };
 

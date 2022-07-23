@@ -376,7 +376,7 @@ namespace TC_Tracker {
         }
 
         private void showWebBtnClicked(object sender, RoutedEventArgs e) {
-            var resultView = new ResultWindow();
+            var resultView = new ResultWindow(realTCs);
             //resultView.tcsData = realTCs.GetRange(0,1);
             //resultView.tcsData = realTCs;
             resultView.Owner = this;

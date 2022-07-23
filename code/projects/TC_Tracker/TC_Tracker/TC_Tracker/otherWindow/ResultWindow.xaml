@@ -8,7 +8,7 @@
         Title="ResultWindow" Height="450" Width="800"
         MouseDown="Window_MouseDown">
     <Grid Name="myGrid">
-        <WebBrowser Name="webBrowser" HorizontalAlignment="Left" VerticalAlignment="Top"  Margin="0,0,-6,-6"/>
+        <WebBrowser Name="webBrowser" HorizontalAlignment="Left" VerticalAlignment="Top" LoadCompleted="loadCompletedHandler" />
         <Popup Name="myPopup" IsOpen="True" Placement="Center"   AllowsTransparency="True" Width="{Binding ActualWidth,
                                ElementName=WebBrowser1,
                                Mode=OneWay}"
@@ -16,12 +16,12 @@
                                 ElementName=WebBrowser1,
                                 Mode=OneWay}"  
                PlacementTarget="{Binding ElementName=WebBrowser1}" >
-            <Button x:Name="exit" HorizontalAlignment="Left" Margin="39,34,0,0" VerticalAlignment="Top" Width="75" Height="71" BorderBrush="{x:Null}" Panel.ZIndex="999">
-            </Button>
+            <Button x:Name="button" Content="Button"/>
         </Popup>
-        
-        
-        
+        <Label x:Name="label" Content="Label" HorizontalAlignment="Left" Margin="666,328,0,0" VerticalAlignment="Top"/>
+
+
+
 
     </Grid>
 </Window>

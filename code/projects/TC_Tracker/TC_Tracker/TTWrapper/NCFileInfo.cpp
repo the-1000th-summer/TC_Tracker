@@ -74,6 +74,29 @@ void NCFileInfo::startTracking(List<Typhoon^>^ realTCs, CancellationToken cancel
     TTCore::TCs tcs;
     bool isCanceled = false;
     m_Instance->startTracking(tcs, &isCanceled, stepPgCallbackPt, progressCallbackPt, nullptr);
+
+    copyToManaged(tcs, realTCs);
+}
+
+void NCFileInfo::copyToManaged(TTCore::TCs& inTC, List<Typhoon^>^ outTC) {
+    auto tcs = inTC.getTcs();
+
+    int tcSize = inTC.size();
+    for (int i = 0; i < tcSize; ++i) {
+        Typhoon^ newTC = gcnew Typhoon();
+        newTC->serialNo = tcs[i].serialNo;
+        newTC->startTimeIndex = tcs[i].startTimeIndex;
+        newTC->endTimeIndex = tcs[i].endTimeIndex;
+        for (const auto& maxVorCell : tcs[i].maxVorCells) {
+            // newTC->maxVorCells->Add(gcnew Tuple<float,float>{latData[maxVorCell.first], lonData[maxVorCell.second]});
+            newTC->maxVorCells->Add(gcnew Tuple<float, float>{maxVorCell.first, maxVorCell.second});
+        }
+        for (const auto& geoCenter : tcs[i].geoCenters) {
+            newTC->geoCenters->Add(gcnew Tuple<float, float>{geoCenter.first, geoCenter.second});
+        }
+
+        outTC->Add(newTC);
+    }
 }
 
 

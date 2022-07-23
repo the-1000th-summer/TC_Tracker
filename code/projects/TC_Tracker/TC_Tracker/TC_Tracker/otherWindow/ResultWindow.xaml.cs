@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using mshtml;
 
 using Newtonsoft.Json;
 using myCLI;
@@ -40,6 +41,7 @@ namespace TC_Tracker.otherWindow {
             }
         }
 
+        private HTMLDocumentEvents2_Event _docEvent;
         public event PropertyChangedEventHandler PropertyChanged;
 
         private List<Typhoon> tcsData;
@@ -55,8 +57,30 @@ namespace TC_Tracker.otherWindow {
             webBrowser.NavigateToStream(System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream("TC_Tracker.path.html"));
         }
 
-        private void Window_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-            //myGrid.Focus();
+        private void loadCompletedHandler(object sender, System.Windows.Navigation.NavigationEventArgs e) {
+            prepareData();
+            webBrowser.InvokeScript("drawBaseMap");
+            draw(1);
+            if (_docEvent != null) {
+                _docEvent.oncontextmenu -= _docEvent_oncontextmenu;
+            }
+            if (webBrowser.Document != null) {
+                _docEvent = (HTMLDocumentEvents2_Event)webBrowser.Document;
+                _docEvent.oncontextmenu += _docEvent_oncontextmenu;
+            }
+        }
+
+        bool _docEvent_oncontextmenu(IHTMLEventObj pEvtObj) {
+            WbShowContextMenu();
+            return false;
+        }
+
+        public void WbShowContextMenu() {
+            ContextMenu cm = FindResource("MnuCustom") as ContextMenu;
+            if (cm == null)
+                return;
+            cm.PlacementTarget = webBrowser;
+            cm.IsOpen = true;
         }
 
         private void prepareData() {
