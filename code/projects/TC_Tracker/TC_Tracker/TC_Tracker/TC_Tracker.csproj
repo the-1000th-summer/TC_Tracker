@@ -122,6 +122,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="otherWindow\TCsJsonWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="otherWindow\Var2SelectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -150,6 +154,9 @@
   <ItemGroup>
     <Compile Include="otherWindow\ResultWindow.xaml.cs">
       <DependentUpon>ResultWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="otherWindow\TCsJsonWindow.xaml.cs">
+      <DependentUpon>TCsJsonWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="otherWindow\Var2SelectWindow.xaml.cs">
       <DependentUpon>Var2SelectWindow.xaml</DependentUpon>

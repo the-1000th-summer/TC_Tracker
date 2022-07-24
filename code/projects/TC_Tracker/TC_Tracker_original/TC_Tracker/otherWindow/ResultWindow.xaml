@@ -16,7 +16,7 @@
     <Grid>
 
         <WebBrowser x:Name="webBrowser" Margin="0,0,135,0" LoadCompleted="loadCompletedHandler"/>
-        <Button x:Name="prevPageBtn" Content="&lt;" HorizontalAlignment="Left" Margin="1141,620,0,0" VerticalAlignment="Top" Width="20" Click="prevPageBtn_Click" Height="20" IsEnabled="{Binding ElementName=resultWin, Path=currentPage, Converter={StaticResource PrevPageBtnConverter}}"/>
+        <Button x:Name="prevPageBtn" Content="&lt;" HorizontalAlignment="Right" Margin="0,0,114,70" VerticalAlignment="Bottom" Width="20" Click="prevPageBtn_Click" Height="20" IsEnabled="{Binding ElementName=resultWin, Path=currentPage, Converter={StaticResource PrevPageBtnConverter}}"/>
         <Button x:Name="nextPageBtn" Content=">" HorizontalAlignment="Left" Margin="1250,620,0,0" VerticalAlignment="Top" Width="20" Height="20" Click="nextPageBtn_Click">
             <Button.IsEnabled>
                 <MultiBinding Converter="{StaticResource NextPageBtnConverter}">

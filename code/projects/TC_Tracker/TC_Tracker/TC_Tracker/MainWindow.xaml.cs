@@ -308,7 +308,8 @@ namespace TC_Tracker {
             }
             zLvComboBox.IsEnabled = true;
             zLvNameTextBlock.Content = zLvDimName;
-            List<int> zLvIndex = Enumerable.Range(1, zLvDimLen-1).ToList();
+            List<int> zLvIndex = Enumerable.Range(0, zLvDimLen).ToList();
+
             zLvComboBox.ItemsSource = zLvIndex;
         }
 
@@ -337,6 +338,7 @@ namespace TC_Tracker {
             if (!checkPassed) { return; }
             selVarNameBtn.IsEnabled = false;
             startTrackingBtn.IsEnabled = false;
+            zLvComboBox.IsEnabled = false;
 
             var tracker = new NCFileInfo(cSelDir, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !string.IsNullOrEmpty(vorVarStr), (zLvDimLen == 0) ? -1 : Int32.Parse(zLvComboBox.SelectedItem.ToString()), gridResValue, "E:\\University\\TC_Tracker\\data\\out");
 
@@ -357,14 +359,13 @@ namespace TC_Tracker {
 
         private Tuple<bool, double> checkGridResValue() {
             var gridResStr = gridResTextBox.Text;
-
             if (string.IsNullOrEmpty(gridResStr)) {
                 if (interpCheckBox.IsChecked ?? false) {
                     MessageBox.Show("格点分辨率不能为空！");
                     return Tuple.Create(false, 0.0);
                 }
             }
-            if (double.TryParse(gridResStr, out var gridRes)) {
+            if (!double.TryParse(gridResStr, out var gridRes)) {
                 MessageBox.Show("输入的格点分辨率不合法。");
                 return Tuple.Create(false, 0.0);
             }
@@ -381,6 +382,16 @@ namespace TC_Tracker {
             //resultView.tcsData = realTCs;
             resultView.Owner = this;
             resultView.ShowDialog();
+        }
+
+        private void gridResTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e) {
+            e.Handled = !double.TryParse(((TextBox)sender).Text + e.Text, out var d_gridRes);
+        }
+
+        private void gridResTextBox_PreviewKeyDown(object sender, KeyEventArgs e) {
+            // Prohibit space in textbox
+            if (e.Key == Key.Space)
+                e.Handled = true;
         }
     }
 }

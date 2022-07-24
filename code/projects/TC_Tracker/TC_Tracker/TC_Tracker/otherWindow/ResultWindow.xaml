@@ -5,14 +5,45 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TC_Tracker.otherWindow"
         mc:Ignorable="d"
-        Title="ResultWindow" Height="450" Width="800">
+        x:Name="resultWin"
+        Title="ResultWindow" Height="600" Width="1024"
+        SizeChanged="windowSizeChanged">
+    <Window.Resources>
+        <ContextMenu x:Key="MnuCustom" StaysOpen="True">
+            <MenuItem Header="导出当前路径..." Click="exClick" IsEnabled="{Binding selectedPathIndex, Source={x:Reference resultWin}, Converter={StaticResource canExportOnePathConverter}}"></MenuItem>
+            <MenuItem Header="Custom 1"></MenuItem>
+        </ContextMenu>
+    </Window.Resources>
     <Grid Name="myGrid">
         <WebBrowser Name="webBrowser" HorizontalAlignment="Left" VerticalAlignment="Top" LoadCompleted="loadCompletedHandler" />
-        <Popup Name="myPopup" IsOpen="True" Placement="Center"   AllowsTransparency="True" >
-            <Button x:Name="button" Content="Button"/>
+        <Popup Name="prevPagePopup" IsOpen="True" AllowsTransparency="True" Width="30"
+               Height="30"  
+               PlacementTarget="{Binding ElementName=fakeBtnLeft}"
+               Placement="Center">
+            <Button Name="prevPageBtn" Content="&lt;" Click="prevPageBtnClicked" IsEnabled="{Binding ElementName=resultWin, Path=currentPage, Converter={StaticResource PrevPageBtnConverter}}"/>
         </Popup>
-        <Label x:Name="label" Content="Label" HorizontalAlignment="Left" Margin="666,328,0,0" VerticalAlignment="Top"/>
-
+        <Popup Name="nextPagePopup" IsOpen="True" AllowsTransparency="True" Width="30"
+               Height="30"  
+               PlacementTarget="{Binding ElementName=fakeBtnRight}"
+               Placement="Center" HorizontalOffset="50">
+            <Button Name="nextPageBtn" Content=">" Click="nextPageBtnClicked">
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{StaticResource NextPageBtnConverter}">
+                        <Binding ElementName="resultWin" Path="currentPage" />
+                        <Binding ElementName="resultWin" Path="pages" />
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>
+        </Popup>
+        <Popup Name="pageLabelPopup" IsOpen="True" AllowsTransparency="True" Width="70"
+               Height="28"  
+               PlacementTarget="{Binding ElementName=fakePageLabel}"
+               Placement="Center" HorizontalOffset="50">
+            <Label Name="pageLabel" Content="{Binding ElementName=resultWin, Path=pageLabelStr}"/>
+        </Popup>
+        <Label x:Name="fakePageLabel" Content="Label" HorizontalAlignment="Right" Margin="0,0,128,52" VerticalAlignment="Bottom" Height="28" Width="58"/>
+        <Button x:Name="fakeBtnLeft" Content="&lt;" HorizontalAlignment="Right" Margin="0,0,169,48" VerticalAlignment="Bottom" Width="30" Height="30"/>
+        <Button x:Name="fakeBtnRight" Content=">" HorizontalAlignment="Right" Margin="0,0,71,48" VerticalAlignment="Bottom" Width="30" Height="30"/>
 
 
 

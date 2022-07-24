@@ -34,7 +34,7 @@
         <ComboBox x:Name="zLvComboBox" HorizontalAlignment="Left" Margin="404,213,0,0" VerticalAlignment="Top" Width="56" Height="20" IsEnabled="False"/>
         <Button x:Name="showWebBtn" Content="查看结果..." HorizontalAlignment="Left" Margin="636,327,0,0" VerticalAlignment="Top" Click="showWebBtnClicked"/>
         <CheckBox x:Name="interpCheckBox" Content="" HorizontalAlignment="Left" Margin="429,378,0,0" VerticalAlignment="Top" IsChecked="{Binding ElementName=mainWin, Path=shouldInterp, Mode=TwoWay}"/>
-        <TextBox x:Name="gridResTextBox" HorizontalAlignment="Left" Margin="492,377,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Visibility="{Binding ElementName=mainWin, Path=interpTextBoxVisibility}"/>
+        <TextBox x:Name="gridResTextBox" HorizontalAlignment="Left" Margin="492,377,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Visibility="{Binding ElementName=mainWin, Path=interpTextBoxVisibility}" PreviewTextInput="gridResTextBox_PreviewTextInput" PreviewKeyDown="gridResTextBox_PreviewKeyDown"/>
         <Button x:Name="startTrackingBtn" Content="开始识别" HorizontalAlignment="Left" Margin="449,327,0,0" VerticalAlignment="Top" Click="startTrackBtnClicked"/>
 
 

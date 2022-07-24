@@ -114,4 +114,14 @@ namespace TC_Tracker {
         }
     }
 
+    public class CanExportOnePathConverter : IValueConverter {
+        public object Convert(object value, Type targetType, object parameter,
+            System.Globalization.CultureInfo culture) {
+            return ((int)value < 0) ? false : true;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            throw new NotSupportedException();
+        }
+    }
+
 }

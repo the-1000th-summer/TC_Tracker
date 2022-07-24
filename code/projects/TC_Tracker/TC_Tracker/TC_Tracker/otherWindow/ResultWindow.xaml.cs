@@ -21,24 +21,36 @@ namespace TC_Tracker.otherWindow {
     /// <summary>
     /// Interaction logic for ResultWindow.xaml
     /// </summary>
-    public partial class ResultWindow : Window {
+    public partial class ResultWindow : Window, INotifyPropertyChanged {
 
         private int _pages = 1;
         public int pages {
-            get { return _pages; }
+            get => _pages;
             set {
                 _pages = value;
-                RaisePropertyChanged("pages");
+                RaisePropertyChanged(nameof(pages));
             }
         }
         private int _currentPage = 1;
         public int currentPage {
-            get { return _currentPage; }
+            get => _currentPage;
             set {
                 _currentPage = value;
                 draw(_currentPage);
-                RaisePropertyChanged("currentPage");
+                RaisePropertyChanged(nameof(currentPage));
             }
+        }
+        private int _selectedPathIndex = -1;
+        public int selectedPathIndex {
+            get => _selectedPathIndex;
+            set {
+                _selectedPathIndex = value;
+                RaisePropertyChanged(nameof(selectedPathIndex));
+            }
+        }
+
+        public string pageLabelStr {
+            get { return string.Format("{0} / {1}", currentPage, pages); }
         }
 
         private HTMLDocumentEvents2_Event _docEvent;
@@ -46,6 +58,7 @@ namespace TC_Tracker.otherWindow {
 
         private List<Typhoon> tcsData;
         private List<List<Dictionary<string, float>>> tcsDataForJS = new List<List<Dictionary<string, float>>>();
+        
 
         public ResultWindow() {
             InitializeComponent();
@@ -53,6 +66,8 @@ namespace TC_Tracker.otherWindow {
 
         public ResultWindow(List<Typhoon> tcsData): this() {
             this.tcsData = tcsData;
+
+            PropertyChanged += resultWin_PropertyChanged;
 
             webBrowser.NavigateToStream(System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream("TC_Tracker.path.html"));
         }
@@ -79,8 +94,16 @@ namespace TC_Tracker.otherWindow {
             ContextMenu cm = FindResource("MnuCustom") as ContextMenu;
             if (cm == null)
                 return;
+            selectedPathIndex = (int)webBrowser.InvokeScript("getTcIndex");
+
             cm.PlacementTarget = webBrowser;
             cm.IsOpen = true;
+        }
+
+        private void resultWin_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == nameof(pages) || e.PropertyName == nameof(currentPage)) {
+                RaisePropertyChanged(nameof(pageLabelStr));
+            }
         }
 
         private void prepareData() {
@@ -113,6 +136,17 @@ namespace TC_Tracker.otherWindow {
             }
         }
 
+        private void exClick(object sender, RoutedEventArgs e) {
+            selectedPathIndex = (int)webBrowser.InvokeScript("getTcIndex");
+            Console.WriteLine("tcindex: {0}", selectedPathIndex);
+            var jsonWindow = new TCsJsonWindow();
+            int tcIndex = (currentPage - 1) * 10 + selectedPathIndex;
+            jsonWindow.jsonTextBox.Text = JsonConvert.SerializeObject(tcsDataForJS[tcIndex]);
+            jsonWindow.Owner = this;
+            jsonWindow.ShowDialog();
+
+        }
+
         private void RaisePropertyChanged(string propertyName) {
             if (PropertyChanged != null) {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
@@ -120,19 +154,45 @@ namespace TC_Tracker.otherWindow {
         }
 
         protected override void OnLocationChanged(EventArgs e) {
-            myPopup.HorizontalOffset += 1;
-            myPopup.HorizontalOffset -= 1;
             base.OnLocationChanged(e);
+            placePopUps();
+        }
+
+        private void windowSizeChanged(object sender, SizeChangedEventArgs e) {
+            placePopUps();
+        }
+
+        private void placePopUps() {
+            prevPagePopup.HorizontalOffset += 1;
+            prevPagePopup.HorizontalOffset -= 1;
+            nextPagePopup.HorizontalOffset += 1;
+            nextPagePopup.HorizontalOffset -= 1;
+            pageLabelPopup.HorizontalOffset += 1;
+            pageLabelPopup.HorizontalOffset -= 1;
         }
 
         protected override void OnDeactivated(EventArgs e) {
             base.OnDeactivated(e);
-            myPopup.IsOpen = false;
+            prevPagePopup.IsOpen = false;
+            nextPagePopup.IsOpen = false;
+            pageLabelPopup.IsOpen = false;
         }
 
         protected override void OnActivated(EventArgs e) {
             base.OnActivated(e);
-            myPopup.IsOpen = true;
+            prevPagePopup.IsOpen = true;
+            nextPagePopup.IsOpen = true;
+            pageLabelPopup.IsOpen = true;
+        }
+
+        private void prevPageBtnClicked(object sender, RoutedEventArgs e) {
+            --currentPage;
+            selectedPathIndex = -1;
+        }
+
+        private void nextPageBtnClicked(object sender, RoutedEventArgs e) {
+            ++currentPage;
+            selectedPathIndex = -1;
         }
     }
 }
