@@ -256,10 +256,10 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             calcRelativeVorField(iiFile.get(), vorField);
         }
     } else {        // not wrfout file
-        if (toGridRes > 0 && shouldRegrid(1.25)) {
+        if (toGridRes > 0 && shouldRegrid(toGridRes)) {
             std::cout << "file should be regrid" << std::endl;
-            auto ref_latData = getRgedLatArr(1.25);
-            auto ref_lonData = getRgedLonArr(1.25);
+            auto ref_latData = getRgedLatArr(toGridRes);
+            auto ref_lonData = getRgedLonArr(toGridRes);
             std::cout << "ref lat data:" << std::endl;
             for (float i : ref_latData) { std::cout << i << " "; }
             std::cout << "\nref lon data:" << std::endl;

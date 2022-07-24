@@ -89,7 +89,9 @@ std::string UtilFunc::currentDateTime() {
     time_t     now = time(0);
     struct tm  tstruct;
     char       buf[80];
-    localtime_s(&tstruct, &now);
+    // clang does not support localtime_s
+    // localtime_s(&tstruct, &now);
+    tstruct = *localtime(&now);
     
     strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
     return buf;
