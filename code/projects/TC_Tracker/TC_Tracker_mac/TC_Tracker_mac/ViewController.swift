@@ -78,14 +78,19 @@ class ViewController: NSViewController, NSComboBoxDataSource {
 
     @IBAction func browseBtnClicked(_ sender: NSButton) {
         let filePath = showFileBrowser()
-        zLvComboBox.isEnabled = false
-        showWebBtn.isEnabled = false
-        interpSwitch.isEnabled = true
         
         guard let filePath = filePath else { return }
-
-        checkFileValid(filePath: filePath)
         
+        zLvComboBox.isEnabled = false
+        showWebBtn.isEnabled = false
+
+        guard checkFileValid(filePath: filePath) else {
+            interpSwitch.isEnabled = false
+            return
+        }
+        
+        interpSwitch.isEnabled = true
+        zVarStr = ""
         checkIfIsWrfoutFile(ncFilePath: filePath)
     }
     
@@ -100,11 +105,12 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     }
     
     @IBAction func startTrackBtnClicked(_ sender: NSButton) {
-        if !checkZLvCombox() { return }
+        if !checkZLvComboBox() { return }
         let (checkPassed, gridResValue) = checkGridResValue()
         if !checkPassed { return }
         selVarNameBtn.isEnabled = false
         startTrackingBtn.isEnabled = false
+        zLvComboBox.isEnabled = false
         
         let tracker = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, gridResValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/")!
         
@@ -125,7 +131,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         self.realTCs = tcs
     }
     
-    private func checkZLvCombox() -> Bool {
+    private func checkZLvComboBox() -> Bool {
         if zLvDimLen == 0 { return true }
         let selectedIndex = zLvComboBox.indexOfSelectedItem
         if selectedIndex == -1 {
@@ -139,15 +145,15 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     }
     
     private func checkGridResValue() -> (Bool, Double) {
+        if interpSwitch.state == .off {
+            return (true, 0)
+        }
         let gridResStr = gridResTextField.stringValue
         if gridResStr.isEmpty {
-            if interpSwitch.state == .on {
-                let alert = NSAlert()
-                alert.messageText = "\(gridResStr): 格点分辨率不能为空。"
-                alert.runModal()
-                return (false, 0)
-            }
-            return (true, 0)
+            let alert = NSAlert()
+            alert.messageText = "\(gridResStr): 格点分辨率不能为空。"
+            alert.runModal()
+            return (false, 0)
         }
         if Double(gridResStr) == nil {
             let alert = NSAlert()
@@ -190,6 +196,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
             zLvComboBox.isEnabled = true
         } else {
             isWrfoutIcon.image = NSImage(systemSymbolName: "multiply.square", accessibilityDescription: nil)
+            zLvComboBox.deselectItem(at: zLvComboBox.indexOfSelectedItem)
             setVarName(allStr: "未指定")
             selVarNameBtn.isEnabled = true
         }
@@ -204,15 +211,10 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         vwndVarStr = v
     }
     private func setVarName(allStr: String) {
-        timeVarStr = allStr
-        latVarStr = allStr
-        lonVarStr = allStr
-        vorVarStr = allStr
-        uwndVarStr = allStr
-        vwndVarStr = allStr
+        setVarName(time: allStr, lat: allStr, lon: allStr, vor: allStr, u: allStr, v: allStr)
     }
     
-    private func checkFileValid(filePath: String) {
+    private func checkFileValid(filePath: String) -> Bool {
         var fileValidInfo: NSString?
         let fileValid = NCFileInfo_Wrapper(ncFilePath: filePath).checkFileValid(&fileValidInfo)
         
@@ -227,19 +229,21 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         } else {
             filePathTextField.stringValue = filePath
         }
+        return fileValid
     }
     
     private func handleZLevelDim() {
         var zLvDimName: NSString?
         zLvDimLen = Int(NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty).getZLvDimLenName(&zLvDimName))
         
+        zLvComboBox.deselectItem(at: zLvComboBox.indexOfSelectedItem)
+        
         if zLvDimLen == 0 {
             zVarStr = "(无)"
             zLvComboBox.isEnabled = false
             return
-        } else {
-            zLvComboBox.isEnabled = true
         }
+        zLvComboBox.isEnabled = true
         zVarStr = zLvDimName as? String ?? ""
         
     }

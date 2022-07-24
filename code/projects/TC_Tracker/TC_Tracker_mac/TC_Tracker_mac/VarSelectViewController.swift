@@ -43,6 +43,7 @@ class VarSelectViewController: NSViewController, NSComboBoxDataSource {
             let alert = NSAlert()
             alert.messageText = "此文件无变量！请检查文件内容"
             alert.runModal()
+            view.window?.close()
         }
     }
     
