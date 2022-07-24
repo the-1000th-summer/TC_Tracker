@@ -33,6 +33,13 @@ namespace TC_Tracker {
                 Properties.Settings.Default.Save();
             }
         }
+        private string jsonFExportDir {
+            get => Properties.Settings.Default.jsonFExportDir;
+            set {
+                Properties.Settings.Default.jsonFExportDir = value;
+                Properties.Settings.Default.Save();
+            }
+        }
         //private string step3FileDir {
         //    get => Properties.Settings.Default.step3FileDir;
         //    set {
@@ -153,6 +160,12 @@ namespace TC_Tracker {
                 return shouldInterp ? Visibility.Visible : Visibility.Collapsed;
             }
         }
+        public string interpLabelStr {
+            get {
+                return shouldInterp ? "插值到格点分辨率：" : "不插值";
+            }
+        }
+
 
         private void RaisePropertyChanged(string propertyName) {
             if (PropertyChanged != null) {
@@ -326,9 +339,11 @@ namespace TC_Tracker {
         }
 
         private void mainWin_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == "shouldInterp") {
-                RaisePropertyChanged("interpTextBoxVisibility");
+            if (e.PropertyName == nameof(shouldInterp)) {
+                RaisePropertyChanged(nameof(interpTextBoxVisibility));
+                RaisePropertyChanged(nameof(interpLabelStr));
             }
+            
         }
 
         private void startTrackBtnClicked(object sender, RoutedEventArgs e) {
@@ -386,13 +401,49 @@ namespace TC_Tracker {
         }
 
         private void gridResTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e) {
-            e.Handled = !double.TryParse(((TextBox)sender).Text + e.Text, out var d_gridRes);
+            if (!(double.TryParse(((TextBox)sender).Text + e.Text, out _))) {
+                e.Handled = true;
+                System.Media.SystemSounds.Asterisk.Play();
+            }
         }
 
         private void gridResTextBox_PreviewKeyDown(object sender, KeyEventArgs e) {
             // Prohibit space in textbox
-            if (e.Key == Key.Space)
+            if (e.Key == Key.Space) {
                 e.Handled = true;
+                System.Media.SystemSounds.Asterisk.Play();
+            }
+        }
+
+        private void exportBtnClicked(object sender, RoutedEventArgs e) {
+            exportFile(false);
+        }
+
+        private void exportFile(bool selStep3FileFirst, string step3FilePath = "") {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.InitialDirectory = string.IsNullOrEmpty(jsonFExportDir) ? "C:\\Users" : jsonFExportDir;
+            dlg.RestoreDirectory = true;
+            dlg.FileName = "Document"; // Default file name
+            dlg.DefaultExt = ".text"; // Default file extension
+            dlg.Filter = "json files|*.json"; // Filter files by extension
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            // Process save file dialog box results
+            if (result == true) {
+                // Save document
+                jsonFExportDir = System.IO.Path.GetDirectoryName(dlg.FileName);
+                string outFilePath = dlg.FileName;
+                Console.WriteLine("filterindex: {0}", dlg.FilterIndex);
+                Console.WriteLine("filePath: {0}", outFilePath);
+
+                //NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", "", s_TempFileDir);
+                //if (selStep3FileFirst) {
+                //    fileInfo.exportFile(step3FilePath, outFilePath);
+                //} else {
+                //    fileInfo.exportFile(outFilePath);
+                //}
+            }
         }
     }
 }

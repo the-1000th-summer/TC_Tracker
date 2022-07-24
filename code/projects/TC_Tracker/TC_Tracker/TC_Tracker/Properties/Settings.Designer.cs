@@ -46,5 +46,17 @@ namespace TC_Tracker.Properties {
                 this["isRunning"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string jsonFExportDir {
+            get {
+                return ((string)(this["jsonFExportDir"]));
+            }
+            set {
+                this["jsonFExportDir"] = value;
+            }
+        }
     }
 }
