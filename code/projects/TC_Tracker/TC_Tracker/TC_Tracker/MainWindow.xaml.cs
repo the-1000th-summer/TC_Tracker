@@ -358,12 +358,13 @@ namespace TC_Tracker {
         }
 
         private Tuple<bool, double> checkGridResValue() {
+            if (!(interpCheckBox.IsChecked ?? false)) {
+                return Tuple.Create(true, 0.0);
+            }
             var gridResStr = gridResTextBox.Text;
             if (string.IsNullOrEmpty(gridResStr)) {
-                if (interpCheckBox.IsChecked ?? false) {
-                    MessageBox.Show("格点分辨率不能为空！");
-                    return Tuple.Create(false, 0.0);
-                }
+                MessageBox.Show("格点分辨率不能为空！");
+                return Tuple.Create(false, 0.0);
             }
             if (!double.TryParse(gridResStr, out var gridRes)) {
                 MessageBox.Show("输入的格点分辨率不合法。");
