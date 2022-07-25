@@ -34,7 +34,7 @@ class ProgressViewController: NSViewController {
         let observer = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
         
         dispatchQueue.async {
-            let realTCs = tracker.startTracking(stepPgCallback: { (stepIdx, observer) in
+            let tcs = tracker.startTracking(stepPgCallback: { (stepIdx, observer) in
                 let mySelf = Unmanaged<ProgressViewController>.fromOpaque(observer!).takeUnretainedValue()
                 DispatchQueue.main.async {
                     mySelf.levelIndicator.intValue = stepIdx
@@ -72,9 +72,9 @@ class ProgressViewController: NSViewController {
                     }
                     
                 }
-            }, withTarget: observer).compactMap { $0 as? Typhoon }
+            }, withTarget: observer)!//.tcs.compactMap { $0 as? Typhoon }
             
-            mainVC.setRealTCs(tcs: realTCs)
+            mainVC.setTCs(tcs: tcs)
             
             DispatchQueue.main.async {
                 mainVC.showWebBtn.isEnabled = true

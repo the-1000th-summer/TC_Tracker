@@ -56,7 +56,8 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     private var theVarStr: String {
         vorVarStr.isEmpty ? uwndVarStr : vorVarStr
     }
-    private var realTCs: [Typhoon] = []
+//    private var realTCs: [Typhoon] = []
+    private var tcs: TCs?
     
     
     override func viewDidLoad() {
@@ -124,7 +125,9 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     
     @IBAction func showWebBtnClicked(_ sender: NSButton) {
         guard let resultVC = storyboard?.instantiateController(withIdentifier: "ResultView") as? ResultViewController else { return }
-        resultVC.tcsData = realTCs
+        guard let tcs = tcs else { return }
+//        resultVC.tcsData = realTCs
+        resultVC.tcsData = tcs.tcs.compactMap { $0 as? Typhoon }
         presentAsModalWindow(resultVC)
     }
     
@@ -140,13 +143,14 @@ class ViewController: NSViewController, NSComboBoxDataSource {
             let alert = NSAlert()
             alert.messageText = "The file is not vaild!"
             alert.runModal()
-//            presentError(<#T##error: Error##Error#>, modalFor: <#T##NSWindow#>, delegate: <#T##Any?#>, didPresent: <#T##Selector?#>, contextInfo: <#T##UnsafeMutableRawPointer?#>)
+
         }
     }
     
     
-    public func setRealTCs(tcs: [Typhoon]) {
-        self.realTCs = tcs
+    public func setTCs(tcs: TCs) {
+//        self.realTCs = tcs
+        self.tcs = tcs
     }
     
     private func checkZLvComboBox() -> Bool {

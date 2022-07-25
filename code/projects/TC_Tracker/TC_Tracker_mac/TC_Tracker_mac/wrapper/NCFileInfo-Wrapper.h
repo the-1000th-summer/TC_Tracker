@@ -35,8 +35,28 @@
 @property (nonatomic, readwrite) int startTimeIndex;
 @property (nonatomic, readwrite) int endTimeIndex;
 
-
 //- (id) initWithSerialNo:(int)serialNo :(NSMutableArray<LatLon *>*)maxVorCells;
+
+@end
+
+@interface TCInfo : NSObject
+
+@property (nonatomic, readwrite) NSString *timeUnits;
+@property (nonatomic, readwrite) bool time_noleap;
+@property (nonatomic, readwrite) double timeInterval;
+/// 文件中time variable第一个数据的值
+@property (nonatomic, readwrite) double firstTValue;
+
+- (id)initWithTimeUnits:(NSString *)timeUnits time_noleap:(bool)time_noleap timeInterval:(double)timeInterval firstTValue:(double)firstTValue;
+
+@end
+
+@interface TCs: NSObject
+
+@property (nonatomic, readwrite) NSMutableArray<Typhoon *>* tcs;
+@property (nonatomic, readwrite) TCInfo* tcInfo;
+
+- (id)initWithRealTCs:(NSMutableArray<Typhoon *>*)tcs tcInfo:(TCInfo*)tcInfo;
 
 @end
 
@@ -55,7 +75,7 @@
 - (bool)checkIfIsWrfoutFile:(NSString **)exceptionInfo;
 - (int)getZLvDimLenName:(NSString **)zLvDimName;
 
-- (NSMutableArray<Typhoon *>*)startTrackingWithStepPgCallback : (void(*)(int stepIdx, void*))stepPgCallback andWith :(void(*)(double progressValue, void*)) progressCallback withTarget: (void*) target;
+- (TCs*)startTrackingWithStepPgCallback : (void(*)(int stepIdx, void*))stepPgCallback andWith :(void(*)(double progressValue, void*)) progressCallback withTarget: (void*) target;
 
 
 //- (void)exportFile_nc

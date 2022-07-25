@@ -10,6 +10,8 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <iostream>
 
+namespace TTCore {
+
 /// 存储台风的总体信息
 class TCInfo {
 public:
@@ -48,6 +50,8 @@ private:
         ar & firstTValue;
     }
 };
+
+}
 
 /// 存储输入nc文件的变量名字
 class VarNames {

@@ -58,12 +58,40 @@
 
 @end
 
+@implementation TCInfo
+
+- (id)initWithTimeUnits:(NSString *)timeUnits time_noleap:(bool)time_noleap timeInterval:(double)timeInterval firstTValue:(double)firstTValue {
+    self = [super init];
+    if (self) {
+        self.timeUnits = timeUnits;
+        self.time_noleap = time_noleap;
+        self.timeInterval = timeInterval;
+        self.firstTValue = firstTValue;
+    }
+    return self;
+}
+
+@end
+
+@implementation TCs
+
+- (id)initWithRealTCs:(NSMutableArray<Typhoon *>*)tcs tcInfo:(TCInfo*)tcInfo {
+    self = [super init];
+    if (self) {
+        self.tcs = tcs;
+        self.tcInfo = tcInfo;
+    }
+    return self;
+}
+
+@end
+
 @interface NCFileInfo_Wrapper() {
     TTCore::NCFileInfo *m_instance;
 }
 
 
-- (void)copyToMangaged:(TTCore::TCs&)inTC :(NSMutableArray<Typhoon *>*) outTC;
+- (TCs*)copyToMangaged:(TTCore::TCs&)inTC;
 @end
 
 @implementation NCFileInfo_Wrapper
@@ -163,22 +191,23 @@
     return zLvDimLen;
 }
 
-- (NSMutableArray<Typhoon *>*)startTrackingWithStepPgCallback : (void(*)(int stepIdx, void*))stepPgCallback andWith :(void(*)(double progressValue, void*)) progressCallback withTarget: (void*) target {
+- (TCs*)startTrackingWithStepPgCallback : (void(*)(int stepIdx, void*))stepPgCallback andWith :(void(*)(double progressValue, void*)) progressCallback withTarget: (void*) target {
     TTCore::TCs tcs;
     bool isCanceled = false;
     m_instance->startTracking(tcs, &isCanceled, stepPgCallback, progressCallback, target);
     
     std::cout << "unmanaged TC number: " << tcs.size() << std::endl;
     
-    NSMutableArray<Typhoon *> *outTC = [NSMutableArray new];
-    [self copyToMangaged:tcs :outTC];
-    return outTC;
+//    NSMutableArray<Typhoon *> *outTC = [NSMutableArray new];
+//    [self copyToMangaged:tcs];
+    return [self copyToMangaged:tcs];
     
 }
 
-- (void)copyToMangaged:(TTCore::TCs&)inTC:(NSMutableArray<Typhoon *>*) outTC {
+- (TCs*)copyToMangaged:(TTCore::TCs&)inTC {
     auto tcs = inTC.getTcs();
     int tcSize = inTC.size();
+    NSMutableArray<Typhoon *> *outTC = [NSMutableArray new];
     
     for (int i = 0; i < tcSize; ++i) {
         NSMutableArray<YXIndex *> *maxVorCells = [NSMutableArray new];
@@ -199,6 +228,11 @@
         
         [outTC addObject:newTC];
     }
+    
+    TCInfo *newTCInfo = [[TCInfo alloc] initWithTimeUnits:[NSString stringWithUTF8String:inTC.getTimeUnits().c_str()] time_noleap:inTC.getTcInfo().getTime_noleap() timeInterval:inTC.getTimeInterval() firstTValue:inTC.getTcInfo().getFirstTValue()];
+    
+    return [[TCs alloc] initWithRealTCs:outTC tcInfo:newTCInfo];
+    
 }
 
 @end
