@@ -58,6 +58,8 @@
 - (NSMutableArray<Typhoon *>*)startTrackingWithStepPgCallback : (void(*)(int stepIdx, void*))stepPgCallback andWith :(void(*)(double progressValue, void*)) progressCallback withTarget: (void*) target;
 
 
+//- (void)exportFile_nc
+
 @end
 
 #endif /* NCFileInfo_Wrapper_h */

@@ -23,7 +23,7 @@ public:
     bool isFileValid = false;
     std::string fileValidInfo;
     
-
+    NCFileInfo();
     NCFileInfo(const char* filePath);
     NCFileInfo(const char* filePath, const VarNames &varNames);
     NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, bool noTempFiles, int threadNum, const char *dumpDirectory, const char *resourceBaseDir);
@@ -36,6 +36,8 @@ public:
     std::vector<std::string> getVorDimsName(const std::string& vorVarName);
     
     void startTracking(TCs &tcs, bool* isCanceled, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target);
+    
+    void exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand);
     
 private:
     std::string resourceBaseDir;

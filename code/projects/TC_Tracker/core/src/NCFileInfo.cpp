@@ -18,7 +18,7 @@
 
 namespace TTCore {
 
-
+NCFileInfo::NCFileInfo() {}
 NCFileInfo::NCFileInfo(const char* filePath) : ncFilePath(filePath) {}
 NCFileInfo::NCFileInfo(const char* filePath, const VarNames &varNames) : ncFilePath(filePath), varNames(varNames) {}
 NCFileInfo::NCFileInfo(const char *filePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, bool noTempFiles, int threadNum, const char *dumpDirectory, const char *resourceBaseDir) : ncFilePath(filePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), toGridRes(toGridRes), noTempFiles(noTempFiles), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir) {}
@@ -126,6 +126,77 @@ void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled, void(*stepPgCallback)
     
     if (!isWrfoutFile)
         p.copyLatLonData(lat_data, lon_data);
+}
+
+/// 将结果输出为netCDF文件（标准：CF Convention）
+void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand) {
+    netCDF::NcFile outFile(oNcFilePath, netCDF::NcFile::replace);
+    /// 每个台风的生命长度
+    std::vector<int> tcsAge{};
+    std::transform(tcs.cbegin(), tcs.cend(), std::back_inserter(tcsAge), [](const Typhoon& tc){return tc.maxVorCells.size();});
+    double intpart;          // (无用变量)
+    double hourInterval = tcs.getTcInfo().getHourInterval();
+    assert(std::modf(hourInterval, &intpart) == 0.0);
+    double firstTValue = tcs.getTcInfo().getFirstTValue();
+    // 创建维度
+    auto stormDimSize = tcs.size();
+    auto timeDimSize = *std::max_element(std::begin(tcsAge), std::end(tcsAge));
+    auto stormDim = outFile.addDim("storm", stormDimSize);
+    auto timeDim = outFile.addDim("date_time", timeDimSize);
+    
+    // 创建变量
+    auto timeVar = outFile.addVar("time", netCDF::NcType::nc_DOUBLE, {stormDim, timeDim});
+    auto latVar = outFile.addVar("lat", netCDF::NcType::nc_FLOAT, {stormDim, timeDim});
+    auto lonVar = outFile.addVar("lon", netCDF::NcType::nc_FLOAT, {stormDim, timeDim});
+    auto serialNoVar = outFile.addVar("serialNo", netCDF::NcType::nc_SHORT, {stormDim, timeDim});
+    
+    // 准备数据
+    auto timeData = std::make_unique<float[]>(stormDimSize * timeDimSize);
+    auto latData = std::make_unique<float[]>(stormDimSize * timeDimSize);
+    auto lonData = std::make_unique<float[]>(stormDimSize * timeDimSize);
+    auto serialNoData = std::make_unique<short[]>(stormDimSize * timeDimSize);
+    
+    size_t tc_i = 0;
+    for (auto const &tc : tcs.getTcs()) {
+//        std::iota(timeData.get()+timeDimSize*tc_i, timeData.get()+timeDimSize*tc_i+tc.geoCenters.size(), tc.startTimeIndex);
+        double startTI = firstTValue+hourInterval*tc.startTimeIndex - hourInterval;
+        std::generate(timeData.get()+timeDimSize*tc_i, timeData.get()+timeDimSize*tc_i+tc.geoCenters.size(), [&startTI, hourInterval]{ return startTI+=hourInterval; });
+        std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), latData.get()+timeDimSize*tc_i, [](const std::pair<float, float> &geoCenter){return geoCenter.first;});
+        std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), lonData.get()+timeDimSize*tc_i, [](const std::pair<float, float> &geoCenter){return geoCenter.second;});
+        std::fill(serialNoData.get()+timeDimSize*tc_i, serialNoData.get()+timeDimSize*tc_i+tc.geoCenters.size(), tc.serialNo);
+        // 输入_FillValue
+        std::fill(timeData.get()+timeDimSize*tc_i+tc.geoCenters.size(), timeData.get()+timeDimSize*(tc_i+1), -9999000.0);
+        std::fill(latData.get()+timeDimSize*tc_i+tc.geoCenters.size(), latData.get()+timeDimSize*(tc_i+1), -9999.0);
+        std::fill(lonData.get()+timeDimSize*tc_i+tc.geoCenters.size(), lonData.get()+timeDimSize*(tc_i+1), -9999.0);
+        std::fill(serialNoData.get()+timeDimSize*tc_i+tc.geoCenters.size(), serialNoData.get()+timeDimSize*(tc_i+1), -9999);
+        ++tc_i;
+    }
+    
+    // 写入变量属性
+    timeVar.putAtt("units", tcs.getTimeUnits());
+    latVar.putAtt("units", "degrees_north");
+    lonVar.putAtt("units", "degrees_east");
+    if (tcs.getTcInfo().getTime_noleap()) {
+        timeVar.putAtt("calendar", "noleap");
+    }
+    
+    serialNoVar.putAtt("coordinates", "time lon lat");
+    timeVar.putAtt("_FillValue", netCDF::NcType::nc_DOUBLE, -9999000.0);
+    latVar.putAtt("_FillValue", netCDF::NcType::nc_FLOAT, -9999.0);
+    lonVar.putAtt("_FillValue", netCDF::NcType::nc_FLOAT, -9999.0);
+    serialNoVar.putAtt("_FillValue", netCDF::NcType::nc_SHORT, -9999);
+    // 写入全局属性
+    UtilFunc::appendHistoryInfo(outFile, fullCommand);
+    outFile.putAtt("featureType", "trajectory");
+    UtilFunc::appendThresholdInfo(outFile);
+    // 写入数据
+    timeVar.putVar(timeData.get());
+    latVar.putVar(latData.get());
+    lonVar.putVar(lonData.get());
+    serialNoVar.putVar(serialNoData.get());
+    
+    outFile.close();
+    
 }
 
 }

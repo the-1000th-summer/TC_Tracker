@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import UniformTypeIdentifiers
 
 class ViewController: NSViewController, NSComboBoxDataSource {
 
@@ -20,6 +21,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBOutlet var showWebBtn: NSButton!
     @IBOutlet var gridResTextField: NSTextField!
     @IBOutlet var interpSwitch: NSSwitch!
+    @IBOutlet var exportBtn: NSButton!
     
     @objc private dynamic var timeVarStr = "未指定"
     @objc private dynamic var latVarStr = "未指定"
@@ -124,6 +126,22 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         guard let resultVC = storyboard?.instantiateController(withIdentifier: "ResultView") as? ResultViewController else { return }
         resultVC.tcsData = realTCs
         presentAsModalWindow(resultVC)
+    }
+    
+    @IBAction func exportBtnClicked(_ sender: NSButton) {
+        let savePanel = NSSavePanel()
+        savePanel.allowedContentTypes = [.png, .pdf]
+        savePanel.allowsOtherFileTypes = false
+        savePanel.message = "asssss"
+        savePanel.prompt = "aaa"
+        savePanel.nameFieldLabel = "dddd"
+        if (savePanel.runModal() == NSApplication.ModalResponse.OK) {
+//            savePanel.typ
+            let alert = NSAlert()
+            alert.messageText = "The file is not vaild!"
+            alert.runModal()
+//            presentError(<#T##error: Error##Error#>, modalFor: <#T##NSWindow#>, delegate: <#T##Any?#>, didPresent: <#T##Selector?#>, contextInfo: <#T##UnsafeMutableRawPointer?#>)
+        }
     }
     
     

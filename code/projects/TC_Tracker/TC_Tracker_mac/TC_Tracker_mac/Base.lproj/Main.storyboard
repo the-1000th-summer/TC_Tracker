@@ -954,7 +954,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8I4-Um-Gsf">
-                                <rect key="frame" x="467" y="23" width="99" height="32"/>
+                                <rect key="frame" x="422" y="23" width="99" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="查看结果..." bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="K6C-Ra-yAX">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1007,6 +1007,17 @@
                                     <binding destination="XfG-lQ-9wD" name="value" keyPath="shouldInterp" id="bla-7h-OdC"/>
                                 </connections>
                             </switch>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZWB-1i-TnZ">
+                                <rect key="frame" x="522" y="23" width="126" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="导出全部结果..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="B0Y-5c-Ekf">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="exportBtnClicked:" target="XfG-lQ-9wD" id="PqN-Aq-4fR"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="dsX-xA-N1O" firstAttribute="leading" secondItem="eSB-VF-VHn" secondAttribute="trailing" constant="132" id="Lza-uv-wtC"/>
@@ -1018,6 +1029,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="exportBtn" destination="ZWB-1i-TnZ" id="T0d-am-TrM"/>
                         <outlet property="filePathTextField" destination="18R-nb-mD0" id="YEO-Tm-QOm"/>
                         <outlet property="gridResTextField" destination="dsX-xA-N1O" id="2j3-dl-Lz9"/>
                         <outlet property="interpSwitch" destination="eSB-VF-VHn" id="7xD-Ka-lcj"/>
