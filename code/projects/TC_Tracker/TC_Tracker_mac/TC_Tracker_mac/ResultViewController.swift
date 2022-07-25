@@ -8,11 +8,12 @@
 import Cocoa
 import WebKit
 
-class ResultViewController: NSViewController {
+class ResultViewController: NSViewController, MyContextMenuDelegate {
 
-    @IBOutlet var webView: WKWebView!
+    @IBOutlet var webView: MyWebView!
     @IBOutlet var nextPageBtn: NSButton!
     
+    @objc private dynamic var selectedPathIndex = -1
     @objc private dynamic var pages: Int = 1
     @objc private dynamic var currentPage: Int = 1 {
         didSet {
@@ -32,6 +33,7 @@ class ResultViewController: NSViewController {
     public var tcsData: [Typhoon] = []
     private var tcsDataForJS: [[[String: Float]]] = []
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -49,6 +51,7 @@ class ResultViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
         prepareData()
+        
     }
     
     override func viewDidAppear() {
@@ -56,6 +59,7 @@ class ResultViewController: NSViewController {
         
         view.window?.styleMask.remove(.resizable)
         
+        webView.contextMenuDelegate = self
         
         print("did appert")
 //        webView.evaluateJavaScript("changeBackgroundColor('red')") { (result, error) in
@@ -63,11 +67,46 @@ class ResultViewController: NSViewController {
 //        }
     }
     
+    func exportCurrentPathClicked() {
+        let tcIndex = (currentPage - 1) * 10 + selectedPathIndex
+        let jsonEncoder = JSONEncoder()
+        let jsonData = try! jsonEncoder.encode(Array(tcsDataForJS[tcIndex]))
+        let jsonStr = String(data: jsonData, encoding: String.Encoding.utf8)!
+        
+        guard let tcsJsonVC = storyboard?.instantiateController(withIdentifier: "TCsJsonVC") as? TCsJsonViewController else { return }
+        tcsJsonVC.setTextViewText(jsonStr)
+        presentAsModalWindow(tcsJsonVC)
+    }
+    
+    func checkIfShouldEnableExp() -> Bool {
+        getSelectedPathIndex()
+        return selectedPathIndex >= 0
+    }
+    
+    private func getSelectedPathIndex() {
+        var waiting = true
+        webView.evaluateJavaScript("getTcIndex()") { (result, error) in
+            if let error = error {
+                self.raiseAlert(msgText: "Javascript Error", infoText: error.localizedDescription)
+                waiting = false
+                return
+            }
+            if let result = result as? Int { self.selectedPathIndex = result }
+            waiting = false
+        }
+        
+        while waiting {
+            RunLoop.current.acceptInput(forMode: RunLoop.Mode.default, before: Date.distantFuture)
+        }
+    }
+    
     @IBAction func prevPageBtnClicked(_ sender: NSButton) {
         currentPage -= 1
+        selectedPathIndex = -1
     }
     @IBAction func nextPageBtnClicked(_ sender: NSButton) {
         currentPage += 1
+        selectedPathIndex = -1
     }
     
     
@@ -124,6 +163,32 @@ class ResultViewController: NSViewController {
         }
     }
     
+
+}
+
+
+class MyWebView: WKWebView {
+    var contextMenuDelegate: MyContextMenuDelegate?
+    
+    override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
+        // 需要subclass, 因为在点右键之前menu是不存在的(nil), 无法更改menu的内容
+        super.willOpenMenu(menu, with: event)
+        
+        menu.items.removeFirst()      // remove Reload action
+        
+        menu.items.append(NSMenuItem(title: "导出当前路径...", action: #selector(exportCurrentPathClicked(_:)), keyEquivalent: ""))
+        menu.items.last?.isEnabled = contextMenuDelegate?.checkIfShouldEnableExp() ?? false
+        
+    }
+    
+    @objc private func exportCurrentPathClicked(_ sender: AnyObject) {
+        contextMenuDelegate?.exportCurrentPathClicked()
+    }
+}
+
+protocol MyContextMenuDelegate {
+    func exportCurrentPathClicked()
+    func checkIfShouldEnableExp() -> Bool
 }
 
 extension ResultViewController: WKNavigationDelegate {

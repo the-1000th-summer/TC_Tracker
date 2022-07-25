@@ -44,7 +44,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @objc private dynamic var shouldNotInterp: Bool {
         return !shouldInterp
     }
-    @objc private dynamic var interpLabel: String {
+    @objc private dynamic var interpLabelStr: String {
         shouldInterp ? "插值到格点分辨率：" : "不插值"
     }
     
@@ -123,7 +123,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBAction func showWebBtnClicked(_ sender: NSButton) {
         guard let resultVC = storyboard?.instantiateController(withIdentifier: "ResultView") as? ResultViewController else { return }
         resultVC.tcsData = realTCs
-        presentAsModalWindow(resultVC);
+        presentAsModalWindow(resultVC)
     }
     
     
@@ -284,7 +284,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         switch key {
         case "shouldNotInterp":
             return ["shouldInterp"]
-        case "interpLabel":
+        case "interpLabelStr":
             return ["shouldInterp"]
         default:
             return []
