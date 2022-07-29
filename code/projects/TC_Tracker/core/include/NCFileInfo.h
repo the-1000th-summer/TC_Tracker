@@ -37,7 +37,10 @@ public:
     
     void startTracking(TCs &tcs, bool* isCanceled, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target);
     
+    void exportFile_json(TCs &tcs, const std::string oFilePath);
+    void exportFile_proto3(TCs &tcs, const std::string oFilePath);
     void exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand);
+    void exportFile_nc_compact(const TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand);
     
 private:
     std::string resourceBaseDir;

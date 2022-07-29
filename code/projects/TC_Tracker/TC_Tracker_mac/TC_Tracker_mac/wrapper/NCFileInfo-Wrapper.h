@@ -62,8 +62,8 @@
 
 @interface NCFileInfo_Wrapper : NSObject
 
-
-- (instancetype)init NS_UNAVAILABLE;
+// if do not want default init method, uncomment next line
+//- (instancetype)init NS_UNAVAILABLE;
 - (id)initWithNcFilePath:(NSString *)filePath;
 - (id)initWithNcFilePath:(NSString *)filePath :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor;
 - (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor :(int)zLevelIndex :(double)toGridRes :(NSString *)tempFileDir;
@@ -77,8 +77,10 @@
 
 - (TCs*)startTrackingWithStepPgCallback : (void(*)(int stepIdx, void*))stepPgCallback andWith :(void(*)(double progressValue, void*)) progressCallback withTarget: (void*) target;
 
-
-//- (void)exportFile_nc
+- (void)exportFile_json:(TCs*)tcs oNcFilePath:(NSString*)oNcFilePath;
+- (void)exportFile_proto3:(TCs*)tcs oNcFilePath:(NSString*)oNcFilePath;
+- (void)exportFile_nc:(TCs*)tcs oNcFilePath:(NSString*)oNcFilePath fullCommand:(NSString*)fullCommand;
+- (void)exportFile_nc_compact:(TCs*)tcs oNcFilePath:(NSString*)oNcFilePath fullCommand:(NSString*)fullCommand;
 
 @end
 

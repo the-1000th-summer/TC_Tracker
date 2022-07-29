@@ -133,17 +133,52 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     
     @IBAction func exportBtnClicked(_ sender: NSButton) {
         let savePanel = NSSavePanel()
-        savePanel.allowedContentTypes = [.png, .pdf]
+        savePanel.allowedContentTypes = [.json, UTType(filenameExtension: "pb")!, UTType(filenameExtension: "nc")!]
         savePanel.allowsOtherFileTypes = false
-        savePanel.message = "asssss"
-        savePanel.prompt = "aaa"
-        savePanel.nameFieldLabel = "dddd"
+        savePanel.message = "export as json, protobuf, or nc file"
+//        savePanel.prompt = "aaa"
+//        savePanel.nameFieldLabel = "dddd"
         if (savePanel.runModal() == NSApplication.ModalResponse.OK) {
 //            savePanel.typ
-            let alert = NSAlert()
-            alert.messageText = "The file is not vaild!"
-            alert.runModal()
-
+            
+            guard let filePath = savePanel.url?.path else {
+                let alert = NSAlert()
+                alert.messageText = "The file path is not valid!"
+                alert.runModal()
+                return
+            }
+            let fileExtension = (filePath as NSString).pathExtension
+            print(fileExtension)
+            
+            switch fileExtension {
+            case "json":
+                NCFileInfo_Wrapper().exportFile_json(tcs, oNcFilePath: filePath)
+            case "pb":
+                NCFileInfo_Wrapper().exportFile_proto3(tcs, oNcFilePath: filePath)
+            case "nc":
+                let alert = NSAlert()
+                alert.messageText = "Save as compact form?"
+                alert.addButton(withTitle: "Not Compact")
+                alert.addButton(withTitle: "Compact")
+                alert.addButton(withTitle: "Cancel")
+                let modalResult = alert.runModal()
+                
+                switch modalResult {
+                case .alertFirstButtonReturn:
+                    NCFileInfo_Wrapper().exportFile_nc(tcs, oNcFilePath: filePath, fullCommand: "exportFile_nc")
+                case .alertSecondButtonReturn:
+                    NCFileInfo_Wrapper().exportFile_nc_compact(tcs, oNcFilePath: filePath, fullCommand: "exportFile_nc_compact")
+                default:
+                    break
+                }
+            default:
+                let alert = NSAlert()
+                alert.messageText = "Extension \"\(fileExtension)\" is not supported"
+                alert.informativeText = "\".json\", \".pb\", \".nc\" are supported extensions."
+                alert.runModal()
+                return
+            }
+//            NCFileInfo_Wrapper().exportFile_nc(tcs, oNcFilePath: savePanel.url?.path, fullCommand: "exportFile_nc");
         }
     }
     

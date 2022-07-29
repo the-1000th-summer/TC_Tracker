@@ -60,6 +60,8 @@
 
 @implementation TCInfo
 
+
+
 - (id)initWithTimeUnits:(NSString *)timeUnits time_noleap:(bool)time_noleap timeInterval:(double)timeInterval firstTValue:(double)firstTValue {
     self = [super init];
     if (self) {
@@ -205,26 +207,26 @@
 }
 
 - (TCs*)copyToMangaged:(TTCore::TCs&)inTC {
-    auto tcs = inTC.getTcs();
+    auto realTCs = inTC.getTcs();
     int tcSize = inTC.size();
     NSMutableArray<Typhoon *> *outTC = [NSMutableArray new];
     
     for (int i = 0; i < tcSize; ++i) {
         NSMutableArray<YXIndex *> *maxVorCells = [NSMutableArray new];
-        for (const auto &maxVorCell : tcs[i].maxVorCells) {
+        for (const auto &maxVorCell : realTCs[i].maxVorCells) {
             [maxVorCells addObject:[[YXIndex alloc] initWithYIndex:maxVorCell.first xIndex:maxVorCell.second]];
         }
         NSMutableArray<LatLon *> *geoCenters = [NSMutableArray new];
-        for (const auto &geoCenter : tcs[i].geoCenters) {
+        for (const auto &geoCenter : realTCs[i].geoCenters) {
             [geoCenters addObject:[[LatLon alloc] initWithLat:geoCenter.first lon:geoCenter.second]];
         }
         
         Typhoon *newTC = [Typhoon new];
-        newTC.serialNo = tcs[i].serialNo;
+        newTC.serialNo = realTCs[i].serialNo;
         newTC.maxVorCells = maxVorCells;
         newTC.geoCenters = geoCenters;
-        newTC.startTimeIndex = tcs[i].startTimeIndex;
-        newTC.endTimeIndex = tcs[i].endTimeIndex;
+        newTC.startTimeIndex = realTCs[i].startTimeIndex;
+        newTC.endTimeIndex = realTCs[i].endTimeIndex;
         
         [outTC addObject:newTC];
     }
@@ -233,6 +235,53 @@
     
     return [[TCs alloc] initWithRealTCs:outTC tcInfo:newTCInfo];
     
+}
+
+- (void)exportFile_json:(TCs*)tcs oNcFilePath:(NSString*)oNcFilePath {
+    TTCore::TCs tcs_cpp = [self toCppTCs:tcs];
+    m_instance->exportFile_json(tcs_cpp, [oNcFilePath cStringUsingEncoding:NSUTF8StringEncoding]);
+}
+
+- (void)exportFile_proto3:(TCs*)tcs oNcFilePath:(NSString*)oNcFilePath {
+    TTCore::TCs tcs_cpp = [self toCppTCs:tcs];
+    m_instance->exportFile_proto3(tcs_cpp, [oNcFilePath cStringUsingEncoding:NSUTF8StringEncoding]);
+}
+
+- (void)exportFile_nc:(TCs*)tcs oNcFilePath:(NSString*)oNcFilePath fullCommand:(NSString*)fullCommand {
+    
+    TTCore::TCs tcs_cpp = [self toCppTCs:tcs];
+    
+    m_instance->exportFile_nc(tcs_cpp, [oNcFilePath cStringUsingEncoding:NSUTF8StringEncoding], [fullCommand cStringUsingEncoding:NSUTF8StringEncoding]);
+}
+
+- (void)exportFile_nc_compact:(TCs*)tcs oNcFilePath:(NSString*)oNcFilePath fullCommand:(NSString*)fullCommand {
+    TTCore::TCs tcs_cpp = [self toCppTCs:tcs];
+    
+    m_instance->exportFile_nc_compact(tcs_cpp, [oNcFilePath cStringUsingEncoding:NSUTF8StringEncoding], [fullCommand cStringUsingEncoding:NSUTF8StringEncoding]);
+    
+}
+
+- (TTCore::TCs)toCppTCs:(TCs*)tcs {
+    std::vector<TTCore::Typhoon> realTCs;
+
+    for (Typhoon *realTC in tcs.tcs) {
+        std::vector<std::pair<int, int>> maxVorCells_cpp;
+        std::vector<std::pair<float, float>> geoCenters_cpp;
+        for (YXIndex *maxVorCell in realTC.maxVorCells) {
+            maxVorCells_cpp.push_back({maxVorCell.yIndex, maxVorCell.xIndex});
+        }
+        for (LatLon *geoCenter in realTC.geoCenters) {
+            geoCenters_cpp.push_back({geoCenter.lat, geoCenter.lon});
+        }
+        
+        realTCs.push_back(TTCore::Typhoon{realTC.serialNo, maxVorCells_cpp, geoCenters_cpp, realTC.startTimeIndex, realTC.endTimeIndex, {}});
+    }
+    
+    auto tcInfo = TTCore::TCInfo([tcs.tcInfo.timeUnits cStringUsingEncoding:NSUTF8StringEncoding], tcs.tcInfo.time_noleap, tcs.tcInfo.timeInterval, tcs.tcInfo.firstTValue);
+    
+    auto tcs_cpp = TTCore::TCs(realTCs, tcInfo);
+    
+    return tcs_cpp;
 }
 
 @end

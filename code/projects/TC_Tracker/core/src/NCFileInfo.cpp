@@ -128,6 +128,93 @@ void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled, void(*stepPgCallback)
         p.copyLatLonData(lat_data, lon_data);
 }
 
+void to_json(nlohmann::json& j, const Typhoon& tc) {
+    j = nlohmann::json{
+        {"maxVorCells", tc.maxVorCells},
+        {"geoCenters", tc.geoCenters},
+        {"startTimeIndex", tc.startTimeIndex},
+        {"endTimeIndex", tc.endTimeIndex}
+    };
+}
+void from_json(const nlohmann::json& j, Typhoon& tc) {
+    j.at("maxVorCells").get_to(tc.maxVorCells);
+    j.at("geoCenters").get_to(tc.geoCenters);
+    j.at("startTimeIndex").get_to(tc.startTimeIndex);
+    j.at("endTimeIndex").get_to(tc.endTimeIndex);
+}
+
+void to_json(nlohmann::json& j, const TCInfo& tcInfo) {
+    j = nlohmann::json{
+        {"timeUnits", tcInfo.getTimeUnits()},
+        {"time_noleap", tcInfo.getTime_noleap()},
+        {"timeInterval", tcInfo.getTimeInterval()},
+        {"firstTValue", tcInfo.getFirstTValue()}
+    };
+}
+//void from_json(const nlohmann::json& j, TCInfo& tcInfo) {
+//    j.at("timeUnits").get_to(tcInfo.getTimeUnits());
+//}
+
+void to_json(nlohmann::json& j, const TCs& tcs) {
+    j = nlohmann::json{
+        {"tcs", tcs.getTcs()},
+        {"tcInfo", tcs.getTcInfo()}
+    };
+}
+//void from_json(const nlohmann::json& j, TCs& tcs) {
+//
+//}
+
+void NCFileInfo::exportFile_json(TCs &tcs, const std::string oFilePath) {
+    nlohmann::json tcs_jsonObj(tcs);
+    std::ofstream jsonFile(oFilePath);
+    jsonFile << tcs_jsonObj;
+}
+
+void NCFileInfo::exportFile_proto3(TCs &tcs, const std::string oFilePath) {
+    TCsP tcsP;
+    for (const Typhoon &tc : tcs.getTcs()) {
+        auto tc_ptr = tcsP.add_typhoons();
+        
+        for (const std::pair<int, int> &maxVorCell : tc.maxVorCells) {
+            auto maxVorCell_ptr = tc_ptr->add_maxvorcells();
+            maxVorCell_ptr->set_latindex(maxVorCell.first);
+            maxVorCell_ptr->set_lonindex(maxVorCell.second);
+        }
+        for (const std::pair<float, float> &geoCenter : tc.geoCenters) {
+            auto geoCenter_ptr = tc_ptr->add_geocenters();
+            geoCenter_ptr->set_lat(geoCenter.first);
+            geoCenter_ptr->set_lon(geoCenter.second);
+        }
+        tc_ptr->set_starttimeindex(tc.startTimeIndex);
+        tc_ptr->set_endtimeindex(tc.endTimeIndex);
+        for (const std::vector<std::pair<int, int>> &vorCellsIndex : tc.vorsCellsIndex) {
+            auto vorCellsIndex_ptr = tc_ptr->add_vorscellsindex();
+            for (const std::pair<int, int> &cellIndex : vorCellsIndex) {
+                auto cellIndex_ptr = vorCellsIndex_ptr->add_vorcellsindex();
+                cellIndex_ptr->set_latindex(cellIndex.first);
+                cellIndex_ptr->set_lonindex(cellIndex.second);
+            }
+        }
+    }
+    auto tcInfo = tcs.getTcInfo();
+    tcsP.set_timeunits(tcInfo.getTimeUnits());
+    tcsP.set_time_noleap(tcInfo.getTime_noleap());
+    tcsP.set_firsttimevalue(tcInfo.getFirstTValue());
+    tcsP.set_timehourinterval(tcInfo.getHourInterval());
+    
+    if (!lat_data.empty()) {        // lat and lon is not wrf file
+        for (auto i : lat_data) { tcsP.add_lats(i); }
+        for (auto i : lon_data) { tcsP.add_lons(i); }
+    }
+    
+    std::fstream output(oFilePath, std::ios::out | std::ios::trunc | std::ios::binary);
+    if (!tcsP.SerializeToOstream(&output)) {
+        std::cout << "Failed to write proto3 file." << std::endl;
+        exit(-1);
+    }
+}
+
 /// 将结果输出为netCDF文件（标准：CF Convention）
 void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand) {
     netCDF::NcFile outFile(oNcFilePath, netCDF::NcFile::replace);
@@ -197,6 +284,64 @@ void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const s
     
     outFile.close();
     
+}
+
+void NCFileInfo::exportFile_nc_compact(const TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand) {
+    netCDF::NcFile outFile(oNcFilePath, netCDF::NcFile::replace);
+    std::vector<int> tcsAge{};
+    std::transform(tcs.cbegin(), tcs.cend(), std::back_inserter(tcsAge), [](const Typhoon& tc){return tc.maxVorCells.size();});
+    
+    
+    // 创建维度
+    auto stormDimSize = tcs.size();
+    int timeDimSize = std::accumulate(tcsAge.begin(), tcsAge.end(), 0);
+    
+    auto stormDim = outFile.addDim("storm", stormDimSize);
+    auto timeDim = outFile.addDim("date_time", timeDimSize);
+    
+    // 创建变量
+    auto rowSizeVar = outFile.addVar("rowSize", netCDF::NcType::nc_INT, {stormDim});
+    auto timeVar = outFile.addVar("time", netCDF::NcType::nc_DOUBLE, {timeDim});
+    auto latVar = outFile.addVar("lat", netCDF::NcType::nc_FLOAT, {timeDim});
+    auto lonVar = outFile.addVar("lon", netCDF::NcType::nc_FLOAT, {timeDim});
+    auto serialNoVar = outFile.addVar("serialNo", netCDF::NcType::nc_SHORT, {timeDim});
+    
+    // 准备数据
+    auto timeData = std::make_unique<float[]>(timeDimSize);
+    auto latData = std::make_unique<float[]>(timeDimSize);
+    auto lonData = std::make_unique<float[]>(timeDimSize);
+    auto serialNoData = std::make_unique<short[]>(timeDimSize);
+    
+    size_t tc_i = 0, pastTimeLen = 0;
+    for (auto const &tc : tcs.getTcs()) {
+        std::iota(timeData.get()+pastTimeLen, timeData.get()+pastTimeLen+tc.geoCenters.size(), tc.startTimeIndex);
+        std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), latData.get()+pastTimeLen, [](const std::pair<float, float> &geoCenter){return geoCenter.first;});
+        std::transform(tc.geoCenters.begin(), tc.geoCenters.end(), lonData.get()+pastTimeLen, [](const std::pair<float, float> &geoCenter){return geoCenter.second;});
+        std::fill(serialNoData.get()+pastTimeLen, serialNoData.get()+pastTimeLen+tc.geoCenters.size(), tc.serialNo);
+        pastTimeLen += tc.geoCenters.size();
+        ++tc_i;
+    }
+    
+    // 写入变量属性
+    timeVar.putAtt("units", tcs.getTimeUnits());
+    latVar.putAtt("units", "degrees_north");
+    lonVar.putAtt("units", "degrees_east");
+    
+    serialNoVar.putAtt("coordinates", "time lon lat");
+    // 写入全局属性
+    UtilFunc::appendHistoryInfo(outFile, fullCommand);
+    outFile.putAtt("featureType", "trajectory");
+    UtilFunc::appendThresholdInfo(outFile);
+    
+    // 写入数据
+    // https://stackoverflow.com/questions/2923272/how-to-convert-vector-to-array
+    rowSizeVar.putVar(&tcsAge[0]);         // vector储存的数据是内存连续的，这么做以避免数据拷贝
+    timeVar.putVar(timeData.get());
+    latVar.putVar(latData.get());
+    lonVar.putVar(lonData.get());
+    serialNoVar.putVar(serialNoData.get());
+    
+    outFile.close();
 }
 
 }

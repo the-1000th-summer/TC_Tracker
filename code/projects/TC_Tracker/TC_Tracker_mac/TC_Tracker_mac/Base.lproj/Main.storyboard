@@ -1012,7 +1012,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="导出全部结果..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="B0Y-5c-Ekf">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                    <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="exportBtnClicked:" target="XfG-lQ-9wD" id="PqN-Aq-4fR"/>
@@ -1432,7 +1432,7 @@ DQ
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <size key="minSize" width="507" height="327"/>
-                                            <size key="maxSize" width="513" height="10000000"/>
+                                            <size key="maxSize" width="522" height="10000000"/>
                                             <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             <connections>
                                                 <binding destination="u52-f8-eho" name="value" keyPath="jsonTextViewText" id="odI-t1-QK3"/>
@@ -1453,16 +1453,16 @@ DQ
                                 <rect key="frame" x="250" y="13" width="62" height="32"/>
                                 <buttonCell key="cell" type="push" title="拷贝" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HT9-FH-Zsu">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                    <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="copyBtnClicked:" target="u52-f8-eho" id="rnQ-eb-7rS"/>
                                 </connections>
                             </button>
                             <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="udk-EK-OLp">
-                                <rect key="frame" x="324" y="22" width="71" height="16"/>
+                                <rect key="frame" x="324" y="22" width="68" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="拷贝成功！" id="z6L-Ng-Gts">
-                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                    <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
