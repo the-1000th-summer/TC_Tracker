@@ -86,6 +86,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         
         zLvComboBox.isEnabled = false
         showWebBtn.isEnabled = false
+        startTrackingBtn.isEnabled = false
 
         guard checkFileValid(filePath: filePath) else {
             interpSwitch.isEnabled = false

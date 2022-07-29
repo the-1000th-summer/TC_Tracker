@@ -78,7 +78,7 @@ private:
     bool shouldRegrid(float spatialRes);
     std::vector<float> getRgedLatArr(float spatialRes);
     std::vector<float> getRgedLonArr(float spatialRes);
-    void regridVorData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, ThreeDArray &vorField);
+    void regridVorData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, ThreeDArray &vorField, void(*progressCallback)(double progressValue, void*), void* target);
     void unstaggerU(netCDF::NcFile *inFile, ThreeDArray &u_unstged, ThreeDArray &v_unstged);
     
     int getLastNotEmptyVecIndex();

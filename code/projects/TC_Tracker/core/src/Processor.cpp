@@ -268,7 +268,7 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             
             stepPgCallback(1, target);      // start regrid
             vorField.setDims(timeLength, ref_latData.size(), ref_lonData.size());
-            regridVorData(ref_latData, ref_lonData, vorField);
+            regridVorData(ref_latData, ref_lonData, vorField, progressCallback, target);
         } else {          // should not regrid
             vorField.setDims(timeLength, latGridNum, lonGridNum);
             if (!varNames.dataIsVor) {
@@ -832,7 +832,7 @@ std::vector<float> Processor::getRgedLonArr(float spatialRes) {
     return ref_lonData;
 }
 
-void Processor::regridVorData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, ThreeDArray &vorField) {
+void Processor::regridVorData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, ThreeDArray &vorField, void(*progressCallback)(double progressValue, void*), void* target) {
     int ref_latGridNum = ref_latData.size(), ref_lonGridNum = ref_lonData.size();
 
     auto tempVorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
@@ -840,7 +840,20 @@ void Processor::regridVorData(const std::vector<float> &ref_latData, const std::
     iiFile->getVar(varNames.vorVarName).getVar(tempVorField.get());
     std::cout << "start regridding..." << std::endl;
 //    auto interp = Linint2();
-    NCL_cxx::linint2(threadNum, timeLength, lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempVorField.get(), vorField.get(), false, -9999);
+    
+    int completed_count = 0;
+    unsigned long itsPerCheck = timeLength / 50;
+    
+    for (int timeIndex = 0; timeIndex < timeLength; ++timeIndex) {
+        NCL_cxx::linint2(lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempVorField.get()+timeIndex*lonGridNum*latGridNum, vorField.get()+timeIndex*ref_lonGridNum*ref_latGridNum, false, -9999);
+        ++completed_count;
+        if (completed_count % itsPerCheck == 0) {
+            progressCallback(static_cast<double>(completed_count)/timeLength*100, target);
+        }
+    }
+    
+//    NCL_cxx::linint2(threadNum, timeLength, lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempVorField.get(), vorField.get(), false, -9999);
+    
     // 将旧的lat和lon数据替换为regrid后的lat和lon
     latGridNum = ref_latGridNum; lonGridNum = ref_lonGridNum;
     latArr = std::make_unique<float[]>(latGridNum);   // reassign, 不会导致内存泄漏
