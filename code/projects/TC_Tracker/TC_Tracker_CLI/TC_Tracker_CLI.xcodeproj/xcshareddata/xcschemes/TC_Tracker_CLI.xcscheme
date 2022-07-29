@@ -31,7 +31,7 @@
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -64,7 +64,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-n time,lat,lon,Vorticity"
+            argument = "-n time,lat,lon,Vorticity,,"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
@@ -89,7 +89,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/Vorticity_JRA-55_hourly.nc"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general.nc"
@@ -112,20 +112,28 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Volumes/My_Passport/Data/ERA5_Data/generated_hourly/Vorticity_ERA5_hourly_2pt0.nc"
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrf_data/wrfout_d01_2016-10-19_00_00_00.nc"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrf_data/out.nc"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "/Volumes/My_Passport/Data/ERA5_Data/generated_hourly/Vorticity_ERA5_hourly_2pt0.nc"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/era5Result_regrid/ERA5_trackResult_2pt0_regridded.nc"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-u"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-z 1"
-            isEnabled = "NO">
+            argument = "-z 6"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-p /Users/richard/Desktop"

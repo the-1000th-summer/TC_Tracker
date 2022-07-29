@@ -40,10 +40,13 @@ inline void abortWithMsg(const std::string &msg) {
 /// @returns 拆分后的字符串vector
 std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> result;
-    std::stringstream ss (s);
+    std::stringstream ss(s);
     std::string item;
-    while (getline (ss, item, delim)) {
-        result.push_back (item);
+    while (getline(ss, item, delim)) {
+        result.push_back(item);
+    }
+    if (s.back() == delim) {
+        result.push_back("");
     }
     return result;
 }
@@ -94,7 +97,7 @@ std::vector<std::string> handleInOutFile(cxxopts::ParseResult *result) {
 bool checkIsWrfoutFile(const std::string &inFilePath) {
     auto fileInfo = TTCore::NCFileInfo(inFilePath.c_str());
     std::string exceptionInfo;
-    bool isWrfoutFile = fileInfo.checkIsWrfoutFile(exceptionInfo);
+    bool isWrfoutFile = fileInfo.checkIfIsWrfoutFile(exceptionInfo);
     std::cout << "Input file is " << (isWrfoutFile ? "" : "NOT ") << "wrfout file." << std::endl;
     return isWrfoutFile;
 }
@@ -103,11 +106,14 @@ VarNames getVarNames(const cxxopts::ParseResult *result, bool isWrfoutFile) {
     
     VarNames varNames;
     if (isWrfoutFile) {
-        varNames = VarNames("XTIME","XLAT","XLONG","vorName");
+        varNames = VarNames("XTIME","XLAT","XLONG","","U","V",false);
     } else if (result->count("n")) {
+        std::cout << (*result)["n"].as<std::string>() << std::endl;
         auto varNamesVec = split((*result)["n"].as<std::string>(), ',');
-        if (varNamesVec.size() != 4) { abortWithMsg("Must specify time,lat,lon,vorticity variable names in order, and use \",\" as delimiter!"); }
-        varNames = VarNames(varNamesVec[0], varNamesVec[1], varNamesVec[2], varNamesVec[3]);
+        if (varNamesVec.size() != 6) { abortWithMsg("Must specify time,lat,lon,vorticity,uwnd,vwnd variable names in order, and use \",\" as delimiter!"); }
+        if (varNamesVec[3].empty() && varNamesVec[4].empty()) { abortWithMsg("Must specify vorticity or wind var names!"); }
+        if (!varNamesVec[3].empty() && !varNamesVec[4].empty()) { abortWithMsg("You can only specify vorticity OR wind var names!"); }
+        varNames = VarNames(varNamesVec[0], varNamesVec[1], varNamesVec[2], varNamesVec[3], varNamesVec[4], varNamesVec[5], !varNamesVec[3].empty());
     } else {
 //        std::cout << exceptionInfo << std::endl;
         varNames.checkVarNames();
@@ -169,6 +175,13 @@ int handleThreadNum(const cxxopts::ParseResult *result) {
     return threadNum;
 }
 
+void myStepPgCB(int a, void *aa) {
+    
+}
+void myProgressCB(double a, void *aa) {
+    std::cout << a << "%" << std::endl;
+}
+
 void tryCXXOPTS(int argc, char * argv[]) {
     auto exePath = std::filesystem::weakly_canonical(std::filesystem::path(argv[0])).parent_path();
     std::vector<std::string> argList(argv, argv + argc);   // for history
@@ -219,12 +232,12 @@ void tryCXXOPTS(int argc, char * argv[]) {
     auto [noTempFiles, tempFilesDir] = handleTempFiles(result.get());
     int threadNum = handleThreadNum(result.get());
     
-    auto fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, zLvIndex, noTempFiles, threadNum, tempFilesDir.c_str());
+    auto fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, zLvIndex, 0.0, noTempFiles, threadNum, tempFilesDir.c_str(), "");
     TTCore::TCs tcs;
     
     /// （无用的变量，因为cli直接Ctrl+C就可终止程序）
     bool isCanceled = false;
-    fileInfo.startTracking(tcs, &isCanceled);
+    fileInfo.startTracking(tcs, &isCanceled, myStepPgCB, myProgressCB, nullptr);
     
     /// 检查输出multidimensional的nc文件还是jagged array nc文件
     std::string argStr = joinStrings(argList, " ");

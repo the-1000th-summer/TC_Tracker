@@ -533,6 +533,10 @@
 					/opt/homebrew/Cellar/boost/1.78.0_1/lib,
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_CFLAGS = (
+					"-Xpreprocessor",
+					"-fopenmp",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.the1000thsummer.TC-Tracker-mac";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -567,6 +571,10 @@
 					/opt/homebrew/Cellar/boost/1.78.0_1/lib,
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_CFLAGS = (
+					"-Xpreprocessor",
+					"-fopenmp",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.the1000thsummer.TC-Tracker-mac";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
