@@ -116,7 +116,9 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         startTrackingBtn.isEnabled = false
         zLvComboBox.isEnabled = false
         
-        let tracker = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, gridResValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/")!
+        var threadNum = UserDefaults.standard.integer(forKey: "ThreadNum")
+        if threadNum == 0 { threadNum = 1 }
+        let tracker = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, Int32(threadNum), gridResValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/")!
         
         guard let progressVC = storyboard?.instantiateController(withIdentifier: "ProgressVC") as? ProgressViewController else { return }
         progressVC.tracker = tracker
@@ -137,6 +139,10 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         savePanel.allowedContentTypes = [.json, UTType(filenameExtension: "pb")!, UTType(filenameExtension: "nc")!]
         savePanel.allowsOtherFileTypes = false
         savePanel.message = "export as json, protobuf, or nc file"
+        if let savedOpenPUrl = UserDefaults.standard.url(forKey: "SavePanelDirUrl") {
+            savePanel.directoryURL = savedOpenPUrl
+        }
+        
 //        savePanel.prompt = "aaa"
 //        savePanel.nameFieldLabel = "dddd"
         if (savePanel.runModal() == NSApplication.ModalResponse.OK) {
@@ -149,7 +155,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
                 return
             }
             let fileExtension = (filePath as NSString).pathExtension
-            print(fileExtension)
+            var extensionSupport = true
             
             switch fileExtension {
             case "json":
@@ -173,11 +179,15 @@ class ViewController: NSViewController, NSComboBoxDataSource {
                     break
                 }
             default:
+                extensionSupport = false
                 let alert = NSAlert()
                 alert.messageText = "Extension \"\(fileExtension)\" is not supported"
                 alert.informativeText = "\".json\", \".pb\", \".nc\" are supported extensions."
                 alert.runModal()
                 return
+            }
+            if extensionSupport {
+                UserDefaults.standard.set(savePanel.directoryURL, forKey: "SavePanelDirUrl")
             }
 //            NCFileInfo_Wrapper().exportFile_nc(tcs, oNcFilePath: savePanel.url?.path, fullCommand: "exportFile_nc");
         }
@@ -314,10 +324,14 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         dialog.showsHiddenFiles = false;
         dialog.allowsMultipleSelection = false;
         dialog.canChooseDirectories = false;
+        if let savedOpenPUrl = UserDefaults.standard.url(forKey: "OpenPanelDirUrl") {
+            dialog.directoryURL = savedOpenPUrl
+        }
         
         if (dialog.runModal() == NSApplication.ModalResponse.OK) {
             let result = dialog.url // Pathname of the file
             if (result != nil) {
+                UserDefaults.standard.set(dialog.directoryURL, forKey: "OpenPanelDirUrl")
                 return result!.path
             } else {
                 let alert = NSAlert()

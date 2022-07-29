@@ -68,6 +68,14 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "-c"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-z 6"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrf_data/minForVor_track_compact.nc"
             isEnabled = "NO">
          </CommandLineArgument>
@@ -116,7 +124,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrf_data/out.nc"
+            argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrf_data/out.pb"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
@@ -130,10 +138,6 @@
          <CommandLineArgument
             argument = "-u"
             isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-z 6"
-            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-p /Users/richard/Desktop"

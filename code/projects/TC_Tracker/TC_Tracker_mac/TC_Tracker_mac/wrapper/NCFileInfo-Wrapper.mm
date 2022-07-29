@@ -124,7 +124,7 @@
     return self;
 }
 
-- (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor :(int)zLevelIndex :(double)toGridRes :(NSString *)tempFileDir {
+- (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor :(int)zLevelIndex :(int)threadNum :(double)toGridRes :(NSString *)tempFileDir {
     self = [super init];
     if (self) {
         auto filePathStr = [filePath cStringUsingEncoding:NSUTF8StringEncoding];
@@ -141,7 +141,7 @@
         NSString *resourcePath = [[NSBundle mainBundle] resourcePath];
         auto resourcePathStr = [resourcePath cStringUsingEncoding:NSUTF8StringEncoding];
         
-        m_instance = new TTCore::NCFileInfo(filePathStr, isWrfoutFile, varNames, zLevelIndex, toGridRes, true, 1, tempFileDirStr, resourcePathStr);
+        m_instance = new TTCore::NCFileInfo(filePathStr, isWrfoutFile, varNames, zLevelIndex, toGridRes, true, threadNum, tempFileDirStr, resourcePathStr);
     }
     return self;
 }

@@ -76,10 +76,13 @@ std::vector<std::string> handleInOutFile(cxxopts::ParseResult *result) {
     }
     
     if (allFilesName.size() == 1) {
-        abortWithMsg("Please specify output file name!");
+        abortWithMsg("Please specify output file path!");
+    }
+    if (allFilesName.size() > 2) {
+        abortWithMsg("Do not specify more than two file path.");
     }
     std::cout << "TC_Tracker start..." << std::endl;
-    std::cout << "Input file(s):" << std::endl;
+    std::cout << "Input file:" << std::endl;
     for (int i = 0; i < allFilesName.size()-1; ++i) {
         std::cout << "  " << allFilesName[i] << std::endl;
     }
@@ -182,6 +185,22 @@ void myProgressCB(double a, void *aa) {
     std::cout << a << "%" << std::endl;
 }
 
+
+/// 从文件的绝对路径获取扩展名(包括“.”)
+/// @param filePath 文件的绝对路径
+std::string getExtensionName(const std::string &filePath) {
+    std::filesystem::path filePathObj(filePath);
+    return filePathObj.extension().string();
+}
+
+void handleOutputFileExtension(const std::string &filePath) {
+    std::string fileExtensionStr = getExtensionName(filePath);
+    std::vector<std::string> validExtension{".json", ".pb", ".nc"};
+    if(std::find(validExtension.begin(), validExtension.end(), fileExtensionStr) == validExtension.end()) {
+        abortWithMsg("Extension \"" + fileExtensionStr + "\" is not supported\n\".json\", \".pb\", \".nc\" are supported extensions.");
+    }
+}
+
 void tryCXXOPTS(int argc, char * argv[]) {
     auto exePath = std::filesystem::weakly_canonical(std::filesystem::path(argv[0])).parent_path();
     std::vector<std::string> argList(argv, argv + argc);   // for history
@@ -226,6 +245,10 @@ void tryCXXOPTS(int argc, char * argv[]) {
     }
 
     auto allFilesPath = handleInOutFile(result.get());
+    
+    std::string outFilePath = allFilesPath.back();
+    handleOutputFileExtension(outFilePath);
+    
     bool isWrfoutFile = checkIsWrfoutFile(allFilesPath[0]);
     auto varNames = getVarNames(result.get(), isWrfoutFile);
     int zLvIndex = handleZLvIndex(result.get(), varNames, allFilesPath[0], isWrfoutFile);
@@ -241,14 +264,29 @@ void tryCXXOPTS(int argc, char * argv[]) {
     
     /// 检查输出multidimensional的nc文件还是jagged array nc文件
     std::string argStr = joinStrings(argList, " ");
-    if (result->count("c")) {
-        fileInfo.exportFile_nc_compact(tcs, allFilesPath.back(), argStr);
-    } else {
-        fileInfo.exportFile_nc(tcs, allFilesPath.back(), argStr);
+    
+    
+    std::string fileExtensionStr = getExtensionName(outFilePath);
+    if (fileExtensionStr == ".json") {
+        if (result->count("c")) {
+            std::cout << "Warning: export as compact version does not support in json file." << std::endl;
+        }
+        fileInfo.exportFile_json(tcs, outFilePath);
+    } else if (fileExtensionStr == ".pb") {
+        if (result->count("c")) {
+            std::cout << "Warning: export as compact version does not support in protobuf file." << std::endl;
+        }
+        fileInfo.exportFile_proto3(tcs, outFilePath);
+    } else if (fileExtensionStr == ".nc") {
+        if (result->count("c")) {
+            fileInfo.exportFile_nc_compact(tcs, outFilePath, argStr);
+        } else {
+            fileInfo.exportFile_nc(tcs, outFilePath, argStr);
+        }
     }
     
-    auto pp = (std::filesystem::path(allFilesPath.back()).parent_path() / (std::filesystem::path(allFilesPath.back()).stem().string() + ".protobuf")).string();
-    fileInfo.exportFile_proto3(tcs, pp);
+//    auto pp = (std::filesystem::path(allFilesPath.back()).parent_path() / (std::filesystem::path(allFilesPath.back()).stem().string() + ".protobuf")).string();
+//    fileInfo.exportFile_proto3(tcs, pp);
     
     std::cout << "end of tracking" << std::endl;
 }

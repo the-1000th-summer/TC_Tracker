@@ -24,6 +24,7 @@
 		79618E71286753BE00539BAE /* NCFileInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79618E70286753BE00539BAE /* NCFileInfo.cpp */; };
 		79618E752867550200539BAE /* NCFileInfo-Wrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 79618E742867550200539BAE /* NCFileInfo-Wrapper.mm */; };
 		796E7335286D581D001807AC /* uv2vr_cfd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 796E7334286D581D001807AC /* uv2vr_cfd.cpp */; };
+		79AC0E7A2893DF5600C0B7DA /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79AC0E792893DF5600C0B7DA /* PreferencesViewController.swift */; };
 		79BC0928288E41BD003D0E2F /* TCsJsonViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79BC0927288E41BD003D0E2F /* TCsJsonViewController.swift */; };
 		79E9166F286C4472002CED06 /* libomp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79E9166E286C4472002CED06 /* libomp.dylib */; };
 		79E91671286C4483002CED06 /* libboost_serialization.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79E91670286C4483002CED06 /* libboost_serialization.dylib */; };
@@ -72,6 +73,7 @@
 		79618E742867550200539BAE /* NCFileInfo-Wrapper.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "NCFileInfo-Wrapper.mm"; sourceTree = "<group>"; };
 		796E7333286D580F001807AC /* uv2vr_cfd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uv2vr_cfd.h; path = ../../core/include/uv2vr_cfd.h; sourceTree = "<group>"; };
 		796E7334286D581D001807AC /* uv2vr_cfd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = uv2vr_cfd.cpp; path = ../../core/src/uv2vr_cfd.cpp; sourceTree = "<group>"; };
+		79AC0E792893DF5600C0B7DA /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		79BC0927288E41BD003D0E2F /* TCsJsonViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCsJsonViewController.swift; sourceTree = "<group>"; };
 		79E91668286C411B002CED06 /* Typhoon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Typhoon.h; path = ../../core/include/Typhoon.h; sourceTree = "<group>"; };
 		79E9166A286C4210002CED06 /* Processor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Processor.h; path = ../../core/include/Processor.h; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 				791A4DB528716E3200BD6FDE /* ResultViewController.swift */,
 				79BC0927288E41BD003D0E2F /* TCsJsonViewController.swift */,
 				7929A7F62876D60500DB7BB3 /* ProgressViewController.swift */,
+				79AC0E792893DF5600C0B7DA /* PreferencesViewController.swift */,
 				796187BE2872E15B00FDAC2C /* path.html */,
 				79618E6B2867537100539BAE /* core */,
 				79618E722867542900539BAE /* wrapper */,
@@ -378,6 +381,7 @@
 				79E9167B286C4582002CED06 /* Processor.cpp in Sources */,
 				79E9168C286C576D002CED06 /* VortexesDumper.cpp in Sources */,
 				796E7335286D581D001807AC /* uv2vr_cfd.cpp in Sources */,
+				79AC0E7A2893DF5600C0B7DA /* PreferencesViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

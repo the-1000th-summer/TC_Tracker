@@ -315,7 +315,7 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
     
     
     stepPgCallback(3, target);         // start getVortexNum1Time
-#   pragma omp parallel for num_threads(4)
+#   pragma omp parallel for num_threads(threadNum)
     for (int timeIndex = 0; timeIndex < timeLength; ++timeIndex) {
         // std::cout << vorVar.getName() << std::endl;
 //        if (timeIndex % itsPerCheck == 0) {

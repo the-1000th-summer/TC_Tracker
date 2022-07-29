@@ -66,7 +66,7 @@
 //- (instancetype)init NS_UNAVAILABLE;
 - (id)initWithNcFilePath:(NSString *)filePath;
 - (id)initWithNcFilePath:(NSString *)filePath :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor;
-- (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor :(int)zLevelIndex :(double)toGridRes :(NSString *)tempFileDir;
+- (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor :(int)zLevelIndex :(int)threadNum :(double)toGridRes :(NSString *)tempFileDir;
 - (void)dealloc;
 
 - (bool)checkFileValid:(NSString **)fileValidInfo;
