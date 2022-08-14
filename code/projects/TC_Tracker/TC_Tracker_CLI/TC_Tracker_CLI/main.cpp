@@ -178,6 +178,20 @@ int handleThreadNum(const cxxopts::ParseResult *result) {
     return threadNum;
 }
 
+double handleRegrid(const cxxopts::ParseResult *result) {
+    if (!result->count("r")) {
+        std::cout << "Data will not be regridded." << std::endl;
+        return 0.0;
+    }
+    double toGridRes = (*result)["r"].as<double>();
+    if (toGridRes <= 0.0) {
+        std::cout << "Data will not be regridded." << std::endl;
+        return toGridRes;
+    }
+    std::cout << "Data will be regridded to " << toGridRes << "°." << std::endl;
+    return toGridRes;
+}
+
 void myStepPgCB(int a, void *aa) {
     
 }
@@ -211,6 +225,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     ("h,help", "Display available options") // a bool parameter
     ("v,version", "Print version information")
     ("z,z-lv-index", "Specify the index of z level (0-based)", cxxopts::value<int>())
+    ("r,to-grid-res", "Specify regrid resolution. Will not regrid if set this flag <= 0.", cxxopts::value<double>()->default_value("0.0"))
     ("t,no-temp-files", "Do not export temp files")
     ("n,var-names", "Set time,lat,lon,vorticity variable names. \",\" as separator.", cxxopts::value<std::string>())
     ("thread", "Set the number of threads tracking, 0 for maximum number of threads", cxxopts::value<int>()->default_value("1"))
@@ -254,13 +269,14 @@ void tryCXXOPTS(int argc, char * argv[]) {
     int zLvIndex = handleZLvIndex(result.get(), varNames, allFilesPath[0], isWrfoutFile);
     auto [noTempFiles, tempFilesDir] = handleTempFiles(result.get());
     int threadNum = handleThreadNum(result.get());
+    double toGridRes = handleRegrid(result.get());
     
-    auto fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, zLvIndex, 0.0, noTempFiles, threadNum, tempFilesDir.c_str(), "");
+    auto fileInfo = TTCore::NCFileInfo(allFilesPath[0].c_str(), isWrfoutFile, varNames, zLvIndex, toGridRes, noTempFiles, threadNum, tempFilesDir.c_str(), "");
     TTCore::TCs tcs;
     
     /// （无用的变量，因为cli直接Ctrl+C就可终止程序）
-    bool isCanceled = false;
-    fileInfo.startTracking(tcs, &isCanceled, myStepPgCB, myProgressCB, nullptr);
+    bool shouldCancel = false;
+    fileInfo.startTracking(tcs, myStepPgCB, myProgressCB, nullptr, &shouldCancel);
     
     /// 检查输出multidimensional的nc文件还是jagged array nc文件
     std::string argStr = joinStrings(argList, " ");

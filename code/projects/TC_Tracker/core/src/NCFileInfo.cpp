@@ -97,7 +97,7 @@ bool NCFileInfo::checkIfIsWrfoutFile(std::string& exceptionInfo) {
 }
 
 
-void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target, bool* shouldCancel) {
+void NCFileInfo::startTracking(TCs &tcs, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target, bool* shouldCancel) {
     
 //    netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
     stepPgCallback(0, target);

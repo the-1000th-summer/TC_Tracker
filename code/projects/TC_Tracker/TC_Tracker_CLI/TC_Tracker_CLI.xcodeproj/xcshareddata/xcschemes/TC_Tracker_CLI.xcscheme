@@ -76,6 +76,10 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "-r 1"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/wrf_data/minForVor_track_compact.nc"
             isEnabled = "NO">
          </CommandLineArgument>
