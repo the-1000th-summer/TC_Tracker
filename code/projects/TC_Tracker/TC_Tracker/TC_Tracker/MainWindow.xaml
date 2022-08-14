@@ -39,6 +39,7 @@
         <Label x:Name="label5" Content="°" HorizontalAlignment="Left" Margin="610,227,0,0" VerticalAlignment="Top" Visibility="{Binding  ElementName=mainWin, Path=interpTextBoxVisibility}"/>
         <Button x:Name="startTrackingBtn" Content="开始识别" HorizontalAlignment="Left" Margin="449,327,0,0" VerticalAlignment="Top" Click="startTrackBtnClicked"/>
         <Button x:Name="exportBtn" Content="导出全部结果..." HorizontalAlignment="Left" Margin="662,368,0,0" VerticalAlignment="Top" Click="exportBtnClicked"/>
+        <Label x:Name="canceledLabel" Content="已取消" HorizontalAlignment="Left" Margin="516,324,0,0" VerticalAlignment="Top" Foreground="Red" Visibility="Collapsed"/>
 
     </Grid>
 </Window>

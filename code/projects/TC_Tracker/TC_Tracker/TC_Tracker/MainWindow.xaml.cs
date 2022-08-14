@@ -199,6 +199,7 @@ namespace TC_Tracker {
             cSelDir = filePath;
             zLvComboBox.IsEnabled = false;
             showWebBtn.IsEnabled = false;
+            canceledLabel.Visibility = Visibility.Collapsed;
 
             if (!checkFileValidAndUpdateUI(filePath)) {
                 interpCheckBox.IsEnabled = false;
@@ -355,7 +356,7 @@ namespace TC_Tracker {
             startTrackingBtn.IsEnabled = false;
             zLvComboBox.IsEnabled = false;
 
-            var tracker = new NCFileInfo(cSelDir, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !string.IsNullOrEmpty(vorVarStr), (zLvDimLen == 0) ? -1 : Int32.Parse(zLvComboBox.SelectedItem.ToString()), gridResValue, "E:\\University\\TC_Tracker\\data\\out");
+            var tracker = new NCFileInfo(cSelDir, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !string.IsNullOrEmpty(vorVarStr), (zLvDimLen == 0) ? -1 : Int32.Parse(zLvComboBox.SelectedItem.ToString()), 4, gridResValue, "E:\\University\\TC_Tracker\\data\\out");
 
             var progressWin = new ProgressWindow(tracker);
             progressWin.Owner = this;

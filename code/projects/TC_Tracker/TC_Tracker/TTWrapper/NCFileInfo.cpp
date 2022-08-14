@@ -13,8 +13,9 @@ NCFileInfo::NCFileInfo(String^ filePath, String^ time, String^ lat, String^ lon,
     
 }
 
-NCFileInfo::NCFileInfo(String^ filePath, bool isWrfoutFile, String^ time, String^ lat, String^ lon, String^ vor, String^ u, String^ v, bool dataIsVor, int zLevelIndex, double toGridRes, String^ tempFileDir) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, VarNames(string2Char(time), string2Char(lat), string2Char(lon), string2Char(vor), string2Char(u), string2Char(v), dataIsVor), zLevelIndex, toGridRes, true, 1, string2Char(tempFileDir), "")) {
-    
+NCFileInfo::NCFileInfo(String^ filePath, bool isWrfoutFile, String^ time, String^ lat, String^ lon, String^ vor, String^ u, String^ v, bool dataIsVor, int zLevelIndex, int threadNum, double toGridRes, String^ tempFileDir) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, VarNames(string2Char(time), string2Char(lat), string2Char(lon), string2Char(vor), string2Char(u), string2Char(v), dataIsVor), zLevelIndex, toGridRes, true, threadNum, string2Char(tempFileDir), "")) {
+    shouldCancel = new bool;
+    *shouldCancel = false;
 }
 
 bool NCFileInfo::checkFileValid(String^% fileValidInfo) {
@@ -67,7 +68,10 @@ int NCFileInfo::getZLvDimLenName(String^% zLvDimName) {
     return zLvDimLen;
 }
 
-void NCFileInfo::startTracking(List<Typhoon^>^ realTCs, CancellationToken cancelToken, StepPgCallback^ stepPgCallback, ProgressCallback^ progressCallback) {
+void NCFileInfo::startTracking(List<Typhoon^>^ realTCs, StepPgCallback^ stepPgCallback, ProgressCallback^ progressCallback, CancellationToken cancelToken) {
+    //bool isCanceled = false;
+    CancellationTokenRegistration reg = cancelToken.Register(gcnew Action(this, &NCFileInfo::Canceled));
+
     GCHandle gch1 = GCHandle::Alloc(stepPgCallback);
     GCHandle gch2 = GCHandle::Alloc(progressCallback);
 
@@ -75,8 +79,7 @@ void NCFileInfo::startTracking(List<Typhoon^>^ realTCs, CancellationToken cancel
     TTCore::CppCallBack2 progressCallbackPt = (TTCore::CppCallBack2)Marshal::GetFunctionPointerForDelegate(progressCallback).ToPointer();
 
     TTCore::TCs tcs;
-    bool isCanceled = false;
-    m_Instance->startTracking(tcs, &isCanceled, stepPgCallbackPt, progressCallbackPt, nullptr);
+    m_Instance->startTracking(tcs, stepPgCallbackPt, progressCallbackPt, nullptr, shouldCancel);
 
     copyToManaged(tcs, realTCs);
 

@@ -45,14 +45,21 @@ namespace TC_Tracker {
             m_Ct = m_Cts.Token;
 
             await Task.Run(() => {
-                tracker.startTracking(realTCs, m_Ct, stepPgCallBack, progressCallBack);
+                tracker.startTracking(realTCs, stepPgCallBack, progressCallBack, m_Ct);
 
                 Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => {
                     MainWindow mainW = (MainWindow)Owner;
-                    mainW.setRealTCs(realTCs);
 
-                    mainW.showWebBtn.IsEnabled = true;
-                    Close();
+                    if (m_Ct.IsCancellationRequested) {
+                        levelLabel.Content = "已取消";
+                        mainW.canceledLabel.Visibility = Visibility.Visible;
+                        Close();
+                    } else {
+                        mainW.setRealTCs(realTCs);
+
+                        mainW.showWebBtn.IsEnabled = true;
+                        Close();
+                    }
                 }));
             });
         }
@@ -101,5 +108,14 @@ namespace TC_Tracker {
             }));
         }
 
+        private void cancelBtnClicked(object sender, RoutedEventArgs e) {
+            cancelBtn.IsEnabled = false;
+            progressBar.IsIndeterminate = true;
+            levelLabel.Content = "取消中...";
+            levelIndicator.Value = levelIndicator.Maximum;
+            levelIndicator.Foreground = Brushes.Red;
+
+            m_Cts.Cancel();
+        }
     }
 }

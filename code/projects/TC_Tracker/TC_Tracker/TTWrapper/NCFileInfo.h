@@ -27,7 +27,9 @@ public ref class NCFileInfo : public ManagedObject<TTCore::NCFileInfo> {
 public:
     NCFileInfo(String^ filePath);
     NCFileInfo(String^ filePath, String^ time, String^ lat, String^ lon, String^ vor, String^ u, String^ v, bool dataIsVor);
-    NCFileInfo(String^ filePath, bool isWrfoutFile, String^ time, String^ lat, String^ lon, String^ vor, String^ u, String^ v, bool dataIsVor, int zLevelIndex, double toGridRes, String^ tempFileDir);
+    NCFileInfo(String^ filePath, bool isWrfoutFile, String^ time, String^ lat, String^ lon, String^ vor, String^ u, String^ v, bool dataIsVor, int zLevelIndex, int threadNum, double toGridRes, String^ tempFileDir);
+    ~NCFileInfo() { if (shouldCancel != nullptr) delete shouldCancel; shouldCancel = nullptr; }
+    !NCFileInfo() { if (shouldCancel != nullptr) delete shouldCancel; shouldCancel = nullptr; }
 
     bool checkFileValid(String^% fileValidInfo);
     int getZLvDimLenName(String^% zLvDimName);
@@ -37,8 +39,12 @@ public:
     List<String^>^ getVarsName();
     List<String^>^ getVorDimsName(String^ vorVarName);
 
-    void startTracking(List<Typhoon^>^ realTCs, CancellationToken cancelToken, StepPgCallback^ stepPgCallback, ProgressCallback^ progressCallback);
+    void startTracking(List<Typhoon^>^ realTCs, StepPgCallback^ stepPgCallback, ProgressCallback^ progressCallback, CancellationToken cancelToken);
     void copyToManaged(TTCore::TCs& inTC, List<Typhoon^>^ outTC);
+
+private:
+    bool *shouldCancel;
+    void Canceled() { if (shouldCancel != nullptr) *shouldCancel = true; }
 
 };
 
