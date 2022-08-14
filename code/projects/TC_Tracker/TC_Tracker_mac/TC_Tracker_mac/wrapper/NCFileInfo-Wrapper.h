@@ -75,7 +75,7 @@
 - (bool)checkIfIsWrfoutFile:(NSString **)exceptionInfo;
 - (int)getZLvDimLenName:(NSString **)zLvDimName;
 
-- (TCs*)startTrackingWithStepPgCallback : (void(*)(int stepIdx, void*))stepPgCallback andWith :(void(*)(double progressValue, void*)) progressCallback withTarget: (void*) target;
+- (TCs*)startTrackingWithStepPgCallback : (void(*)(int stepIdx, void*))stepPgCallback andWith :(void(*)(double progressValue, void*)) progressCallback withTarget: (void*) target withCancelFlag: (bool*)shouldCancel;
 
 - (void)exportFile_json:(TCs*)tcs oNcFilePath:(NSString*)oNcFilePath;
 - (void)exportFile_proto3:(TCs*)tcs oNcFilePath:(NSString*)oNcFilePath;

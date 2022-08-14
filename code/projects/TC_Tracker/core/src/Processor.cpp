@@ -35,7 +35,7 @@
 #endif
 namespace TTCore {
 
-Processor::Processor(bool* isCanceled, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string& dumpDirectory, const std::string &resourceBaseDir) : isCanceled(isCanceled), iFilePath(iFilePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), toGridRes(toGridRes), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir), iiFile{std::make_unique<netCDF::NcFile>(iFilePath, netCDF::NcFile::read)}, tcInfo(getTCInfo()) {
+Processor::Processor(bool* shouldCancel, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string& dumpDirectory, const std::string &resourceBaseDir) : shouldCancel(shouldCancel), iFilePath(iFilePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), toGridRes(toGridRes), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir), iiFile{std::make_unique<netCDF::NcFile>(iFilePath, netCDF::NcFile::read)}, tcInfo(getTCInfo()) {
     
     threadNum ? threadNum : omp_get_max_threads();
     getDimLength();
@@ -267,8 +267,25 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             std::cout << std::endl;
             
             stepPgCallback(1, target);      // start regrid
+            
             vorField.setDims(timeLength, ref_latData.size(), ref_lonData.size());
-            regridVorData(ref_latData, ref_lonData, vorField, progressCallback, target);
+            
+            if (!varNames.dataIsVor) {
+                auto uField = ThreeDArray(timeLength, ref_latData.size(), ref_lonData.size());
+                auto vField = ThreeDArray(timeLength, ref_latData.size(), ref_lonData.size());
+                
+                regridTheVarData(ref_latData, ref_lonData, varNames.uwndVarName, uField, progressCallback, target);
+                regridTheVarData(ref_latData, ref_lonData, varNames.uwndVarName, vField, progressCallback, target);
+                
+                refreshRgedLatLonData(ref_latData, ref_lonData);
+                
+                stepPgCallback(2, target);         // start cal rv
+                calculateRV(uField, vField, vorField);
+            } else {
+                regridTheVarData(ref_latData, ref_lonData, varNames.vorVarName, vorField, progressCallback, target);
+                refreshRgedLatLonData(ref_latData, ref_lonData);
+            }
+            
         } else {          // should not regrid
             vorField.setDims(timeLength, latGridNum, lonGridNum);
             if (!varNames.dataIsVor) {
@@ -314,6 +331,7 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
     unsigned long itsPerCheck = timeLength / 20;
     
     
+    
     stepPgCallback(3, target);         // start getVortexNum1Time
 #   pragma omp parallel for num_threads(threadNum)
     for (int timeIndex = 0; timeIndex < timeLength; ++timeIndex) {
@@ -328,20 +346,23 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
 //        }
         // vorVar.getVar({timeIndex,0,0}, {1, latGridNum, lonGridNum}, vorField.get());
         
+        if (*shouldCancel) { continue; }
+        
         getVortexNum1Time(vorField, timeIndex);
 //        TCNum_prevTime = tpNum_timei;
         
-#    pragma omp atomic
+#       pragma omp atomic
         ++completed_count;
         
         if (completed_count % itsPerCheck == 0) {
-#    pragma omp critical
+#       pragma omp critical
             progressCallback(static_cast<double>(completed_count)/timeLength*100, target);
         }
     }
 //    dumpVortexes(allVorsCellsIndex);
-    progressCallback(100, target);
+//    progressCallback(100, target);
     std::cout << "Done step1" << std::endl;
+    
 }
 
 /// 第二步：跟踪第一步生成的每个时次的气旋，生成真正的气旋对象。
@@ -832,12 +853,18 @@ std::vector<float> Processor::getRgedLonArr(float spatialRes) {
     return ref_lonData;
 }
 
-void Processor::regridVorData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, ThreeDArray &vorField, void(*progressCallback)(double progressValue, void*), void* target) {
+void Processor::regridTheVarData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, const std::string &theVarName, ThreeDArray &theVarField, void(*progressCallback)(double progressValue, void*), void* target) {
     int ref_latGridNum = ref_latData.size(), ref_lonGridNum = ref_lonData.size();
-
-    auto tempVorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
-    std::cout << "reading file from disk..." << std::endl;
-    iiFile->getVar(varNames.vorVarName).getVar(tempVorField.get());
+    auto theVar = iiFile->getVar(theVarName);
+    
+    auto tempTheVarField = ThreeDArray(timeLength, latGridNum, lonGridNum);
+    
+    if (zLevelIndex == -1) {
+        theVar.getVar(tempTheVarField.get());
+    } else {
+        theVar.getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { timeLength,1,latGridNum,lonGridNum }, tempTheVarField.get());
+    }
+    
     std::cout << "start regridding..." << std::endl;
 //    auto interp = Linint2();
     
@@ -845,7 +872,7 @@ void Processor::regridVorData(const std::vector<float> &ref_latData, const std::
     unsigned long itsPerCheck = timeLength / 50;
     
     for (int timeIndex = 0; timeIndex < timeLength; ++timeIndex) {
-        NCL_cxx::linint2(lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempVorField.get()+timeIndex*lonGridNum*latGridNum, vorField.get()+timeIndex*ref_lonGridNum*ref_latGridNum, false, -9999);
+        NCL_cxx::linint2(lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempTheVarField.get()+timeIndex*lonGridNum*latGridNum, theVarField.get()+timeIndex*ref_lonGridNum*ref_latGridNum, false, -9999);
         ++completed_count;
         if (completed_count % itsPerCheck == 0) {
             progressCallback(static_cast<double>(completed_count)/timeLength*100, target);
@@ -853,13 +880,31 @@ void Processor::regridVorData(const std::vector<float> &ref_latData, const std::
     }
     
 //    NCL_cxx::linint2(threadNum, timeLength, lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempVorField.get(), vorField.get(), false, -9999);
-    
+
+}
+
+void Processor::refreshRgedLatLonData(const std::vector<float> &newLatData, const std::vector<float> &newLonData) {
     // 将旧的lat和lon数据替换为regrid后的lat和lon
+    int ref_latGridNum = newLatData.size(), ref_lonGridNum = newLonData.size();
     latGridNum = ref_latGridNum; lonGridNum = ref_lonGridNum;
     latArr = std::make_unique<float[]>(latGridNum);   // reassign, 不会导致内存泄漏
     lonArr = std::make_unique<float[]>(lonGridNum);   // reassign, 不会导致内存泄漏
-    std::copy(ref_latData.data(), ref_latData.data()+latGridNum, latArr.get());
-    std::copy(ref_lonData.data(), ref_lonData.data()+lonGridNum, lonArr.get());
+    std::copy(newLatData.data(), newLatData.data()+latGridNum, latArr.get());
+    std::copy(newLonData.data(), newLonData.data()+lonGridNum, lonArr.get());
+}
+
+void Processor::calculateRV(ThreeDArray &uField, ThreeDArray &vField, ThreeDArray &vorField) {
+    float fillValue = 0.0;
+    auto uVar = iiFile->getVar(varNames.uwndVarName);
+    if (UtilFunc::checkIfHasVarAtt(uVar, "_FillValue")) {
+        uVar.getAtt("_FillValue").getValues(&fillValue);
+    } else {
+        fillValue = 9.96921e+36;
+    }
+
+    for (int time_i = 0; time_i < timeLength; ++time_i) {
+        uv2vr_cfd().calRV(uField[time_i], vField[time_i], latArr.get(), lonArr.get(), latGridNum, lonGridNum, fillValue, 2, vorField[time_i]);
+    }
 }
 
 void Processor::unstaggerU(netCDF::NcFile *inFile, ThreeDArray &u_unstged, ThreeDArray &v_unstged) {

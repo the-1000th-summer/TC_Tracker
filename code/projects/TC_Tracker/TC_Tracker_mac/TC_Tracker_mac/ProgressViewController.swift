@@ -12,10 +12,13 @@ class ProgressViewController: NSViewController {
     @IBOutlet var progressBar: NSProgressIndicator!
     @IBOutlet var levelIndicator: NSLevelIndicator!
     @IBOutlet var levelLabel: NSTextField!
+    @IBOutlet var cancelBtn: NSButton!
     
     
     public var tracker: NCFileInfo_Wrapper?
     private var realTCs: [Typhoon] = []
+    
+    private let shouldCancelPt = UnsafeMutablePointer<Bool>.allocate(capacity: 1)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +35,8 @@ class ProgressViewController: NSViewController {
         
         let dispatchQueue = DispatchQueue(label: "QueueIdentification", qos: .userInitiated)
         let observer = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+        
+        shouldCancelPt.initialize(to: false)
         
         dispatchQueue.async {
             let tcs = tracker.startTracking(stepPgCallback: { (stepIdx, observer) in
@@ -72,15 +77,37 @@ class ProgressViewController: NSViewController {
                     }
                     
                 }
-            }, withTarget: observer)!//.tcs.compactMap { $0 as? Typhoon }
+            }, withTarget: observer, withCancelFlag: self.shouldCancelPt)!//.tcs.compactMap { $0 as? Typhoon }
             
-            mainVC.setTCs(tcs: tcs)
-            
-            DispatchQueue.main.async {
-                mainVC.showWebBtn.isEnabled = true
-                mainVC.dismiss(self)
+            if self.shouldCancelPt.pointee {
+                DispatchQueue.main.async {
+                    self.levelLabel.stringValue = "已取消"
+                    mainVC.canceledLabel.isHidden = false
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    mainVC.dismiss(self)
+                }
+            } else {
+                mainVC.setTCs(tcs: tcs)
+                
+                DispatchQueue.main.async {
+                    mainVC.showWebBtn.isEnabled = true
+                    mainVC.dismiss(self)
+                }
             }
+            
         }
+        
+        shouldCancelPt.deallocate()
     }
     
+    @IBAction func cancelBtnClicked(_ sender: NSButton) {
+        cancelBtn.isEnabled = false
+        levelLabel.stringValue = "取消中..."
+        progressBar.isIndeterminate = true
+        progressBar.startAnimation(nil)
+        levelIndicator.intValue = Int32(levelIndicator.maxValue)
+        levelIndicator.fillColor = .red
+        shouldCancelPt.pointee = true
+    }
 }

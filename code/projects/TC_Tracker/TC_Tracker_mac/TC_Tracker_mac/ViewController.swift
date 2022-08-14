@@ -22,6 +22,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     @IBOutlet var gridResTextField: NSTextField!
     @IBOutlet var interpSwitch: NSSwitch!
     @IBOutlet var exportBtn: NSButton!
+    @IBOutlet var canceledLabel: NSTextField!
     
     @objc private dynamic var timeVarStr = "未指定"
     @objc private dynamic var latVarStr = "未指定"
@@ -87,6 +88,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         zLvComboBox.isEnabled = false
         showWebBtn.isEnabled = false
         startTrackingBtn.isEnabled = false
+        canceledLabel.isHidden = true
 
         guard checkFileValid(filePath: filePath) else {
             interpSwitch.isEnabled = false

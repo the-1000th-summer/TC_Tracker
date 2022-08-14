@@ -413,7 +413,7 @@
                                 </imageCell>
                             </imageView>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rVK-hR-QC0">
-                                <rect key="frame" x="350" y="50" width="88" height="32"/>
+                                <rect key="frame" x="350" y="61" width="88" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="开始识别" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yrK-3o-ljz">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -488,6 +488,15 @@
                                     <action selector="exportBtnClicked:" target="XfG-lQ-9wD" id="PqN-Aq-4fR"/>
                                 </connections>
                             </button>
+                            <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ILc-Oq-xt2">
+                                <rect key="frame" x="442" y="70" width="44" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="已取消" id="iuA-Pe-BBJ">
+                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                    <color key="textColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
                             <constraint firstItem="dsX-xA-N1O" firstAttribute="leading" secondItem="eSB-VF-VHn" secondAttribute="trailing" constant="132" id="Lza-uv-wtC"/>
@@ -499,6 +508,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="canceledLabel" destination="ILc-Oq-xt2" id="AWn-55-aeP"/>
                         <outlet property="exportBtn" destination="ZWB-1i-TnZ" id="T0d-am-TrM"/>
                         <outlet property="filePathTextField" destination="18R-nb-mD0" id="YEO-Tm-QOm"/>
                         <outlet property="gridResTextField" destination="dsX-xA-N1O" id="2j3-dl-Lz9"/>
@@ -539,6 +549,9 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <connections>
+                                    <action selector="cancelBtnClicked:" target="wVZ-11-skp" id="hpT-gK-xic"/>
+                                </connections>
                             </button>
                             <levelIndicator verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iRb-jZ-15z">
                                 <rect key="frame" x="127" y="112" width="95" height="18"/>
@@ -564,6 +577,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="cancelBtn" destination="ngb-3S-aID" id="lMH-sb-AEL"/>
                         <outlet property="levelIndicator" destination="iRb-jZ-15z" id="yWj-qg-sf5"/>
                         <outlet property="levelLabel" destination="W4Z-QX-HC2" id="idp-ob-byk"/>
                         <outlet property="progressBar" destination="myX-dQ-O21" id="bMa-oN-Yc7"/>
@@ -585,7 +599,7 @@
                                 <rect key="frame" x="93" y="194" width="44" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="线程数" id="3Cu-IN-x15">
-                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                    <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>

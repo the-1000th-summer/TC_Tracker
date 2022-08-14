@@ -19,7 +19,7 @@ using CppCallBack2 = void(__stdcall*)(double progressValue, void*);
 class Processor {
 public:
 //    Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &timeVName="", const std::string & latVName="", const std::string & lonVName="", const std::string & vorVName="", int zLevelIndex = -1, const std::string & dumpDirectory = "");
-    Processor(bool* isCanceled, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string & dumpDirectory, const std::string &resourceBaseDir);
+    Processor(bool* shouldCancel, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string & dumpDirectory, const std::string &resourceBaseDir);
     //Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
     ~Processor();
     TCInfo getTCInfo();
@@ -48,7 +48,7 @@ public:
     void copyLatLonData(std::vector<float> &lat_data, std::vector<float> &lon_data);
     
 private:
-    bool* isCanceled;
+    bool* shouldCancel;
 //    netCDF::NcFile *iiFile;
     std::string iFilePath;
     std::unique_ptr<netCDF::NcFile> iiFile;
@@ -78,8 +78,11 @@ private:
     bool shouldRegrid(float spatialRes);
     std::vector<float> getRgedLatArr(float spatialRes);
     std::vector<float> getRgedLonArr(float spatialRes);
-    void regridVorData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, ThreeDArray &vorField, void(*progressCallback)(double progressValue, void*), void* target);
+    void regridTheVarData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, const std::string &theVarName, ThreeDArray &theVarField, void(*progressCallback)(double progressValue, void*), void* target);
+    void calculateRV(ThreeDArray &uField, ThreeDArray &vField, ThreeDArray &vorField);
+    void refreshRgedLatLonData(const std::vector<float> &newLatData, const std::vector<float> &newLonData);
     void unstaggerU(netCDF::NcFile *inFile, ThreeDArray &u_unstged, ThreeDArray &v_unstged);
+    
     
     int getLastNotEmptyVecIndex();
     void checkDirAndCreate(const std::string &folderName);

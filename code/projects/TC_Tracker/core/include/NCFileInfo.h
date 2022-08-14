@@ -35,7 +35,7 @@ public:
     std::vector<std::string> getVarsName();
     std::vector<std::string> getVorDimsName(const std::string& vorVarName);
     
-    void startTracking(TCs &tcs, bool* isCanceled, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target);
+    void startTracking(TCs &tcs, bool* isCanceled, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target, bool* shouldCancel);
     
     void exportFile_json(TCs &tcs, const std::string oFilePath);
     void exportFile_proto3(TCs &tcs, const std::string oFilePath);
