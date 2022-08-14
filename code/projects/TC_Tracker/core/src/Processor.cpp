@@ -225,12 +225,45 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             auto u_regularGrid = ThreeDArray(timeLength, lat_rged.size(), lon_rged.size());
             auto v_regularGrid = ThreeDArray(timeLength, lat_rged.size(), lon_rged.size());
             int ier = 0;
-            for (int time_i = 0; time_i < timeLength; ++time_i)
+            
+            int completed_count = 0;
+            unsigned long itsPerCheck = timeLength / 20;
+            
+#           pragma omp parallel for num_threads(threadNum)
+            for (int time_i = 0; time_i < timeLength; ++time_i) {
+                if (*shouldCancel) { continue; }
+                
                 NCL_cxx::rcm2rgrid<float>(lonArr2D.get(), latArr2D.get(), lonGridNum, latGridNum, lon_rged.data(), lat_rged.data(), lon_rged.size(), lat_rged.size(), u_unstged[time_i], u_regularGrid[time_i], 9.96921e+36, ier);
+                
+#               pragma omp atomic
+                ++completed_count;
+
+                if (completed_count % itsPerCheck == 0) {
+#                   pragma omp critical
+                    progressCallback(static_cast<double>(completed_count)/timeLength*100, target);
+                }
+            }
             assert(ier == 0);
-            for (int time_i = 0; time_i < timeLength; ++time_i)
+            if (*shouldCancel) { return; }
+            
+            completed_count = 0;
+#           pragma omp parallel for num_threads(threadNum)
+            for (int time_i = 0; time_i < timeLength; ++time_i) {
+                if (*shouldCancel) { continue; }
+                
                 NCL_cxx::rcm2rgrid<float>(lonArr2D.get(), latArr2D.get(), lonGridNum, latGridNum, lon_rged.data(), lat_rged.data(), lon_rged.size(), lat_rged.size(), v_unstged[time_i], v_regularGrid[time_i], 9.96921e+36, ier);
+                
+#               pragma omp atomic
+                ++completed_count;
+                
+                if (completed_count % itsPerCheck == 0) {
+#                   pragma omp critical
+                    progressCallback(static_cast<double>(completed_count)/timeLength*100, target);
+                }
+            }
             assert(ier == 0);
+            if (*shouldCancel) { return; }
+            
             std::cout << "finish regrid wrfout uv" << std::endl;
             
             stepPgCallback(2, target);    // start cal rv
@@ -239,6 +272,7 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             for (int time_i = 0; time_i < timeLength; ++time_i) {
                 uv2vr_cfd().calRV(u_regularGrid[time_i], v_regularGrid[time_i], lat_rged.data(), lon_rged.data(), lat_rged.size(), lon_rged.size(), 9.96921e+36, 2, vorField[time_i]);
             }
+            if (*shouldCancel) { return; }
             std::cout << "finish cal wrfout rv" << std::endl;
             
             // treat regridded data as regular grid data
@@ -275,14 +309,18 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
                 auto vField = ThreeDArray(timeLength, ref_latData.size(), ref_lonData.size());
                 
                 regridTheVarData(ref_latData, ref_lonData, varNames.uwndVarName, uField, progressCallback, target);
+                if (*shouldCancel) { return; }
                 regridTheVarData(ref_latData, ref_lonData, varNames.uwndVarName, vField, progressCallback, target);
+                if (*shouldCancel) { return; }
                 
                 refreshRgedLatLonData(ref_latData, ref_lonData);
                 
                 stepPgCallback(2, target);         // start cal rv
                 calculateRV(uField, vField, vorField);
+                if (*shouldCancel) { return; }
             } else {
                 regridTheVarData(ref_latData, ref_lonData, varNames.vorVarName, vorField, progressCallback, target);
+                if (*shouldCancel) { return; }
                 refreshRgedLatLonData(ref_latData, ref_lonData);
             }
             
@@ -329,8 +367,6 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
     
     int completed_count = 0;
     unsigned long itsPerCheck = timeLength / 20;
-    
-    
     
     stepPgCallback(3, target);         // start getVortexNum1Time
 #   pragma omp parallel for num_threads(threadNum)
@@ -871,10 +907,17 @@ void Processor::regridTheVarData(const std::vector<float> &ref_latData, const st
     int completed_count = 0;
     unsigned long itsPerCheck = timeLength / 50;
     
+#   pragma omp parallel for num_threads(threadNum)
     for (int timeIndex = 0; timeIndex < timeLength; ++timeIndex) {
+        if (*shouldCancel) { continue; }
+        
         NCL_cxx::linint2(lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempTheVarField.get()+timeIndex*lonGridNum*latGridNum, theVarField.get()+timeIndex*ref_lonGridNum*ref_latGridNum, false, -9999);
+        
+#       pragma omp atomic
         ++completed_count;
+        
         if (completed_count % itsPerCheck == 0) {
+#           pragma omp critical
             progressCallback(static_cast<double>(completed_count)/timeLength*100, target);
         }
     }

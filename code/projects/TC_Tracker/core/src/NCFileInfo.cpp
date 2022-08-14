@@ -115,6 +115,7 @@ void NCFileInfo::startTracking(TCs &tcs, bool* isCanceled, void(*stepPgCallback)
     if (!noTempFiles)
         p.dumpStep2(ncFilePath);
     
+    if (*shouldCancel) { return; }
     stepPgCallback(5, target);
     p.removeNoise();
 
