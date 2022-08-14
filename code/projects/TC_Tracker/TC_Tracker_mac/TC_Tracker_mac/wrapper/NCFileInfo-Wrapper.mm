@@ -195,8 +195,8 @@
 
 - (TCs*)startTrackingWithStepPgCallback : (void(*)(int stepIdx, void*))stepPgCallback andWith :(void(*)(double progressValue, void*)) progressCallback withTarget: (void*) target withCancelFlag: (bool*)shouldCancel {
     TTCore::TCs tcs;
-    bool isCanceled = false;
-    m_instance->startTracking(tcs, &isCanceled, stepPgCallback, progressCallback, target, shouldCancel);
+
+    m_instance->startTracking(tcs, stepPgCallback, progressCallback, target, shouldCancel);
     
     std::cout << "unmanaged TC number: " << tcs.size() << std::endl;
     
