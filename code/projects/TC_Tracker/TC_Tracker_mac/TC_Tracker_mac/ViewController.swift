@@ -377,11 +377,10 @@ class OnlyDoubleValueFormatter: NumberFormatter {
         }
 
         // Optional: limit input length
-        /*
-        if partialString.characters.count>3 {
-            return false
-        }
-        */
+//        if partialString.characters.count>3 {
+//            return false
+//        }
+        
         let numSubStrs = partialString.split(separator: ".")
         if (numSubStrs.count == 2) {
             if numSubStrs[1].count > 2 {
