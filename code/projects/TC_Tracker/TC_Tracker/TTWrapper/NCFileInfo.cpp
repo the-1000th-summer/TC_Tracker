@@ -58,9 +58,6 @@ List<String^>^ NCFileInfo::getVorDimsName(String^ vorVarName) {
     return vorDimList;
 }
 
-/// 此函数获取z方向维度的名字和其长度
-/// @param[inout] z方向维度名字
-/// @return z方向维度长度
 int NCFileInfo::getZLvDimLenName(String^% zLvDimName) {
     std::string dimName = "";
     int zLvDimLen = m_Instance->getZLvDimLenName(dimName);

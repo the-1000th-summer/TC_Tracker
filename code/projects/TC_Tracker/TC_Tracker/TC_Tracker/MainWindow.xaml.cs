@@ -199,6 +199,7 @@ namespace TC_Tracker {
             cSelDir = filePath;
             zLvComboBox.IsEnabled = false;
             showWebBtn.IsEnabled = false;
+            startTrackingBtn.IsEnabled = false;
             canceledLabel.Visibility = Visibility.Collapsed;
 
             if (!checkFileValidAndUpdateUI(filePath)) {
@@ -414,6 +415,10 @@ namespace TC_Tracker {
                 e.Handled = true;
                 System.Media.SystemSounds.Asterisk.Play();
             }
+        }
+
+        private void exit_OnClick(object sender, RoutedEventArgs e) {
+            Application.Current.Shutdown();
         }
 
         private void exportBtnClicked(object sender, RoutedEventArgs e) {
