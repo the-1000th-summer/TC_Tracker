@@ -166,10 +166,10 @@ class ViewController: NSViewController, NSComboBoxDataSource {
                 NCFileInfo_Wrapper().exportFile_proto3(tcs, oNcFilePath: filePath)
             case "nc":
                 let alert = NSAlert()
-                alert.messageText = "Save as compact form?"
-                alert.addButton(withTitle: "Not Compact")
+                alert.messageText = "保存为compact形式？"
+                alert.addButton(withTitle: "非Compact")
                 alert.addButton(withTitle: "Compact")
-                alert.addButton(withTitle: "Cancel")
+                alert.addButton(withTitle: "取消")
                 let modalResult = alert.runModal()
                 
                 switch modalResult {
