@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
+using WPFCustomMessageBox;
 using myCLI;
 using TC_Tracker.otherWindow;
 
@@ -33,10 +34,10 @@ namespace TC_Tracker {
                 Properties.Settings.Default.Save();
             }
         }
-        private string jsonFExportDir {
-            get => Properties.Settings.Default.jsonFExportDir;
+        private string exportDir {
+            get => Properties.Settings.Default.exportDir;
             set {
-                Properties.Settings.Default.jsonFExportDir = value;
+                Properties.Settings.Default.exportDir = value;
                 Properties.Settings.Default.Save();
             }
         }
@@ -44,13 +45,6 @@ namespace TC_Tracker {
         //    get => Properties.Settings.Default.step3FileDir;
         //    set {
         //        Properties.Settings.Default.step3FileDir = value;
-        //        Properties.Settings.Default.Save();
-        //    }
-        //}
-        //private string jsonFExportDir {
-        //    get => Properties.Settings.Default.jsonFExportDir;
-        //    set {
-        //        Properties.Settings.Default.jsonFExportDir = value;
         //        Properties.Settings.Default.Save();
         //    }
         //}
@@ -174,7 +168,8 @@ namespace TC_Tracker {
         }
 
         private int zLvDimLen = 0;
-        private List<Typhoon> realTCs = new List<Typhoon>();
+        //private List<Typhoon> realTCs = new List<Typhoon>();
+        private TCs? tcs;
 
         //private BackgroundWorker bgWorker;
         //private List<Typhoon> realTCs = new List<Typhoon>();
@@ -199,6 +194,7 @@ namespace TC_Tracker {
             cSelDir = filePath;
             zLvComboBox.IsEnabled = false;
             showWebBtn.IsEnabled = false;
+            exportBtn.IsEnabled = false;
             startTrackingBtn.IsEnabled = false;
             canceledLabel.Visibility = Visibility.Collapsed;
 
@@ -357,7 +353,9 @@ namespace TC_Tracker {
             startTrackingBtn.IsEnabled = false;
             zLvComboBox.IsEnabled = false;
 
-            var tracker = new NCFileInfo(cSelDir, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !string.IsNullOrEmpty(vorVarStr), (zLvDimLen == 0) ? -1 : Int32.Parse(zLvComboBox.SelectedItem.ToString()), 4, gridResValue, "E:\\University\\TC_Tracker\\data\\out");
+            int threadNum = Properties.Settings.Default.threadNum;
+
+            var tracker = new NCFileInfo(cSelDir, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !string.IsNullOrEmpty(vorVarStr), (zLvDimLen == 0) ? -1 : Int32.Parse(zLvComboBox.SelectedItem.ToString()), threadNum, gridResValue, "E:\\University\\TC_Tracker\\data\\out");
 
             var progressWin = new ProgressWindow(tracker);
             progressWin.Owner = this;
@@ -390,12 +388,13 @@ namespace TC_Tracker {
             return Tuple.Create(true, gridRes);
         }
 
-        public void setRealTCs(List<Typhoon> tcs) {
-            realTCs = tcs;
+        public void setTCs(TCs tcs) {
+            this.tcs = tcs;
         }
 
         private void showWebBtnClicked(object sender, RoutedEventArgs e) {
-            var resultView = new ResultWindow(realTCs);
+            if (tcs is null) { return; }
+            var resultView = new ResultWindow(tcs.tcs);
             //resultView.tcsData = realTCs.GetRange(0,1);
             //resultView.tcsData = realTCs;
             resultView.Owner = this;
@@ -421,29 +420,79 @@ namespace TC_Tracker {
             Application.Current.Shutdown();
         }
 
+        /// <summary>
+        /// 点击了设置按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void settingsClicked(object sender, RoutedEventArgs e) {
+            var settingsView = new SettingsWindow();
+            settingsView.Owner = this;
+            settingsView.ShowDialog();
+        }
+
+        private void about_OnClick(object sender, RoutedEventArgs e) {
+            bool isWindowOpen = false;
+            foreach (Window w in Application.Current.Windows) {
+                if (w is AboutWindow) {
+                    isWindowOpen = true;
+                    w.Activate();
+                }
+            }
+            if (!isWindowOpen) {
+                var newwindow = new AboutWindow();
+                newwindow.Show();
+            }
+        }
+
         private void exportBtnClicked(object sender, RoutedEventArgs e) {
             exportFile(false);
         }
 
         private void exportFile(bool selStep3FileFirst, string step3FilePath = "") {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.InitialDirectory = string.IsNullOrEmpty(jsonFExportDir) ? "C:\\Users" : jsonFExportDir;
+            dlg.InitialDirectory = string.IsNullOrEmpty(exportDir) ? "C:\\Users" : exportDir;
             dlg.RestoreDirectory = true;
-            dlg.FileName = "Document"; // Default file name
-            dlg.DefaultExt = ".text"; // Default file extension
-            dlg.Filter = "json files|*.json"; // Filter files by extension
+            dlg.FileName = "trackResult"; // Default file name
+            dlg.DefaultExt = ".json"; // Default file extension
+            dlg.Filter = "json files|*.json|protobuf files|*.pb|netCDF files|*.nc"; // Filter files by extension
 
             Nullable<bool> result = dlg.ShowDialog();
 
             // Process save file dialog box results
             if (result == true) {
                 // Save document
-                jsonFExportDir = System.IO.Path.GetDirectoryName(dlg.FileName);
+                exportDir = System.IO.Path.GetDirectoryName(dlg.FileName);
+                var fileExtension = System.IO.Path.GetExtension(dlg.FileName);
                 string outFilePath = dlg.FileName;
                 Console.WriteLine("filterindex: {0}", dlg.FilterIndex);
                 Console.WriteLine("filePath: {0}", outFilePath);
+                Console.WriteLine("extension: {0}", fileExtension);
 
-                //NCFileInfo fileInfo = new NCFileInfo(cSelDir, !isNotWrfoutFile, "", "", "", "", s_TempFileDir);
+                switch (fileExtension) {
+                case ".json":
+                    new NCFileInfo().exportFile_json(tcs, outFilePath);
+                    break;
+                case ".pb":
+                    new NCFileInfo().exportFile_proto3(tcs, outFilePath);
+                    break;
+                case ".nc":
+                    var isCompactResult = CustomMessageBox.ShowYesNoCancel("保存为compact形式？", "保存为compact形式？", "Compact", "非Compact", "取消");
+                    switch (isCompactResult) {
+                    case MessageBoxResult.Yes:
+                        new NCFileInfo().exportFile_nc_compact(tcs, outFilePath, "exportFile_nc_compact");
+                        break;
+                    case MessageBoxResult.No:
+                        new NCFileInfo().exportFile_nc(tcs, outFilePath, "exportFile_nc");
+                        break;
+                    default:
+                        break;
+                    }
+                    break;
+                default:
+                    MessageBox.Show($"Extension \"{fileExtension}\" is not supported.\n\".json\", \".pb\", \".nc\" are supported extensions");
+                    break;
+                }
                 //if (selStep3FileFirst) {
                 //    fileInfo.exportFile(step3FilePath, outFilePath);
                 //} else {

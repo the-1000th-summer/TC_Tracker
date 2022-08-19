@@ -5,6 +5,16 @@ using namespace System::Collections::Generic;
 
 namespace myCLI {
 
+TCInfo::TCInfo(String^ timeUnits, bool time_noleap, double timeInterval, double firstTValue) : timeUnits(timeUnits), time_noleap(time_noleap), timeInterval(timeInterval), firstTValue(firstTValue) {
+}
+
+TCs::TCs(List<Typhoon^>^ tcs, TCInfo^ tcInfo) : tcs(tcs), tcInfo(tcInfo) {
+}
+
+NCFileInfo::NCFileInfo() : ManagedObject(new TTCore::NCFileInfo()) {
+
+}
+
 NCFileInfo::NCFileInfo(String^ filePath) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath))) {
 
 }
@@ -65,7 +75,7 @@ int NCFileInfo::getZLvDimLenName(String^% zLvDimName) {
     return zLvDimLen;
 }
 
-void NCFileInfo::startTracking(List<Typhoon^>^ realTCs, StepPgCallback^ stepPgCallback, ProgressCallback^ progressCallback, CancellationToken cancelToken) {
+TCs^ NCFileInfo::startTracking(StepPgCallback^ stepPgCallback, ProgressCallback^ progressCallback, CancellationToken cancelToken) {
     //bool isCanceled = false;
     CancellationTokenRegistration reg = cancelToken.Register(gcnew Action(this, &NCFileInfo::Canceled));
 
@@ -78,32 +88,85 @@ void NCFileInfo::startTracking(List<Typhoon^>^ realTCs, StepPgCallback^ stepPgCa
     TTCore::TCs tcs;
     m_Instance->startTracking(tcs, stepPgCallbackPt, progressCallbackPt, nullptr, shouldCancel);
 
-    copyToManaged(tcs, realTCs);
+    //copyToManaged(tcs, realTCs);
 
     gch1.Free();
     gch2.Free();
+
+    return copyToManaged(tcs);
 }
 
-void NCFileInfo::copyToManaged(TTCore::TCs& inTC, List<Typhoon^>^ outTC) {
-    auto tcs = inTC.getTcs();
-
+TCs^ NCFileInfo::copyToManaged(TTCore::TCs& inTC) {
+    auto realTCs = inTC.getTcs();
     int tcSize = inTC.size();
+    List<Typhoon^>^ outTC = gcnew List<Typhoon^>();
+
     for (int i = 0; i < tcSize; ++i) {
         Typhoon^ newTC = gcnew Typhoon();
-        newTC->serialNo = tcs[i].serialNo;
-        newTC->startTimeIndex = tcs[i].startTimeIndex;
-        newTC->endTimeIndex = tcs[i].endTimeIndex;
-        for (const auto& maxVorCell : tcs[i].maxVorCells) {
+        newTC->serialNo = realTCs[i].serialNo;
+        newTC->startTimeIndex = realTCs[i].startTimeIndex;
+        newTC->endTimeIndex = realTCs[i].endTimeIndex;
+        for (const auto& maxVorCell : realTCs[i].maxVorCells) {
             // newTC->maxVorCells->Add(gcnew Tuple<float,float>{latData[maxVorCell.first], lonData[maxVorCell.second]});
             newTC->maxVorCells->Add(gcnew Tuple<float, float>{maxVorCell.first, maxVorCell.second});
         }
-        for (const auto& geoCenter : tcs[i].geoCenters) {
+        for (const auto& geoCenter : realTCs[i].geoCenters) {
             newTC->geoCenters->Add(gcnew Tuple<float, float>{geoCenter.first, geoCenter.second});
         }
 
         outTC->Add(newTC);
     }
+
+    TCInfo^ newTCInfo = gcnew TCInfo(
+        gcnew String(inTC.getTimeUnits().c_str()),
+        inTC.getTcInfo().getTime_noleap(),
+        inTC.getTimeInterval(),
+        inTC.getTcInfo().getFirstTValue()
+    );
+
+    return gcnew TCs(outTC, newTCInfo);
 }
 
+void NCFileInfo::exportFile_json(TCs^ tcs, String^ oNcFilePath) {
+    TTCore::TCs tcs_cpp = toCppTCs(tcs);
+    m_Instance->exportFile_json(tcs_cpp, string2Char(oNcFilePath));
+}
+
+void NCFileInfo::exportFile_proto3(TCs^ tcs, String^ oNcFilePath) {
+    TTCore::TCs tcs_cpp = toCppTCs(tcs);
+    m_Instance->exportFile_proto3(tcs_cpp, string2Char(oNcFilePath));
+}
+
+void NCFileInfo::exportFile_nc(TCs^ tcs, String^ oNcFilePath, String^ fullCommand) {
+    TTCore::TCs tcs_cpp = toCppTCs(tcs);
+    m_Instance->exportFile_nc(tcs_cpp, string2Char(oNcFilePath), string2Char(fullCommand));
+}
+
+void NCFileInfo::exportFile_nc_compact(TCs^ tcs, String^ oNcFilePath, String^ fullCommand) {
+    TTCore::TCs tcs_cpp = toCppTCs(tcs);
+    m_Instance->exportFile_nc_compact(tcs_cpp, string2Char(oNcFilePath), string2Char(fullCommand));
+}
+
+TTCore::TCs NCFileInfo::toCppTCs(TCs^ tcs) {
+    std::vector<TTCore::Typhoon> realTCs;
+
+    for each (Typhoon^ realTC in tcs->tcs) {
+        std::vector<std::pair<int, int>> maxVorCells_cpp;
+        std::vector<std::pair<float, float>> geoCenters_cpp;
+        for each (Tuple<float, float>^ maxVorCell in realTC->maxVorCells) {
+            maxVorCells_cpp.push_back({maxVorCell->Item1, maxVorCell->Item2});
+        }
+        for each (Tuple<float, float>^ geoCenter in realTC->geoCenters) {
+            geoCenters_cpp.push_back({geoCenter->Item1, geoCenter->Item2});
+        }
+
+        realTCs.push_back(TTCore::Typhoon{realTC->serialNo, maxVorCells_cpp, geoCenters_cpp, realTC->startTimeIndex, realTC->endTimeIndex, {}});
+    }
+    
+    auto tcInfo = TTCore::TCInfo(string2Char(tcs->tcInfo->timeUnits), tcs->tcInfo->time_noleap, tcs->tcInfo->timeInterval, tcs->tcInfo->firstTValue);
+    auto tcs_cpp = TTCore::TCs(realTCs, tcInfo);
+
+    return tcs_cpp;
+}
 
 }

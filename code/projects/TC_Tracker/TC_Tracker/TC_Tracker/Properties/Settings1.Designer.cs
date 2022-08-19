@@ -50,12 +50,24 @@ namespace TC_Tracker.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string jsonFExportDir {
+        public string exportDir {
             get {
-                return ((string)(this["jsonFExportDir"]));
+                return ((string)(this["exportDir"]));
             }
             set {
-                this["jsonFExportDir"] = value;
+                this["exportDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int threadNum {
+            get {
+                return ((int)(this["threadNum"]));
+            }
+            set {
+                this["threadNum"] = value;
             }
         }
     }

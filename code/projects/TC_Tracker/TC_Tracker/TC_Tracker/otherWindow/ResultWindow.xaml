@@ -6,12 +6,11 @@
         xmlns:local="clr-namespace:TC_Tracker.otherWindow"
         mc:Ignorable="d"
         x:Name="resultWin"
-        Title="ResultWindow" Height="600" Width="1024"
+        Title="结果" Height="600" Width="1024"
         SizeChanged="windowSizeChanged">
     <Window.Resources>
         <ContextMenu x:Key="MnuCustom" StaysOpen="True">
             <MenuItem Header="导出当前路径..." Click="exClick" IsEnabled="{Binding selectedPathIndex, Source={x:Reference resultWin}, Converter={StaticResource canExportOnePathConverter}}"></MenuItem>
-            <MenuItem Header="Custom 1"></MenuItem>
         </ContextMenu>
     </Window.Resources>
     <Grid Name="myGrid">

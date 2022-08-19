@@ -22,7 +22,7 @@ namespace TC_Tracker {
     public partial class ProgressWindow : Window {
 
         private NCFileInfo tracker;
-        private List<Typhoon> realTCs = new List<Typhoon>();
+        //private List<Typhoon> realTCs = new List<Typhoon>();
 
         private System.Threading.CancellationTokenSource m_Cts;
         private System.Threading.CancellationToken m_Ct;
@@ -45,7 +45,7 @@ namespace TC_Tracker {
             m_Ct = m_Cts.Token;
 
             await Task.Run(() => {
-                tracker.startTracking(realTCs, stepPgCallBack, progressCallBack, m_Ct);
+                var tcs = tracker.startTracking(stepPgCallBack, progressCallBack, m_Ct);
 
                 Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => {
                     MainWindow mainW = (MainWindow)Owner;
@@ -55,9 +55,10 @@ namespace TC_Tracker {
                         mainW.canceledLabel.Visibility = Visibility.Visible;
                         Close();
                     } else {
-                        mainW.setRealTCs(realTCs);
+                        mainW.setTCs(tcs);
 
                         mainW.showWebBtn.IsEnabled = true;
+                        mainW.exportBtn.IsEnabled = true;
                         Close();
                     }
                 }));

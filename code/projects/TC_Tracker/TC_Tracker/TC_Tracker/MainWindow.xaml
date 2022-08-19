@@ -6,55 +6,59 @@
         xmlns:local="clr-namespace:TC_Tracker"
         mc:Ignorable="d"
         x:Name="mainWin"
-        Title="TC Tracker" Height="450" Width="800"
+        Title="热带气旋路径识别软件" Height="450" Width="800"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanMinimize"
         Closing="windowClosing">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="71*"/>
+            <ColumnDefinition Width="729*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Menu Grid.Row="0">
+        <Menu Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,17">
             <MenuItem Header="文件(_F)">
                 <MenuItem x:Name="menu_selDir" Header="选择文件(_O)" Click="browseButtonClicked" />
                 <MenuItem Header="退出(_X)" Click="exit_OnClick" />
             </MenuItem>
             <MenuItem Header="偏好设置(_P)">
-                <MenuItem x:Name="settings" Header="设置..."></MenuItem>
-                <MenuItem Header="关于..."></MenuItem>
+                <MenuItem x:Name="settings" Header="设置..." Click="settingsClicked"></MenuItem>
+                <MenuItem Header="关于..." Click="about_OnClick"></MenuItem>
             </MenuItem>
         </Menu>
-        <Label x:Name="label" Content="工作文件" HorizontalAlignment="Left" Margin="83,48,0,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="156,48,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="442" Height="25" IsReadOnly="True" Grid.Row="1"/>
-        <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="630,48,0,0" VerticalAlignment="Top" Height="25" Width="78" Click="browseButtonClicked" Grid.Row="1"/>
-        <Button x:Name="selVarNameBtn" Content="选择变量..." HorizontalAlignment="Left" Margin="144,90,0,0" VerticalAlignment="Top" Height="34" Width="72" Click="varSelClicked" IsEnabled="False" Grid.Row="1"/>
-        <Label x:Name="label1" Content="时间变量名：" HorizontalAlignment="Right" Margin="0,140,642,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <Label x:Name="label1_Copy" Content="纬度变量名：" HorizontalAlignment="Right" Margin="0,170,642,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <Label x:Name="label1_Copy1" Content="经度变量名：" HorizontalAlignment="Right" Margin="0,200,642,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <Label x:Name="vorLabel" Content="涡度变量名：" HorizontalAlignment="Right" Margin="0,230,642,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <Label x:Name="uwndLabel" Content="u风变量名：" HorizontalAlignment="Right" Margin="0,260,642,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <Label x:Name="vwndLabel" Content="v风变量名：" HorizontalAlignment="Right" Margin="0,290,642,0" VerticalAlignment="Top" Grid.Row="1"/>
+        <Label x:Name="label" Content="工作文件" HorizontalAlignment="Left" Margin="12,31,0,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
+        <TextBox x:Name="ncFileTextBox" HorizontalAlignment="Left" Margin="85,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="442" Height="25" IsReadOnly="True" Grid.Row="1" Grid.Column="1"/>
+        <Button x:Name="button" Content="选择文件..." HorizontalAlignment="Left" Margin="559,31,0,0" VerticalAlignment="Top" Height="25" Width="78" Click="browseButtonClicked" Grid.Row="1" Grid.Column="1"/>
+        <Button x:Name="selVarNameBtn" Content="选择变量..." HorizontalAlignment="Left" Margin="73,73,0,0" VerticalAlignment="Top" Height="34" Width="72" Click="varSelClicked" IsEnabled="False" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="label1" Content="时间变量名：" HorizontalAlignment="Right" Margin="0,123,642,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="label1_Copy" Content="纬度变量名：" HorizontalAlignment="Right" Margin="0,153,642,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="label1_Copy1" Content="经度变量名：" HorizontalAlignment="Right" Margin="0,183,642,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="vorLabel" Content="涡度变量名：" HorizontalAlignment="Right" Margin="0,213,642,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="uwndLabel" Content="u风变量名：" HorizontalAlignment="Right" Margin="0,243,642,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="vwndLabel" Content="v风变量名：" HorizontalAlignment="Right" Margin="0,273,642,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
 
-        <Label x:Name="timeNameLabel" HorizontalAlignment="Left" Margin="156,140,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=timeVarStr}" Grid.Row="1"/>
-        <Label x:Name="latNameLabel" HorizontalAlignment="Left" Margin="156,170,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=latVarStr}" Grid.Row="1"/>
-        <Label x:Name="lonNameLabel" HorizontalAlignment="Left" Margin="156,200,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=lonVarStr}" Grid.Row="1"/>
-        <Label x:Name="vorNameLabel" HorizontalAlignment="Left" Margin="156,230,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=vorVarStr}" Grid.Row="1"/>
-        <Label x:Name="uwndNameLabel" HorizontalAlignment="Left" Margin="156,260,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=uwndVarStr}" Grid.Row="1"/>
-        <Label x:Name="vwndNameLabel" HorizontalAlignment="Left" Margin="156,290,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=vwndVarStr}" Grid.Row="1"/>
-        <Label x:Name="label2" Content="z方向维度名：" HorizontalAlignment="Left" Margin="354,139,0,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <Label x:Name="zLvNameTextBlock" Content="未指定" HorizontalAlignment="Left" Margin="442,139,0,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <Label x:Name="label3" Content="选取第                    层数据" HorizontalAlignment="Left" Margin="348,167,0,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <ComboBox x:Name="zLvComboBox" HorizontalAlignment="Left" Margin="397,170,0,0" VerticalAlignment="Top" Width="56" Height="20" IsEnabled="False" Grid.Row="1"/>
-        <Button x:Name="showWebBtn" Content="查看结果..." HorizontalAlignment="Left" Margin="556,356,0,0" VerticalAlignment="Top" Click="showWebBtnClicked" Grid.Row="1"/>
-        <CheckBox x:Name="interpCheckBox" Content="" HorizontalAlignment="Center" Margin="0,228,0,0" VerticalAlignment="Top" IsChecked="{Binding ElementName=mainWin, Path=shouldInterp, Mode=TwoWay}" Grid.Row="1"/>
-        <Label x:Name="interpLabel" Content="{Binding ElementName=mainWin, Path=interpLabelStr}" HorizontalAlignment="Left" Margin="411,223,0,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <TextBox x:Name="gridResTextBox" HorizontalAlignment="Left" Margin="531,227,0,0" TextWrapping="Wrap" Text="" TextAlignment="Right" VerticalAlignment="Top" Width="67" Visibility="{Binding ElementName=mainWin, Path=interpTextBoxVisibility}" PreviewTextInput="gridResTextBox_PreviewTextInput" PreviewKeyDown="gridResTextBox_PreviewKeyDown" Grid.Row="1"/>
-        <Label x:Name="label5" Content="°" HorizontalAlignment="Left" Margin="596,215,0,0" VerticalAlignment="Top" Visibility="{Binding  ElementName=mainWin, Path=interpTextBoxVisibility}" Grid.Row="1"/>
-        <Button x:Name="startTrackingBtn" Content="开始识别" HorizontalAlignment="Left" Margin="435,315,0,0" VerticalAlignment="Top" Click="startTrackBtnClicked" IsEnabled="False" Grid.Row="1"/>
-        <Button x:Name="exportBtn" Content="导出全部结果..." HorizontalAlignment="Left" Margin="648,356,0,0" VerticalAlignment="Top" Click="exportBtnClicked" IsEnabled="False" Grid.Row="1"/>
-        <Label x:Name="canceledLabel" Content="已取消" HorizontalAlignment="Left" Margin="516,324,0,0" VerticalAlignment="Top" Foreground="Red" Visibility="Collapsed"/>
+        <Label x:Name="timeNameLabel" HorizontalAlignment="Left" Margin="85,123,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=timeVarStr}" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="latNameLabel" HorizontalAlignment="Left" Margin="85,153,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=latVarStr}" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="lonNameLabel" HorizontalAlignment="Left" Margin="85,183,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=lonVarStr}" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="vorNameLabel" HorizontalAlignment="Left" Margin="85,213,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=vorVarStr}" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="uwndNameLabel" HorizontalAlignment="Left" Margin="85,243,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=uwndVarStr}" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="vwndNameLabel" HorizontalAlignment="Left" Margin="85,273,0,0" VerticalAlignment="Top" Content="{Binding ElementName=mainWin, Path=vwndVarStr}" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="label2" Content="z方向维度名：" HorizontalAlignment="Left" Margin="283,122,0,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="zLvNameTextBlock" Content="未指定" HorizontalAlignment="Left" Margin="371,122,0,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="label3" Content="选取第                    层数据" HorizontalAlignment="Left" Margin="277,150,0,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
+        <ComboBox x:Name="zLvComboBox" HorizontalAlignment="Left" Margin="326,153,0,0" VerticalAlignment="Top" Width="56" Height="20" IsEnabled="False" Grid.Row="1" Grid.Column="1"/>
+        <Button x:Name="showWebBtn" Content="查看结果..." HorizontalAlignment="Left" Margin="485,339,0,0" VerticalAlignment="Top" Click="showWebBtnClicked" Grid.Row="1" Grid.Column="1"/>
+        <CheckBox x:Name="interpCheckBox" Content="" HorizontalAlignment="Left" Margin="319,211,0,0" VerticalAlignment="Top" IsChecked="{Binding ElementName=mainWin, Path=shouldInterp, Mode=TwoWay}" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="interpLabel" Content="{Binding ElementName=mainWin, Path=interpLabelStr}" HorizontalAlignment="Left" Margin="340,206,0,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
+        <TextBox x:Name="gridResTextBox" HorizontalAlignment="Left" Margin="460,210,0,0" TextWrapping="Wrap" Text="" TextAlignment="Right" VerticalAlignment="Top" Width="67" Visibility="{Binding ElementName=mainWin, Path=interpTextBoxVisibility}" PreviewTextInput="gridResTextBox_PreviewTextInput" PreviewKeyDown="gridResTextBox_PreviewKeyDown" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="label5" Content="°" HorizontalAlignment="Left" Margin="525,198,0,0" VerticalAlignment="Top" Visibility="{Binding  ElementName=mainWin, Path=interpTextBoxVisibility}" Grid.Row="1" Grid.Column="1"/>
+        <Button x:Name="startTrackingBtn" Content="开始识别" HorizontalAlignment="Left" Margin="364,298,0,0" VerticalAlignment="Top" Click="startTrackBtnClicked" IsEnabled="False" Grid.Row="1" Grid.Column="1"/>
+        <Button x:Name="exportBtn" Content="导出全部结果..." HorizontalAlignment="Left" Margin="577,339,0,0" VerticalAlignment="Top" Click="exportBtnClicked" IsEnabled="False" Grid.Row="1" Grid.Column="1"/>
+        <Label x:Name="canceledLabel" Content="已取消" HorizontalAlignment="Left" Margin="445,290,0,0" VerticalAlignment="Top" Foreground="Red" Visibility="Collapsed" Grid.Column="1" Grid.Row="1"/>
 
     </Grid>
 </Window>
