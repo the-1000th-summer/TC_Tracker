@@ -92,6 +92,7 @@ class ProgressViewController: NSViewController {
                 
                 DispatchQueue.main.async {
                     mainVC.showWebBtn.isEnabled = true
+                    mainVC.exportBtn.isEnabled = true
                     mainVC.dismiss(self)
                 }
             }

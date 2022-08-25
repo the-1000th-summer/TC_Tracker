@@ -79,14 +79,15 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         // Update the view, if already loaded.
         }
     }
-
-    @IBAction func browseBtnClicked(_ sender: NSButton) {
+    
+    public func selectAFile() {
         let filePath = showFileBrowser()
         
         guard let filePath = filePath else { return }
         
         zLvComboBox.isEnabled = false
         showWebBtn.isEnabled = false
+        exportBtn.isEnabled = false
         startTrackingBtn.isEnabled = false
         canceledLabel.isHidden = true
 
@@ -98,6 +99,10 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         interpSwitch.isEnabled = true
         zVarStr = ""
         checkIfIsWrfoutFile(ncFilePath: filePath)
+    }
+
+    @IBAction private func browseBtnClicked(_ sender: NSButton) {
+        selectAFile()
     }
     
     @IBAction func varSelBtnClicked(_ sender: NSButton) {

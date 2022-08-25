@@ -219,7 +219,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     auto exePath = std::filesystem::weakly_canonical(std::filesystem::path(argv[0])).parent_path();
     std::vector<std::string> argList(argv, argv + argc);   // for history
 
-    cxxopts::Options options("TC_Tracker", "TC_Tracker: Tropical Cyclone tracking program");
+    cxxopts::Options options("TC_Tracker_CLI", "热带气旋路径识别软件(TC Tracker): Tropical Cyclone tracking program");
     options.add_options()
     ("c,compact-nc-file", "The program will output compact version of netCDF file")
     ("h,help", "Display available options") // a bool parameter
@@ -227,7 +227,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     ("z,z-lv-index", "Specify the index of z level (0-based)", cxxopts::value<int>())
     ("r,to-grid-res", "Specify regrid resolution. Will not regrid if set this flag <= 0.", cxxopts::value<double>()->default_value("0.0"))
     ("t,no-temp-files", "Do not export temp files")
-    ("n,var-names", "Set time,lat,lon,vorticity variable names. \",\" as separator.", cxxopts::value<std::string>())
+    ("n,var-names", "Set time,lat,lon,vorticity,uwnd,vwnd variable names. \",\" as separator.", cxxopts::value<std::string>())
     ("thread", "Set the number of threads tracking, 0 for maximum number of threads", cxxopts::value<int>()->default_value("1"))
     ("p,temp-files-dir", "Set directory of temp files", cxxopts::value<std::string>()->default_value(exePath))
     ("min-vorticity", "Set vorticity threshold", cxxopts::value<float>())
@@ -237,7 +237,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     ("inOutFiles", "Input and output file names", cxxopts::value<std::vector<std::string>>());
 
     options.parse_positional({"inOutFiles"});
-    options.positional_help("input.nc output.nc");
+    options.positional_help("input.nc output.[json | pb | nc]");
     // 解析
     std::unique_ptr<cxxopts::ParseResult> result;
     
