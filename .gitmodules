@@ -1,0 +1,3 @@
+[submodule "code/projects/third_party/NCL_func_cxx"]
+	path = code/projects/third_party/NCL_func_cxx
+	url = git@github.com:the-1000th-summer/NCL_func_cxx.git
