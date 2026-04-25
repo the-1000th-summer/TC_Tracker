@@ -7,6 +7,9 @@
 #include <iostream>
 #include <netcdf>
 #include <filesystem>
+// #ifdef _WIN32
+// #include <windows.h>
+// #endif
 //#include <numeric>
 //#include <boost/program_options.hpp>
 #include "cxxopts.hpp"
@@ -26,6 +29,13 @@
 //        exit(0);
 //    }
 //}
+
+// void configureConsoleEncoding() {
+// #ifdef _WIN32
+//     SetConsoleOutputCP(CP_UTF8);
+//     SetConsoleCP(CP_UTF8);
+// #endif
+// }
 
 inline void abortWithMsg(const std::string &msg) {
     std::cout << "\nERROR!" << std::endl;
@@ -92,7 +102,9 @@ std::vector<std::string> handleInOutFile(cxxopts::ParseResult *result) {
     std::vector<std::string> allFilesPath{};
     std::transform(allFilesName.cbegin(), allFilesName.cend(), std::back_inserter(allFilesPath), [](const std::string &fileName) {
         std::filesystem::path inFileName(fileName);
-        return inFileName.is_relative() ? std::filesystem::current_path() / inFileName : inFileName;
+
+        auto fullPath = inFileName.is_relative() ? std::filesystem::current_path() / inFileName : inFileName;
+        return fullPath.string();
     });
     return allFilesPath;
 }
@@ -229,7 +241,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     ("t,no-temp-files", "Do not export temp files")
     ("n,var-names", "Set time,lat,lon,vorticity,uwnd,vwnd variable names. \",\" as separator.", cxxopts::value<std::string>())
     ("thread", "Set the number of threads tracking, 0 for maximum number of threads", cxxopts::value<int>()->default_value("1"))
-    ("p,temp-files-dir", "Set directory of temp files", cxxopts::value<std::string>()->default_value(exePath))
+    ("p,temp-files-dir", "Set directory of temp files", cxxopts::value<std::string>()->default_value(exePath.string()))
     ("min-vorticity", "Set vorticity threshold", cxxopts::value<float>())
     ;
     // hidden options
@@ -337,6 +349,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
 
 
 int main(int argc, char * argv[]) {
+    // configureConsoleEncoding();
     
 //    netCDF::NcFile("dsf", netCDF::NcFile::read);
     tryCXXOPTS(argc, argv);

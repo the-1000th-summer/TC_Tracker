@@ -2,7 +2,9 @@
   "dependencies": [
     "boost-filesystem",
     "boost-serialization",
+    "boost-dll",
     "netcdf-c",
-    "netcdf-cxx4"
+    "netcdf-cxx4",
+    "protobuf"
   ]
 }

@@ -16,7 +16,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
-// #include <boost/dll/runtime_symbol_info.hpp>
+#include <boost/dll/runtime_symbol_info.hpp>
 #include <omp.h>
 
 #include "json.hpp"
@@ -26,7 +26,7 @@
 #include "Typhoon.h"
 #include "VortexesDumper.h"
 #include "TCsP.pb.h"
-#include "Linint2.h"
+#include "linint2.h"
 #include "uv2vr_cfd.h"
 #include "rcm2rgrid.h"
 // for MS compiler
