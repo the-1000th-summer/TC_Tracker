@@ -1,0 +1,8 @@
+{
+  "dependencies": [
+    "boost-filesystem",
+    "boost-serialization",
+    "netcdf-c",
+    "netcdf-cxx4"
+  ]
+}

@@ -5,11 +5,12 @@ include(CTest)
 enable_testing()
 
 set(CMAKE_CXX_STANDARD 17)
-# project include file and source file
-include_directories(
-    ../../core/include
-)
-aux_source_directory(../../core/src SRC_LIST)
+
+set(CORE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../core")
+set(CORE_INCLUDE_DIR "${CORE_DIR}/include")
+set(CORE_SRC_DIR "${CORE_DIR}/src")
+
+file(GLOB CORE_SOURCES CONFIGURE_DEPENDS "${CORE_SRC_DIR}/*.cpp")
 
 # find boost
 set(Boost_USE_STATIC_LIBS OFF)
@@ -22,18 +23,22 @@ find_package(netCDF REQUIRED)
 # if(Boost_FOUND AND netCDF_FOUND AND OPENMP_FOUND)
 if(Boost_FOUND AND netCDF_FOUND)
     # set for OpenMP
-    message("sdfffffff!")
+#    message("sdfffffff!")
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
     
     find_library(libncxxPath netcdf-cxx4 ${netCDF_LIB_DIR})
-    add_executable(TC_Tracker_CLI main.cpp ${SRC_LIST})
+    add_executable(TC_Tracker_CLI main.cpp ${CORE_SOURCES})
+    target_include_directories(TC_Tracker_CLI PRIVATE "${CORE_INCLUDE_DIR}")
+
     # create "data" dir in build dir and copy the data into it
     add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/data")
     add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/../../../../../data/myMap/myMap.dat" "${CMAKE_BINARY_DIR}/data")
+
     # target_link_libraries(TC_Tracker_CLI Boost::serialization Boost::filesystem OpenMP::OpenMP_CXX ${libncxxPath})
     target_link_libraries(TC_Tracker_CLI Boost::serialization Boost::filesystem -fopenmp ${libncxxPath})
+
     # install to -DCMAKE_INSTALL_PREFIX
     # (RUNTIME means executable file path)
     install (TARGETS TC_Tracker_CLI RUNTIME DESTINATION .)

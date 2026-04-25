@@ -6,6 +6,11 @@ enable_testing()
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CORE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../core")
+set(CORE_INCLUDE_DIR "${CORE_DIR}/include")
+set(CORE_SRC_DIR "${CORE_DIR}/src")
+file(GLOB CORE_SOURCES CONFIGURE_DEPENDS "${CORE_SRC_DIR}/*.cpp")
+
 set(nccDir /wind1/home/16dengh/software/myLib/cxxLib/netCDF/real_gcc940)
 set(nccxxDir /wind1/home/16dengh/software/myLib/cxxLib/netCDF)
 # set(nccxxDir /wind1/home/16dengh/anaconda3)
@@ -15,11 +20,10 @@ include_directories(
     ${nccDir}/include
     ${nccxxDir}/include
     ${boostDir}/include
-    ../../core/include
+    ${CORE_INCLUDE_DIR}
 )
-aux_source_directory(../../core/src SRC_LIST)
 
-add_executable(TC_Tracker_CLI main.cpp ${SRC_LIST})
+add_executable(TC_Tracker_CLI main.cpp ${CORE_SOURCES})
 message("${CMAKE_BINARY_DIR}")
 add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/data")
 add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/../../../../../data/myMap/myMap.dat" "${CMAKE_BINARY_DIR}/data")

@@ -19,6 +19,8 @@ xcuserdata/
 __pycache__/
 # visual studio generated files
 .vs/
+.idea/
+
 Debug/
 bin/
 obj/
