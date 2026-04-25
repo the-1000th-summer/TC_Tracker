@@ -7,9 +7,15 @@
 #include <iostream>
 #include <netcdf>
 #include <filesystem>
-// #ifdef _WIN32
-// #include <windows.h>
-// #endif
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#endif
 //#include <numeric>
 //#include <boost/program_options.hpp>
 #include "cxxopts.hpp"
@@ -30,12 +36,12 @@
 //    }
 //}
 
-// void configureConsoleEncoding() {
-// #ifdef _WIN32
-//     SetConsoleOutputCP(CP_UTF8);
-//     SetConsoleCP(CP_UTF8);
-// #endif
-// }
+void configureConsoleEncoding() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+}
 
 inline void abortWithMsg(const std::string &msg) {
     std::cout << "\nERROR!" << std::endl;
@@ -349,7 +355,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
 
 
 int main(int argc, char * argv[]) {
-    // configureConsoleEncoding();
+    configureConsoleEncoding();
     
 //    netCDF::NcFile("dsf", netCDF::NcFile::read);
     tryCXXOPTS(argc, argv);
