@@ -71,12 +71,15 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>E:\University\TC_Tracker\code\projects\TC_Tracker\core\include;$(ProjectDir);E:\p_learn\cpp_learn\NCL_func_cxx\include</IncludePath>
+    <IncludePath>$(SolutionDir)..\core\include;$(ProjectDir);$(SolutionDir)..\third_party\NCL_func_cxx\include</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>E:\University\TC_Tracker\code\projects\TC_Tracker\core\include;$(ProjectDir);E:\p_learn\cpp_learn\NCL_func_cxx\include</IncludePath>
+    <IncludePath>$(SolutionDir)..\core\include;$(ProjectDir);$(SolutionDir)..\third_party\NCL_func_cxx\include</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -115,6 +118,8 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,6 +140,8 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,10 +154,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\dmapgci.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\linint2.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\linmsg_dp.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\rcm2rgrid.h" />
     <ClInclude Include="..\..\core\include\json.hpp" />
     <ClInclude Include="..\..\core\include\multiArray.h" />
     <ClInclude Include="..\..\core\include\NCFileInfo.h" />
@@ -161,14 +164,13 @@
     <ClInclude Include="..\..\core\include\Utils.h" />
     <ClInclude Include="..\..\core\include\uv2vr_cfd.h" />
     <ClInclude Include="..\..\core\include\VortexesDumper.h" />
+    <ClInclude Include="..\..\third_party\NCL_func_cxx\include\dmapgci.h" />
+    <ClInclude Include="..\..\third_party\NCL_func_cxx\include\linint2.h" />
+    <ClInclude Include="..\..\third_party\NCL_func_cxx\include\linmsg_dp.h" />
+    <ClInclude Include="..\..\third_party\NCL_func_cxx\include\rcm2rgrid.h" />
     <ClInclude Include="Core.h" />
-    <ClInclude Include="TCsP.pb.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\dmapgci.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\linint2.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\linmsg_dp.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\rcm2rgrid.cpp" />
     <ClCompile Include="..\..\core\src\NCFileInfo.cpp" />
     <ClCompile Include="..\..\core\src\Processor.cpp" />
     <ClCompile Include="..\..\core\src\TC1Time.cpp" />
@@ -176,7 +178,19 @@
     <ClCompile Include="..\..\core\src\Utils.cpp" />
     <ClCompile Include="..\..\core\src\uv2vr_cfd.cpp" />
     <ClCompile Include="..\..\core\src\VortexesDumper.cpp" />
-    <ClCompile Include="TCsP.pb.cc" />
+    <ClCompile Include="..\..\third_party\NCL_func_cxx\src\dmapgci.cpp" />
+    <ClCompile Include="..\..\third_party\NCL_func_cxx\src\linint2.cpp" />
+    <ClCompile Include="..\..\third_party\NCL_func_cxx\src\linmsg_dp.cpp" />
+    <ClCompile Include="..\..\third_party\NCL_func_cxx\src\rcm2rgrid.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\core\TCsP.proto">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(VcpkgManifestRoot)\vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\protoc.exe --proto_path=$(SolutionDir)..\core --cpp_out=$(ProjectDir) TCsP.proto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).pb.h;$(ProjectDir)%(Filename).pb.cc</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(VcpkgManifestRoot)\vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\protoc.exe --proto_path=$(SolutionDir)..\core --cpp_out=$(ProjectDir) TCsP.proto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).pb.h;$(ProjectDir)%(Filename).pb.cc</Outputs>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

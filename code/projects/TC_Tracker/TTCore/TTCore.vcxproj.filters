@@ -54,21 +54,6 @@
     <ClInclude Include="..\..\core\include\VortexesDumper.h">
       <Filter>Header Files\Calculator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\dmapgci.h">
-      <Filter>Header Files\Calculator\ncl_cxx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\linint2.h">
-      <Filter>Header Files\Calculator\ncl_cxx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\linmsg_dp.h">
-      <Filter>Header Files\Calculator\ncl_cxx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\include\rcm2rgrid.h">
-      <Filter>Header Files\Calculator\ncl_cxx</Filter>
-    </ClInclude>
-    <ClInclude Include="TCsP.pb.h">
-      <Filter>Header Files\TCStruct</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\core\include\multiArray.h">
       <Filter>Header Files\TCStruct</Filter>
     </ClInclude>
@@ -83,6 +68,18 @@
     </ClInclude>
     <ClInclude Include="..\..\core\include\json.hpp">
       <Filter>Header Files\3rdPartyLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\NCL_func_cxx\include\dmapgci.h">
+      <Filter>Header Files\Calculator\ncl_cxx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\NCL_func_cxx\include\linint2.h">
+      <Filter>Header Files\Calculator\ncl_cxx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\NCL_func_cxx\include\linmsg_dp.h">
+      <Filter>Header Files\Calculator\ncl_cxx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\NCL_func_cxx\include\rcm2rgrid.h">
+      <Filter>Header Files\Calculator\ncl_cxx</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -101,26 +98,28 @@
     <ClCompile Include="..\..\core\src\VortexesDumper.cpp">
       <Filter>Source Files\Calculator</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\dmapgci.cpp">
-      <Filter>Source Files\Calculator\ncl_cxx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\linint2.cpp">
-      <Filter>Source Files\Calculator\ncl_cxx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\linmsg_dp.cpp">
-      <Filter>Source Files\Calculator\ncl_cxx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\p_learn\cpp_learn\NCL_func_cxx\src\rcm2rgrid.cpp">
-      <Filter>Source Files\Calculator\ncl_cxx</Filter>
-    </ClCompile>
-    <ClCompile Include="TCsP.pb.cc">
-      <Filter>Source Files\TCStruct</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\core\src\TC1Time.cpp">
       <Filter>Source Files\TCStruct</Filter>
     </ClCompile>
     <ClCompile Include="..\..\core\src\Typhoon.cpp">
       <Filter>Source Files\TCStruct</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\third_party\NCL_func_cxx\src\dmapgci.cpp">
+      <Filter>Source Files\Calculator\ncl_cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\NCL_func_cxx\src\linint2.cpp">
+      <Filter>Source Files\Calculator\ncl_cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\NCL_func_cxx\src\linmsg_dp.cpp">
+      <Filter>Source Files\Calculator\ncl_cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\NCL_func_cxx\src\rcm2rgrid.cpp">
+      <Filter>Source Files\Calculator\ncl_cxx</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\core\TCsP.proto">
+      <Filter>Source Files\TCStruct</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
