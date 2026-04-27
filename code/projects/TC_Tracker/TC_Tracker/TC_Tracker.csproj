@@ -254,4 +254,7 @@
     <EmbeddedResource Include="path.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if exist "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\*.dll" xcopy /Y /D "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\*.dll" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
