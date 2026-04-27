@@ -116,6 +116,9 @@
     <ClCompile Include="..\..\third_party\NCL_func_cxx\src\rcm2rgrid.cpp">
       <Filter>Source Files\Calculator\ncl_cxx</Filter>
     </ClCompile>
+    <ClCompile Include="TCsP.pb.cc">
+      <Filter>Source Files\TCStruct</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\core\TCsP.proto">

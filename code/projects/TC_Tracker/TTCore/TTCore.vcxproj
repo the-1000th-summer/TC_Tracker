@@ -182,6 +182,7 @@
     <ClCompile Include="..\..\third_party\NCL_func_cxx\src\linint2.cpp" />
     <ClCompile Include="..\..\third_party\NCL_func_cxx\src\linmsg_dp.cpp" />
     <ClCompile Include="..\..\third_party\NCL_func_cxx\src\rcm2rgrid.cpp" />
+    <ClCompile Include="TCsP.pb.cc" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\core\TCsP.proto">
