@@ -4,7 +4,6 @@
     "boost-serialization",
     "boost-dll",
     "netcdf-c",
-    "netcdf-cxx4",
-    "protobuf"
+    "netcdf-cxx4"
   ]
 }

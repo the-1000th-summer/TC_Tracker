@@ -25,7 +25,11 @@
 #include "Utils.h"
 #include "Typhoon.h"
 #include "VortexesDumper.h"
+
+#ifndef DISABLE_PROTOBUF
 #include "TCsP.pb.h"
+#endif
+
 #include "linint2.h"
 #include "uv2vr_cfd.h"
 #include "rcm2rgrid.h"

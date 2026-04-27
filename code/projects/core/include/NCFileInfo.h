@@ -38,7 +38,9 @@ public:
     void startTracking(TCs &tcs, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target, bool* shouldCancel);
     
     void exportFile_json(TCs &tcs, const std::string oFilePath);
+#ifndef DISABLE_PROTOBUF
     void exportFile_proto3(TCs &tcs, const std::string oFilePath);
+#endif
     void exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand);
     void exportFile_nc_compact(const TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand);
     

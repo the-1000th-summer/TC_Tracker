@@ -113,7 +113,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DISABLE_PROTOBUF;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -135,7 +135,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DISABLE_PROTOBUF;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -182,16 +182,6 @@
     <ClCompile Include="..\..\third_party\NCL_func_cxx\src\linint2.cpp" />
     <ClCompile Include="..\..\third_party\NCL_func_cxx\src\linmsg_dp.cpp" />
     <ClCompile Include="..\..\third_party\NCL_func_cxx\src\rcm2rgrid.cpp" />
-    <ClCompile Include="TCsP.pb.cc" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\..\core\TCsP.proto">
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(VcpkgManifestRoot)\vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\protoc.exe --proto_path=$(SolutionDir)..\core --cpp_out=$(ProjectDir) TCsP.proto</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).pb.h;$(ProjectDir)%(Filename).pb.cc</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(VcpkgManifestRoot)\vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\protoc.exe --proto_path=$(SolutionDir)..\core --cpp_out=$(ProjectDir) TCsP.proto</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).pb.h;$(ProjectDir)%(Filename).pb.cc</Outputs>
-    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

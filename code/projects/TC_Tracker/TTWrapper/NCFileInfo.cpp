@@ -134,7 +134,9 @@ void NCFileInfo::exportFile_json(TCs^ tcs, String^ oNcFilePath) {
 
 void NCFileInfo::exportFile_proto3(TCs^ tcs, String^ oNcFilePath) {
     TTCore::TCs tcs_cpp = toCppTCs(tcs);
+#ifndef DISABLE_PROTOBUF
     m_Instance->exportFile_proto3(tcs_cpp, string2Char(oNcFilePath));
+#endif
 }
 
 void NCFileInfo::exportFile_nc(TCs^ tcs, String^ oNcFilePath, String^ fullCommand) {

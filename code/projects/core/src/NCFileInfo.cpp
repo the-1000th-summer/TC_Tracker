@@ -14,7 +14,10 @@
 #include "NCFileInfo.h"
 #include "Processor.h"
 #include "Typhoon.h"
+
+#ifndef DISABLE_PROTOBUF
 #include "TCsP.pb.h"
+#endif
 
 namespace TTCore {
 
@@ -172,6 +175,7 @@ void NCFileInfo::exportFile_json(TCs &tcs, const std::string oFilePath) {
     jsonFile << tcs_jsonObj;
 }
 
+#ifndef DISABLE_PROTOBUF
 void NCFileInfo::exportFile_proto3(TCs &tcs, const std::string oFilePath) {
     TCsP tcsP;
     for (const Typhoon &tc : tcs.getTcs()) {
@@ -215,6 +219,7 @@ void NCFileInfo::exportFile_proto3(TCs &tcs, const std::string oFilePath) {
         exit(-1);
     }
 }
+#endif
 
 /// 将结果输出为netCDF文件（标准：CF Convention）
 void NCFileInfo::exportFile_nc(TCs &tcs, const std::string &oNcFilePath, const std::string &fullCommand) {
