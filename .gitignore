@@ -34,3 +34,7 @@ x64/
 /code/projects/TC_Tracker_dotnetF/
 /code/projects/tryFixDLL/
 /code/projects/tryFixDLL_dotnetF/
+
+# protobuf generated files
+TCsP.pb.h
+TCsP.pb.cc
