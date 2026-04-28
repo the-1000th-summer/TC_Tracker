@@ -293,7 +293,7 @@ void tryCXXOPTS(int argc, char * argv[]) {
     TTCore::TCs tcs;
     
     /// （无用的变量，因为cli直接Ctrl+C就可终止程序）
-    bool shouldCancel = false;
+    std::atomic_bool shouldCancel = false;
     fileInfo.startTracking(tcs, myStepPgCB, myProgressCB, nullptr, &shouldCancel);
     
     /// 检查输出multidimensional的nc文件还是jagged array nc文件
