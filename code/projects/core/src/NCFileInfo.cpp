@@ -100,7 +100,7 @@ bool NCFileInfo::checkIfIsWrfoutFile(std::string& exceptionInfo) {
 }
 
 
-void NCFileInfo::startTracking(TCs &tcs, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target, bool* shouldCancel) {
+void NCFileInfo::startTracking(TCs &tcs, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target, std::atomic_bool* shouldCancel) {
     
 //    netCDF::NcFile f(ncFilePath, netCDF::NcFile::read);
     stepPgCallback(0, target);
@@ -108,7 +108,7 @@ void NCFileInfo::startTracking(TCs &tcs, void(*stepPgCallback)(int stepIdx, void
     Processor p(shouldCancel, ncFilePath, isWrfoutFile, varNames, zLevelIndex, toGridRes, threadNum, dumpDir, resourceBaseDir);
     
     p.recognizeTyphoon(stepPgCallback, progressCallback, target);
-    if (*shouldCancel) return;
+    if (shouldCancel->load()) return;
     if (!noTempFiles)
         p.dumpStep1(ncFilePath);
     
@@ -118,7 +118,7 @@ void NCFileInfo::startTracking(TCs &tcs, void(*stepPgCallback)(int stepIdx, void
     if (!noTempFiles)
         p.dumpStep2(ncFilePath);
     
-    if (*shouldCancel) { return; }
+    if (shouldCancel->load()) { return; }
     stepPgCallback(5, target);
     p.removeNoise();
 

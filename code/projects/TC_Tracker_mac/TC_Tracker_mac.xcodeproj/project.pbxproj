@@ -18,6 +18,7 @@
 		794FF9342FA0C291005C1A47 /* libabsl_log_internal_message.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 794FF9332FA0C291005C1A47 /* libabsl_log_internal_message.dylib */; };
 		794FF9362FA0C2C5005C1A47 /* libabsl_log_internal_check_op.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 794FF9352FA0C2C5005C1A47 /* libabsl_log_internal_check_op.dylib */; };
 		794FF9382FA0C445005C1A47 /* libomp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 794FF9372FA0C445005C1A47 /* libomp.dylib */; };
+		794FF9422FA0E859005C1A47 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 794FF9412FA0E859005C1A47 /* data */; };
 		796187BF2872E15B00FDAC2C /* path.html in Resources */ = {isa = PBXBuildFile; fileRef = 796187BE2872E15B00FDAC2C /* path.html */; };
 		79618E572867129C00539BAE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79618E562867129C00539BAE /* AppDelegate.swift */; };
 		79618E592867129C00539BAE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79618E582867129C00539BAE /* ViewController.swift */; };
@@ -57,6 +58,7 @@
 		794FF9332FA0C291005C1A47 /* libabsl_log_internal_message.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libabsl_log_internal_message.dylib; path = ../../../../../../../../../opt/homebrew/lib/libabsl_log_internal_message.dylib; sourceTree = "<group>"; };
 		794FF9352FA0C2C5005C1A47 /* libabsl_log_internal_check_op.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libabsl_log_internal_check_op.dylib; path = ../../../../../../../../../opt/homebrew/lib/libabsl_log_internal_check_op.dylib; sourceTree = "<group>"; };
 		794FF9372FA0C445005C1A47 /* libomp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libomp.dylib; path = ../../../../../../../../../opt/homebrew/Cellar/libomp/22.1.4/lib/libomp.dylib; sourceTree = "<group>"; };
+		794FF9412FA0E859005C1A47 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = TC_Tracker_mac/data; sourceTree = "<group>"; };
 		795DA7B3286B3A7200909341 /* TCInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TCInfo.h; path = ../../core/include/TCInfo.h; sourceTree = "<group>"; };
 		796187BE2872E15B00FDAC2C /* path.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = path.html; sourceTree = "<group>"; };
 		79618E532867129C00539BAE /* 热带气旋路径识别软件.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "热带气旋路径识别软件.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -149,6 +151,7 @@
 		79618E4A2867129C00539BAE = {
 			isa = PBXGroup;
 			children = (
+				794FF9412FA0E859005C1A47 /* data */,
 				79618E552867129C00539BAE /* TC_Tracker_mac */,
 				79618E542867129C00539BAE /* Products */,
 				79F5B9A02868940B002BA4BE /* Frameworks */,
@@ -342,6 +345,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				794FF9422FA0E859005C1A47 /* data in Resources */,
 				79618E5B2867129D00539BAE /* Assets.xcassets in Resources */,
 				796187BF2872E15B00FDAC2C /* path.html in Resources */,
 				79618E5E2867129D00539BAE /* Main.storyboard in Resources */,

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <netcdf>
 #include <string>
 #include <utility>
@@ -19,7 +20,7 @@ using CppCallBack2 = void(__stdcall*)(double progressValue, void*);
 class Processor {
 public:
 //    Processor(bool* isCanceled, netCDF::NcFile &iFile, bool isWrfoutFile, const std::string &timeVName="", const std::string & latVName="", const std::string & lonVName="", const std::string & vorVName="", int zLevelIndex = -1, const std::string & dumpDirectory = "");
-    Processor(bool* shouldCancel, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string & dumpDirectory, const std::string &resourceBaseDir);
+    Processor(std::atomic_bool* shouldCancel, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string & dumpDirectory, const std::string &resourceBaseDir);
     //Processor(netCDF::NcFile &iFile, bool isWrfoutFile, const std::string& dumpDirectory);
     ~Processor();
     TCInfo getTCInfo();
@@ -48,7 +49,7 @@ public:
     void copyLatLonData(std::vector<float> &lat_data, std::vector<float> &lon_data);
     
 private:
-    bool* shouldCancel;
+    std::atomic_bool* shouldCancel;
 //    netCDF::NcFile *iiFile;
     std::string iFilePath;
     std::unique_ptr<netCDF::NcFile> iiFile;

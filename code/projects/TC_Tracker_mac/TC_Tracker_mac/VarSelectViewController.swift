@@ -15,14 +15,12 @@ class VarSelectViewController: NSViewController, NSComboBoxDataSource {
     @IBOutlet var uwndNameComboBox: NSComboBox!
     @IBOutlet var vwndNameComboBox: NSComboBox!
     
-    @objc private dynamic var vorNameIsEnabled = false
-    @objc private dynamic var windNameIsEnabled = false
-    @objc private dynamic var nextStepBtnIsEnabled: Bool {
-        vorNameIsEnabled || windNameIsEnabled
-    }
-    @objc private dynamic var windNameLabelColor: NSColor {
-        windNameIsEnabled ? .white : .gray
-    }
+    @IBOutlet var uwndLabel: NSTextField!
+    @IBOutlet var vwndLabel: NSTextField!
+    
+    
+    private var vorNameIsEnabled = true
+
     
     public var ncFilePath: String = ""
     private var varsName: [String] = []
@@ -48,8 +46,21 @@ class VarSelectViewController: NSViewController, NSComboBoxDataSource {
     }
     
     @IBAction func radioButtonChanged(_ sender: NSButton) {
+//        vorNameIsEnabled = (sender.state == vorRadioBtn.state)
+//        windNameIsEnabled = !vorNameIsEnabled
         vorNameIsEnabled = (sender.state == vorRadioBtn.state)
-        windNameIsEnabled = !vorNameIsEnabled
+        if vorNameIsEnabled {
+            vorNameComboBox.isEnabled = true
+            uwndNameComboBox.isEnabled = false
+            vwndNameComboBox.isEnabled = false
+            
+        } else {
+            vorNameComboBox.isEnabled = false
+            uwndNameComboBox.isEnabled = true
+            vwndNameComboBox.isEnabled = true
+        }
+        uwndLabel.textColor = uwndNameComboBox.isEnabled ? .labelColor : .gray
+        vwndLabel.textColor = vwndNameComboBox.isEnabled ? .labelColor : .gray
     }
     
     @IBAction func nextStepBtnClicked(_ sender: NSButton) {
@@ -86,17 +97,6 @@ class VarSelectViewController: NSViewController, NSComboBoxDataSource {
     
     func comboBox(_ comboBox: NSComboBox, objectValueForItemAt index: Int) -> Any? {
         return varsName[index]
-    }
-    
-    override class func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String> {
-        switch key {
-        case "windNameLabelColor":
-            return ["windNameIsEnabled"]
-        case "nextStepBtnIsEnabled":
-            return ["vorNameIsEnabled", "windNameIsEnabled"]
-        default:
-            return []
-        }
     }
     
 }

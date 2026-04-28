@@ -6,6 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#include <atomic>
 
 #import "NCFileInfo-Wrapper.h"
 #import "NCFileInfo.h"
@@ -90,6 +91,7 @@
 
 @interface NCFileInfo_Wrapper() {
     TTCore::NCFileInfo *m_instance;
+    std::atomic_bool m_shouldCancel;
 }
 
 
@@ -102,6 +104,7 @@
     self = [super init];
     if (self) {
         m_instance = new TTCore::NCFileInfo([filePath cStringUsingEncoding:NSUTF8StringEncoding]);
+        m_shouldCancel.store(false);
     }
     return self;
 }
@@ -120,6 +123,7 @@
         auto varNames = VarNames(timeStr, latStr, lonStr, vorStr, uStr, vStr, dataIsVor);
         
         m_instance = new TTCore::NCFileInfo(filePathStr, varNames);
+        m_shouldCancel.store(false);
     }
     return self;
 }
@@ -142,6 +146,7 @@
         auto resourcePathStr = [resourcePath cStringUsingEncoding:NSUTF8StringEncoding];
         
         m_instance = new TTCore::NCFileInfo(filePathStr, isWrfoutFile, varNames, zLevelIndex, toGridRes, true, threadNum, tempFileDirStr, resourcePathStr);
+        m_shouldCancel.store(false);
     }
     return self;
 }
@@ -193,10 +198,22 @@
     return zLvDimLen;
 }
 
-- (TCs*)startTrackingWithStepPgCallback : (void(*)(int stepIdx, void*))stepPgCallback andWith :(void(*)(double progressValue, void*)) progressCallback withTarget: (void*) target withCancelFlag: (bool*)shouldCancel {
+- (void)resetCancelState {
+    m_shouldCancel.store(false);
+}
+
+- (void)requestCancel {
+    m_shouldCancel.store(true);
+}
+
+- (bool)wasCancelled {
+    return m_shouldCancel.load();
+}
+
+- (TCs*)startTrackingWithStepPgCallback : (void(*)(int stepIdx, void*))stepPgCallback andWith :(void(*)(double progressValue, void*)) progressCallback withTarget: (void*) target {
     TTCore::TCs tcs;
 
-    m_instance->startTracking(tcs, stepPgCallback, progressCallback, target, shouldCancel);
+    m_instance->startTracking(tcs, stepPgCallback, progressCallback, target, &m_shouldCancel);
     
     std::cout << "unmanaged TC number: " << tcs.size() << std::endl;
     

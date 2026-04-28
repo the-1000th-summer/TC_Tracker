@@ -39,7 +39,7 @@
 #endif
 namespace TTCore {
 
-Processor::Processor(bool* shouldCancel, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string& dumpDirectory, const std::string &resourceBaseDir) : shouldCancel(shouldCancel), iFilePath(iFilePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), toGridRes(toGridRes), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir), iiFile{std::make_unique<netCDF::NcFile>(iFilePath, netCDF::NcFile::read)}, tcInfo(getTCInfo()) {
+Processor::Processor(std::atomic_bool* shouldCancel, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string& dumpDirectory, const std::string &resourceBaseDir) : shouldCancel(shouldCancel), iFilePath(iFilePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), toGridRes(toGridRes), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir), iiFile{std::make_unique<netCDF::NcFile>(iFilePath, netCDF::NcFile::read)}, tcInfo(getTCInfo()) {
     
     threadNum ? threadNum : omp_get_max_threads();
     getDimLength();
@@ -235,7 +235,7 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             
 #           pragma omp parallel for num_threads(threadNum)
             for (int time_i = 0; time_i < timeLength; ++time_i) {
-                if (*shouldCancel) { continue; }
+                if (shouldCancel->load()) { continue; }
                 
                 NCL_cxx::rcm2rgrid<float>(lonArr2D.get(), latArr2D.get(), lonGridNum, latGridNum, lon_rged.data(), lat_rged.data(), lon_rged.size(), lat_rged.size(), u_unstged[time_i], u_regularGrid[time_i], 9.96921e+36, ier);
                 
@@ -248,12 +248,12 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
                 }
             }
             assert(ier == 0);
-            if (*shouldCancel) { return; }
+            if (shouldCancel->load()) { return; }
             
             completed_count = 0;
 #           pragma omp parallel for num_threads(threadNum)
             for (int time_i = 0; time_i < timeLength; ++time_i) {
-                if (*shouldCancel) { continue; }
+                if (shouldCancel->load()) { continue; }
                 
                 NCL_cxx::rcm2rgrid<float>(lonArr2D.get(), latArr2D.get(), lonGridNum, latGridNum, lon_rged.data(), lat_rged.data(), lon_rged.size(), lat_rged.size(), v_unstged[time_i], v_regularGrid[time_i], 9.96921e+36, ier);
                 
@@ -266,7 +266,7 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
                 }
             }
             assert(ier == 0);
-            if (*shouldCancel) { return; }
+            if (shouldCancel->load()) { return; }
             
             std::cout << "finish regrid wrfout uv" << std::endl;
             
@@ -276,7 +276,7 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             for (int time_i = 0; time_i < timeLength; ++time_i) {
                 uv2vr_cfd().calRV(u_regularGrid[time_i], v_regularGrid[time_i], lat_rged.data(), lon_rged.data(), lat_rged.size(), lon_rged.size(), 9.96921e+36, 2, vorField[time_i]);
             }
-            if (*shouldCancel) { return; }
+            if (shouldCancel->load()) { return; }
             std::cout << "finish cal wrfout rv" << std::endl;
             
             // treat regridded data as regular grid data
@@ -313,18 +313,18 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
                 auto vField = ThreeDArray(timeLength, ref_latData.size(), ref_lonData.size());
                 
                 regridTheVarData(ref_latData, ref_lonData, varNames.uwndVarName, uField, progressCallback, target);
-                if (*shouldCancel) { return; }
+                if (shouldCancel->load()) { return; }
                 regridTheVarData(ref_latData, ref_lonData, varNames.uwndVarName, vField, progressCallback, target);
-                if (*shouldCancel) { return; }
+                if (shouldCancel->load()) { return; }
                 
                 refreshRgedLatLonData(ref_latData, ref_lonData);
                 
                 stepPgCallback(2, target);         // start cal rv
                 calculateRV(uField, vField, vorField);
-                if (*shouldCancel) { return; }
+                if (shouldCancel->load()) { return; }
             } else {
                 regridTheVarData(ref_latData, ref_lonData, varNames.vorVarName, vorField, progressCallback, target);
-                if (*shouldCancel) { return; }
+                if (shouldCancel->load()) { return; }
                 refreshRgedLatLonData(ref_latData, ref_lonData);
             }
             
@@ -386,7 +386,7 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
 //        }
         // vorVar.getVar({timeIndex,0,0}, {1, latGridNum, lonGridNum}, vorField.get());
         
-        if (*shouldCancel) { continue; }
+        if (shouldCancel->load()) { continue; }
         
         getVortexNum1Time(vorField, timeIndex);
 //        TCNum_prevTime = tpNum_timei;
@@ -913,7 +913,7 @@ void Processor::regridTheVarData(const std::vector<float> &ref_latData, const st
     
 #   pragma omp parallel for num_threads(threadNum)
     for (int timeIndex = 0; timeIndex < timeLength; ++timeIndex) {
-        if (*shouldCancel) { continue; }
+        if (shouldCancel->load()) { continue; }
         
         NCL_cxx::linint2(lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempTheVarField.get()+timeIndex*lonGridNum*latGridNum, theVarField.get()+timeIndex*ref_lonGridNum*ref_latGridNum, false, -9999);
         

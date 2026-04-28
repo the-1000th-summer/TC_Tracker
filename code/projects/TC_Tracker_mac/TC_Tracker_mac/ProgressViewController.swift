@@ -18,8 +18,6 @@ class ProgressViewController: NSViewController {
     public var tracker: NCFileInfo_Wrapper?
     private var realTCs: [Typhoon] = []
     
-    private let shouldCancelPt = UnsafeMutablePointer<Bool>.allocate(capacity: 1)
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -35,8 +33,7 @@ class ProgressViewController: NSViewController {
         
         let dispatchQueue = DispatchQueue(label: "QueueIdentification", qos: .userInitiated)
         let observer = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-        
-        shouldCancelPt.initialize(to: false)
+        tracker.resetCancelState()
         
         dispatchQueue.async {
             let tcs = tracker.startTracking(stepPgCallback: { (stepIdx, observer) in
@@ -77,9 +74,9 @@ class ProgressViewController: NSViewController {
                     }
                     
                 }
-            }, withTarget: observer, withCancelFlag: self.shouldCancelPt)!//.tcs.compactMap { $0 as? Typhoon }
+            }, withTarget: observer)!//.tcs.compactMap { $0 as? Typhoon }
             
-            if self.shouldCancelPt.pointee {
+            if tracker.wasCancelled() {
                 DispatchQueue.main.async {
                     self.levelLabel.stringValue = "已取消"
                     mainVC.canceledLabel.isHidden = false
@@ -98,8 +95,6 @@ class ProgressViewController: NSViewController {
             }
             
         }
-        
-        shouldCancelPt.deallocate()
     }
     
     @IBAction func cancelBtnClicked(_ sender: NSButton) {
@@ -109,6 +104,6 @@ class ProgressViewController: NSViewController {
         progressBar.startAnimation(nil)
         levelIndicator.intValue = Int32(levelIndicator.maxValue)
         levelIndicator.fillColor = .red
-        shouldCancelPt.pointee = true
+        tracker?.requestCancel()
     }
 }

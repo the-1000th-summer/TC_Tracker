@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <string>
 #include <vector>
 #include <netcdf>
@@ -35,7 +36,7 @@ public:
     std::vector<std::string> getVarsName();
     std::vector<std::string> getVorDimsName(const std::string& vorVarName);
     
-    void startTracking(TCs &tcs, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target, bool* shouldCancel);
+    void startTracking(TCs &tcs, void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target, std::atomic_bool* shouldCancel);
     
     void exportFile_json(TCs &tcs, const std::string oFilePath);
 #ifndef DISABLE_PROTOBUF
