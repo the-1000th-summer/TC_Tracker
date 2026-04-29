@@ -11,21 +11,19 @@ TCInfo::TCInfo(String^ timeUnits, bool time_noleap, double timeInterval, double 
 TCs::TCs(List<Typhoon^>^ tcs, TCInfo^ tcInfo) : tcs(tcs), tcInfo(tcInfo) {
 }
 
-NCFileInfo::NCFileInfo() : ManagedObject(new TTCore::NCFileInfo()) {
+NCFileInfo::NCFileInfo() : ManagedObject(new TTCore::NCFileInfo()), shouldCancel(nullptr) {
 
 }
 
-NCFileInfo::NCFileInfo(String^ filePath) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath))) {
+NCFileInfo::NCFileInfo(String^ filePath) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath))), shouldCancel(nullptr) {
 
 }
 
-NCFileInfo::NCFileInfo(String^ filePath, String^ time, String^ lat, String^ lon, String^ vor, String^ u, String^ v, bool dataIsVor) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), VarNames(string2Char(time), string2Char(lat), string2Char(lon), string2Char(vor), string2Char(u), string2Char(v), dataIsVor))) {
+NCFileInfo::NCFileInfo(String^ filePath, String^ time, String^ lat, String^ lon, String^ vor, String^ u, String^ v, bool dataIsVor) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), VarNames(string2Char(time), string2Char(lat), string2Char(lon), string2Char(vor), string2Char(u), string2Char(v), dataIsVor))), shouldCancel(nullptr) {
     
 }
 
-NCFileInfo::NCFileInfo(String^ filePath, bool isWrfoutFile, String^ time, String^ lat, String^ lon, String^ vor, String^ u, String^ v, bool dataIsVor, int zLevelIndex, int threadNum, double toGridRes, String^ tempFileDir) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, VarNames(string2Char(time), string2Char(lat), string2Char(lon), string2Char(vor), string2Char(u), string2Char(v), dataIsVor), zLevelIndex, toGridRes, true, threadNum, string2Char(tempFileDir), "")) {
-    shouldCancel = new bool;
-    *shouldCancel = false;
+NCFileInfo::NCFileInfo(String^ filePath, bool isWrfoutFile, String^ time, String^ lat, String^ lon, String^ vor, String^ u, String^ v, bool dataIsVor, int zLevelIndex, int threadNum, double toGridRes, String^ tempFileDir) : ManagedObject(new TTCore::NCFileInfo(string2Char(filePath), isWrfoutFile, VarNames(string2Char(time), string2Char(lat), string2Char(lon), string2Char(vor), string2Char(u), string2Char(v), dataIsVor), zLevelIndex, toGridRes, true, threadNum, string2Char(tempFileDir), "")), shouldCancel(new std::atomic_bool(false)) {
 }
 
 bool NCFileInfo::checkFileValid(String^% fileValidInfo) {
@@ -77,6 +75,10 @@ int NCFileInfo::getZLvDimLenName(String^% zLvDimName) {
 
 TCs^ NCFileInfo::startTracking(StepPgCallback^ stepPgCallback, ProgressCallback^ progressCallback, CancellationToken cancelToken) {
     //bool isCanceled = false;
+    if (shouldCancel == nullptr) {
+        shouldCancel = new std::atomic_bool(false);
+    }
+    shouldCancel->store(false);
     CancellationTokenRegistration reg = cancelToken.Register(gcnew Action(this, &NCFileInfo::Canceled));
 
     GCHandle gch1 = GCHandle::Alloc(stepPgCallback);

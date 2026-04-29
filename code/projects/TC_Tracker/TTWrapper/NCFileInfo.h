@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include "ManagedObject.h"
 #include "../TTCore/Core.h"
 
@@ -67,8 +69,8 @@ public:
     void exportFile_nc_compact(TCs^ tcs, String^ oNcFilePath, String^ fullCommand);
 
 private:
-    bool *shouldCancel;
-    void Canceled() { if (shouldCancel != nullptr) *shouldCancel = true; }
+    std::atomic_bool *shouldCancel;
+    void Canceled() { if (shouldCancel != nullptr) shouldCancel->store(true); }
     TTCore::TCs toCppTCs(TCs^ tcs);
 };
 

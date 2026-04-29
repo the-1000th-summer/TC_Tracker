@@ -1,0 +1,104 @@
+name: Release TC_Tracker_CLI
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Existing tag to build and publish, for example v0.1.0"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  CLI_SOURCE_DIR: code/projects/TC_Tracker_CLI
+  BUILD_DIR: ${{ github.workspace }}/build/tc-tracker-cli
+  INSTALL_DIR: ${{ github.workspace }}/dist/TC_Tracker_CLI
+  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+  VCPKG_DEFAULT_TRIPLET: x64-windows
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
+
+jobs:
+  build-windows:
+    name: Build Windows x64
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Restore vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg-cache
+          key: vcpkg-${{ runner.os }}-${{ env.VCPKG_DEFAULT_TRIPLET }}-${{ hashFiles('code/projects/TC_Tracker_CLI/vcpkg.json', 'code/projects/TC_Tracker_CLI/vcpkg-configuration.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-${{ env.VCPKG_DEFAULT_TRIPLET }}-
+
+      - name: Bootstrap vcpkg
+        shell: pwsh
+        run: |
+          git clone https://github.com/microsoft/vcpkg "$env:VCPKG_ROOT"
+          & "$env:VCPKG_ROOT/bootstrap-vcpkg.bat" -disableMetrics
+
+      - name: Configure CMake
+        shell: pwsh
+        env:
+          VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg-cache,readwrite
+        run: |
+          New-Item -ItemType Directory -Force "${{ github.workspace }}/vcpkg-cache" | Out-Null
+
+          cmake `
+            -S "$env:CLI_SOURCE_DIR" `
+            -B "$env:BUILD_DIR" `
+            -G "Visual Studio 17 2022" `
+            -A x64 `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Build
+        shell: pwsh
+        run: cmake --build "$env:BUILD_DIR" --config Release --target TC_Tracker_CLI --parallel
+
+      - name: Install and collect runtime files
+        shell: pwsh
+        run: |
+          cmake --install "$env:BUILD_DIR" --config Release --prefix "$env:INSTALL_DIR"
+
+          $runtimeDir = Join-Path "$env:BUILD_DIR" "Release"
+          if (Test-Path $runtimeDir) {
+            Copy-Item "$runtimeDir/*.dll" "$env:INSTALL_DIR" -Force -ErrorAction SilentlyContinue
+          }
+
+          $rootDlls = Get-ChildItem "$env:BUILD_DIR" -Filter "*.dll" -File -ErrorAction SilentlyContinue
+          if ($rootDlls) {
+            Copy-Item $rootDlls.FullName "$env:INSTALL_DIR" -Force
+          }
+
+          Get-ChildItem "$env:INSTALL_DIR" -Recurse
+
+      - name: Create release archive
+        id: package
+        shell: pwsh
+        run: |
+          $assetName = "TC_Tracker_CLI-$env:RELEASE_TAG-windows-x64.zip"
+          $assetPath = Join-Path "$env:RUNNER_TEMP" $assetName
+          Compress-Archive -Path "$env:INSTALL_DIR/*" -DestinationPath $assetPath -Force
+          "asset_path=$assetPath" >> $env:GITHUB_OUTPUT
+
+      - name: Upload archive to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: TC_Tracker_CLI ${{ env.RELEASE_TAG }}
+          files: ${{ steps.package.outputs.asset_path }}
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

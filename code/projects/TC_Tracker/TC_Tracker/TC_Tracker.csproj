@@ -217,12 +217,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="data\myMap.dat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="data\myMap_noIsland.dat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -255,6 +249,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if exist "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\*.dll" xcopy /Y /D "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\*.dll" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>if exist "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\*.dll" xcopy /Y /D "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\*.dll" "$(TargetDir)"
+if not exist "$(TargetDir)data" mkdir "$(TargetDir)data"
+copy /Y "$(SolutionDir)..\..\data\myMap.dat" "$(TargetDir)data\"</PostBuildEvent>
   </PropertyGroup>
 </Project>
