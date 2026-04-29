@@ -4,6 +4,7 @@ project(tc_tracker_core LANGUAGES CXX)
 
 find_package(Boost 1.70 REQUIRED COMPONENTS serialization filesystem)
 find_package(netCDF REQUIRED)
+find_package(netCDFCxx CONFIG REQUIRED)
 find_package(OpenMP REQUIRED)
 find_package(Protobuf REQUIRED)
 
@@ -11,17 +12,6 @@ set(NCL_FUNC_CXX_DIR "${CMAKE_CURRENT_LIST_DIR}/../third_party/NCL_func_cxx")
 
 # Generate C++ source files from the TCsP.proto file
 protobuf_generate_cpp(TCS_PROTO_SRCS TCS_PROTO_HDRS TCsP.proto)
-
-find_library(TC_TRACKER_NETCDF_CXX_LIBRARY
-    NAMES netcdf-cxx4 netcdf_c++4
-    HINTS
-        ${netCDF_LIB_DIR}
-        ${netCDF_LIBRARY_DIRS}
-)
-
-if(NOT TC_TRACKER_NETCDF_CXX_LIBRARY)
-    message(FATAL_ERROR "Could not find the netCDF C++4 library.")
-endif()
 
 add_library(tc_tracker_core STATIC
     src/NCFileInfo.cpp
@@ -48,6 +38,8 @@ if(MSVC)
     target_compile_options(tc_tracker_core PRIVATE /utf-8)
 endif()
 
+
+# Include directories
 target_include_directories(tc_tracker_core
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/include"
@@ -63,11 +55,13 @@ elseif(netCDF_INCLUDE_DIR)
     target_include_directories(tc_tracker_core PUBLIC ${netCDF_INCLUDE_DIR})
 endif()
 
+
+# Link libraries
 target_link_libraries(tc_tracker_core
     PUBLIC
         Boost::serialization
         Boost::filesystem
-        ${TC_TRACKER_NETCDF_CXX_LIBRARY}
+        netCDF::netcdf-cxx4
 )
 
 if(TARGET netCDF::netcdf)
