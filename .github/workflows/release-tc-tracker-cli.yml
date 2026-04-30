@@ -36,7 +36,8 @@ jobs:
           submodules: recursive
 
       - name: Restore vcpkg binary cache
-        uses: actions/cache@v4
+        id: restore-vcpkg-cache
+        uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/vcpkg-cache
           key: vcpkg-${{ runner.os }}-${{ env.VCPKG_DEFAULT_TRIPLET }}-${{ hashFiles('code/projects/TC_Tracker_CLI/vcpkg.json', 'code/projects/TC_Tracker_CLI/vcpkg-configuration.json') }}
@@ -62,6 +63,14 @@ jobs:
             -G "Visual Studio 17 2022" `
             -A x64 `
             -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Save vcpkg binary cache
+        if: steps.restore-vcpkg-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        continue-on-error: true
+        with:
+          path: ${{ github.workspace }}/vcpkg-cache
+          key: ${{ steps.restore-vcpkg-cache.outputs.cache-primary-key }}
 
       - name: Build
         shell: pwsh
