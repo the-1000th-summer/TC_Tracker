@@ -19,6 +19,9 @@ env:
   CLI_SOURCE_DIR: code/projects/TC_Tracker_CLI
   GUI_SOURCE_DIR: code/projects/TC_Tracker
   GUI_SOLUTION_PATH: code/projects/TC_Tracker/TC_Tracker.sln
+  MAC_GUI_SOURCE_DIR: code/projects/TC_Tracker_mac
+  MAC_GUI_PROJECT_PATH: code/projects/TC_Tracker_mac/TC_Tracker_mac.xcodeproj
+  MAC_GUI_SCHEME: TC_Tracker_mac
   RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
 
 jobs:
@@ -231,6 +234,67 @@ jobs:
           path: ${{ steps.package.outputs.asset_path }}
           if-no-files-found: error
 
+  build-gui-macos:
+    name: Build GUI macOS arm64
+    runs-on: macos-latest
+    env:
+      DERIVED_DATA_DIR: ${{ github.workspace }}/build/tc-tracker-mac-derived-data
+      ARTIFACT_DIR: ${{ github.workspace }}/dist/TC_Tracker_mac
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install dependencies
+        run: brew install boost protobuf abseil netcdf netcdf-cxx libomp nlohmann-json
+
+      - name: Build app
+        run: |
+          xcodebuild \
+            -project "$MAC_GUI_PROJECT_PATH" \
+            -scheme "$MAC_GUI_SCHEME" \
+            -configuration Release \
+            -derivedDataPath "$DERIVED_DATA_DIR" \
+            -destination "generic/platform=macOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Collect app bundle
+        id: collect
+        run: |
+          app_path="$(find "$DERIVED_DATA_DIR/Build/Products/Release" -maxdepth 1 -type d -name "*.app" -print -quit)"
+          if [ -z "$app_path" ]; then
+            echo "No .app bundle found in Release products." >&2
+            exit 1
+          fi
+
+          mkdir -p "$ARTIFACT_DIR"
+          ditto "$app_path" "$ARTIFACT_DIR/$(basename "$app_path")"
+          find "$ARTIFACT_DIR" -maxdepth 4 -print
+          echo "app_name=$(basename "$app_path")" >> "$GITHUB_OUTPUT"
+
+      - name: Create release archive
+        id: package
+        run: |
+          asset_name="TC_Tracker-$RELEASE_TAG-macos-arm64.tar.gz"
+          asset_path="$RUNNER_TEMP/$asset_name"
+          tar -czf "$asset_path" -C "$ARTIFACT_DIR" "${{ steps.collect.outputs.app_name }}"
+          echo "asset_path=$asset_path" >> "$GITHUB_OUTPUT"
+
+      - name: Upload GUI macOS archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tc-tracker-gui-macos-arm64
+          path: ${{ steps.package.outputs.asset_path }}
+          if-no-files-found: error
+
   publish-release:
     name: Publish GitHub Release
     runs-on: ubuntu-latest
@@ -238,6 +302,7 @@ jobs:
       - build-windows
       - build-macos
       - build-gui-windows
+      - build-gui-macos
 
     steps:
       - name: Download release archives
