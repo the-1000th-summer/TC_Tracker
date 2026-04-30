@@ -2,22 +2,11 @@ name: Build TC_Tracker Windows
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - code/projects/TC_Tracker/**
-      - code/core/**
-      - code/third_party/**
-      - .github/actions/prepare-windows-vcpkg/action.yml
-      - .github/workflows/build-tc-tracker-windows.yml
-  pull_request:
-    paths:
-      - code/projects/TC_Tracker/**
-      - code/core/**
-      - code/third_party/**
-      - .github/actions/prepare-windows-vcpkg/action.yml
-      - .github/workflows/build-tc-tracker-windows.yml
+    inputs:
+      tag_name:
+        description: "Existing tag to build, for example v0.1.0"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -25,6 +14,7 @@ permissions:
 env:
   GUI_SOURCE_DIR: code/projects/TC_Tracker
   SOLUTION_PATH: code/projects/TC_Tracker/TC_Tracker.sln
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
 
 jobs:
   build-windows:
@@ -42,6 +32,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref }}
           fetch-depth: 0
           submodules: recursive
 
