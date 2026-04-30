@@ -251,6 +251,6 @@
   <PropertyGroup>
     <PostBuildEvent>if exist "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\*.dll" xcopy /Y /D "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\*.dll" "$(TargetDir)"
 if not exist "$(TargetDir)data" mkdir "$(TargetDir)data"
-copy /Y "$(SolutionDir)..\..\data\myMap.dat" "$(TargetDir)data\"</PostBuildEvent>
+copy /Y "$(SolutionDir)..\..\data\myMap.json" "$(TargetDir)data\"</PostBuildEvent>
   </PropertyGroup>
 </Project>
