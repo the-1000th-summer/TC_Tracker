@@ -90,7 +90,7 @@ jobs:
 
   build-macos:
     name: Build macOS arm64
-    runs-on: macos-latest
+    runs-on: macos-15
     env:
       BUILD_DIR: ${{ github.workspace }}/build/tc-tracker-cli
       INSTALL_DIR: ${{ github.workspace }}/dist/TC_Tracker_CLI
@@ -117,6 +117,7 @@ jobs:
             -B "$BUILD_DIR" \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 \
             -DCMAKE_PREFIX_PATH="$BREW_PREFIX;$LIBOMP_PREFIX" \
             -DOpenMP_ROOT="$LIBOMP_PREFIX" \
             -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$LIBOMP_PREFIX/include" \
@@ -236,7 +237,7 @@ jobs:
 
   build-gui-macos:
     name: Build GUI macOS arm64
-    runs-on: macos-latest
+    runs-on: macos-15
     env:
       DERIVED_DATA_DIR: ${{ github.workspace }}/build/tc-tracker-mac-derived-data
       ARTIFACT_DIR: ${{ github.workspace }}/dist/TC_Tracker_mac
@@ -264,6 +265,8 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=NO \
             build
 
       - name: Collect app bundle
