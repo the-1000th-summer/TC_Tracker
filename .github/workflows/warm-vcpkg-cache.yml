@@ -1,0 +1,44 @@
+name: Warm vcpkg Cache
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - code/projects/TC_Tracker_CLI/vcpkg.json
+      - code/projects/TC_Tracker_CLI/vcpkg-configuration.json
+      - .github/actions/prepare-windows-vcpkg/action.yml
+      - .github/workflows/release-tc-tracker-cli.yml
+      - .github/workflows/warm-vcpkg-cache.yml
+
+permissions:
+  contents: read
+
+env:
+  CLI_SOURCE_DIR: code/projects/TC_Tracker_CLI
+
+jobs:
+  warm-windows-vcpkg-cache:
+    name: Warm Windows vcpkg cache
+    runs-on: windows-latest
+    env:
+      BUILD_DIR: ${{ github.workspace }}/build/tc-tracker-cli
+      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+      VCPKG_DEFAULT_TRIPLET: x64-windows
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Prepare Windows vcpkg
+        uses: ./.github/actions/prepare-windows-vcpkg
+        with:
+          source-dir: ${{ env.CLI_SOURCE_DIR }}
+          build-dir: ${{ env.BUILD_DIR }}
+          vcpkg-root: ${{ env.VCPKG_ROOT }}
+          cache-dir: ${{ github.workspace }}/vcpkg-cache
+          triplet: ${{ env.VCPKG_DEFAULT_TRIPLET }}
