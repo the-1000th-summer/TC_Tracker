@@ -363,10 +363,13 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/../core/TCsP.proto",
 			);
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(SRCROOT)/TC_Tracker_mac/proto_include/TCsP.pb.cc",
+				"$(SRCROOT)/TC_Tracker_mac/proto_include/TCsP.pb.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
