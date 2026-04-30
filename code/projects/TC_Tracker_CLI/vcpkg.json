@@ -3,6 +3,7 @@
     "boost-filesystem",
     "boost-serialization",
     "boost-dll",
+    "nlohmann-json",
     "netcdf-c",
     "netcdf-cxx4",
     "protobuf"

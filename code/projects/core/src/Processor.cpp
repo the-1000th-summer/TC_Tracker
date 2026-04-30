@@ -15,11 +15,10 @@
 #include <filesystem>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
-#include <boost/serialization/vector.hpp>
 #include <boost/dll/runtime_symbol_info.hpp>
 #include <omp.h>
+#include <nlohmann/json.hpp>
 
-#include "json.hpp"
 #include "multiArray.h"
 #include "Processor.h"
 #include "Utils.h"
@@ -40,7 +39,7 @@
 namespace TTCore {
 
 Processor::Processor(std::atomic_bool* shouldCancel, const std::string &iFilePath, bool isWrfoutFile, const VarNames &varNames, int zLevelIndex, double toGridRes, int threadNum, const std::string& dumpDirectory, const std::string &resourceBaseDir) : shouldCancel(shouldCancel), iFilePath(iFilePath), isWrfoutFile(isWrfoutFile), varNames(varNames), zLevelIndex(zLevelIndex), toGridRes(toGridRes), threadNum(threadNum), dumpDir(dumpDirectory), resourceBaseDir(resourceBaseDir), iiFile{std::make_unique<netCDF::NcFile>(iFilePath, netCDF::NcFile::read)}, tcInfo(getTCInfo()) {
-    
+
     threadNum ? threadNum : omp_get_max_threads();
     getDimLength();
     allVortexes = std::vector<std::vector<TC1Time>>(timeLength);
@@ -53,7 +52,7 @@ Processor::Processor(std::atomic_bool* shouldCancel, const std::string &iFilePat
         lonArr = std::make_unique<float[]>(lonGridNum);
         UtilFunc::getLatLonData(iiFile.get(), varNames.latVarName, varNames.lonVarName, latArr.get(), lonArr.get());
     }
-    
+
     // std::cout << a << std::endl;
     // iFile = netCDF::NcFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read)
     checkDirAndCreate(Constants::STEP_FILE_NAME);
@@ -77,7 +76,7 @@ TCInfo Processor::getTCInfo() {
     timeVar.getAtt("units").getValues(timeUnits);
     // time calendar
     bool time_noleap;
-    
+
     if (!UtilFunc::checkIfHasVarAtt(timeVar, "calendar")) {
         time_noleap = false;
     } else {
@@ -105,7 +104,7 @@ void Processor::getDimLength() {
         latGridNum = iiFile->getDim("south_north").getSize();
         lonGridNum = iiFile->getDim("west_east").getSize();
     }
-    
+
 }
 
 /// 此方法计算wrfout文件的相对涡度
@@ -129,10 +128,10 @@ void Processor::calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv) {
         inFile->getVar("U").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny,nx + 1 }, u.get());
         inFile->getVar("V").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny + 1,nx }, v.get());
     }
-    
+
     inFile->getVar("MAPFAC_U").getVar(msfu.get());
     inFile->getVar("MAPFAC_V").getVar(msfv.get());
-    
+
     for (int k = 0; k < nt; ++k) {
         for (int j = 0; j < ny; ++j) {
             // jp1: 1,2,3,4...,ny-2,ny-1,ny-1
@@ -144,21 +143,21 @@ void Processor::calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv) {
                 int ip1 = std::min(i+1, static_cast<int>(nx-1));
                 // im1: 0,0,1,2,...,nx-4,nx-3,nx-2
                 int im1 = std::max(i-1, 0);
-                
+
                 float dsx = (ip1 - im1) * dx;     // (1,2,2,2,...,2,2,1)*dx
                 float dsy = (jp1 - jm1) * dy;     // (1,2,2,2,...,2,2,1)*dy
                 float mm = msfm(k, j, i) * msfm(k, j, i);
-                
+
                 auto dudy = 0.5 * (u(k, jp1, i) / msfu(k, jp1, i) +
                                    u(k, jp1, i + 1) / msfu(k, jp1, i + 1) -
                                    u(k, jm1, i) / msfu(k, jm1, i) -
                                    u(k, jm1, i + 1) / msfu(k, jm1, i + 1)) / dsy * mm;
-                
+
                 auto dvdx = 0.5 * (v(k, j, ip1) / msfv(k, j, ip1) +
                                    v(k, j + 1, ip1) / msfv(k, j + 1, ip1) -
                                    v(k, j, im1) / msfv(k, j, im1) -
                                    v(k, j + 1, im1) / msfv(k, j + 1, im1)) / dsx * mm;
-                
+
                 rv(k, j, i) = dvdx - dudy;
             }
         }
@@ -168,11 +167,11 @@ void Processor::calcRelativeVorField(netCDF::NcFile *inFile, ThreeDArray& rv) {
 /// 第一步：找出有台风的日期，记录日期与台风信息
 void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void(*progressCallback)(double progressValue, void*), void* target) {
     std::cout << "step 1 (recognize_typhoon): successfully read data，start tracking..." << std::endl;
-    
+
     /// 记录前一个时次的台风数目
 //    int TCNum_prevTime = 0;
     //constexpr int startYear = 1979, endYear = 2018;
-    
+
     /// startYear的1月1日0时时次在文件中的index
 //    int startIndexInFile = 0;
     /// endYear的12月31日0时时次在文件中的index
@@ -181,28 +180,28 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
 //    auto vorField = ThreeDArray(timeLength, latGridNum, lonGridNum);
 //    std::unique_ptr<ThreeDArray> vorField;
     auto vorField = ThreeDArray();
-    
+
     if (isWrfoutFile) {
         if (toGridRes > 0) {
-            
+
             auto minLatD = latArr2D.max(0).second / toGridRes;
             auto maxLatD = latArr2D.min(latGridNum-1).second / toGridRes;
             auto minLonD = lonArr2D.maxInColumn(0) / toGridRes;
             auto maxLonD = lonArr2D.minInColumn(lonGridNum-1) / toGridRes;
-            
+
             float minLatDIntegral, maxLatDIntegral;
             float minLonDIntegral, maxLonDIntegral;
             modf(minLatD, &minLatDIntegral);
             modf(maxLatD, &maxLatDIntegral);
             modf(minLonD, &minLonDIntegral);
             modf(maxLonD, &maxLonDIntegral);
-            
+
             const float minLat_rged = (minLatD <= 0) ? minLatDIntegral*toGridRes : (minLatDIntegral+1)*toGridRes;
             const float maxLat_rged = (maxLatD < 0) ? (maxLatDIntegral-1)*toGridRes : maxLatDIntegral*toGridRes;
             // 不考虑有lon负值的情况
             const float minLon_rged = (minLonDIntegral + 1) * toGridRes;
             const float maxLon_rged = maxLonDIntegral * toGridRes;
-            
+
             std::vector<float> lat_rged;
             std::vector<float> lon_rged;
             float nowLat = minLat_rged;
@@ -219,26 +218,26 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
                 if (nowLon > maxLon_rged)
                     break;
             }
-            
+
             stepPgCallback(1, target);     // start regrid
-            
+
             auto u_unstged = ThreeDArray(timeLength,latGridNum,lonGridNum);
             auto v_unstged = ThreeDArray(timeLength,latGridNum,lonGridNum);
             unstaggerU(iiFile.get(), u_unstged, v_unstged);
-            
+
             auto u_regularGrid = ThreeDArray(timeLength, lat_rged.size(), lon_rged.size());
             auto v_regularGrid = ThreeDArray(timeLength, lat_rged.size(), lon_rged.size());
             int ier = 0;
-            
+
             int completed_count = 0;
             unsigned long itsPerCheck = timeLength / 20;
-            
+
 #           pragma omp parallel for num_threads(threadNum)
             for (int time_i = 0; time_i < timeLength; ++time_i) {
                 if (shouldCancel->load()) { continue; }
-                
+
                 NCL_cxx::rcm2rgrid<float>(lonArr2D.get(), latArr2D.get(), lonGridNum, latGridNum, lon_rged.data(), lat_rged.data(), lon_rged.size(), lat_rged.size(), u_unstged[time_i], u_regularGrid[time_i], 9.96921e+36, ier);
-                
+
 #               pragma omp atomic
                 ++completed_count;
 
@@ -249,17 +248,17 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             }
             assert(ier == 0);
             if (shouldCancel->load()) { return; }
-            
+
             completed_count = 0;
 #           pragma omp parallel for num_threads(threadNum)
             for (int time_i = 0; time_i < timeLength; ++time_i) {
                 if (shouldCancel->load()) { continue; }
-                
+
                 NCL_cxx::rcm2rgrid<float>(lonArr2D.get(), latArr2D.get(), lonGridNum, latGridNum, lon_rged.data(), lat_rged.data(), lon_rged.size(), lat_rged.size(), v_unstged[time_i], v_regularGrid[time_i], 9.96921e+36, ier);
-                
+
 #               pragma omp atomic
                 ++completed_count;
-                
+
                 if (completed_count % itsPerCheck == 0) {
 #                   pragma omp critical
                     progressCallback(static_cast<double>(completed_count)/timeLength*100, target);
@@ -267,18 +266,18 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             }
             assert(ier == 0);
             if (shouldCancel->load()) { return; }
-            
+
             std::cout << "finish regrid wrfout uv" << std::endl;
-            
+
             stepPgCallback(2, target);    // start cal rv
-            
+
             vorField.setDims(timeLength, lat_rged.size(), lon_rged.size());
             for (int time_i = 0; time_i < timeLength; ++time_i) {
                 uv2vr_cfd().calRV(u_regularGrid[time_i], v_regularGrid[time_i], lat_rged.data(), lon_rged.data(), lat_rged.size(), lon_rged.size(), 9.96921e+36, 2, vorField[time_i]);
             }
             if (shouldCancel->load()) { return; }
             std::cout << "finish cal wrfout rv" << std::endl;
-            
+
             // treat regridded data as regular grid data
             wrfChangeToRegular = true;
             latArr = std::make_unique<float[]>(lat_rged.size());
@@ -287,7 +286,7 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             std::copy(lon_rged.begin(), lon_rged.end(), lonArr.get());
 //            latArr2D.get() = nullptr;
 //            lonArr2D.get() = nullptr;
-            
+
         } else {     // should not regrid
             vorField.setDims(timeLength, latGridNum, lonGridNum);
             stepPgCallback(2, target);    // start cal rv
@@ -303,22 +302,22 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             std::cout << "\nref lon data:" << std::endl;
             for (float i : ref_lonData) { std::cout << i << " "; }
             std::cout << std::endl;
-            
+
             stepPgCallback(1, target);      // start regrid
-            
+
             vorField.setDims(timeLength, ref_latData.size(), ref_lonData.size());
-            
+
             if (!varNames.dataIsVor) {
                 auto uField = ThreeDArray(timeLength, ref_latData.size(), ref_lonData.size());
                 auto vField = ThreeDArray(timeLength, ref_latData.size(), ref_lonData.size());
-                
+
                 regridTheVarData(ref_latData, ref_lonData, varNames.uwndVarName, uField, progressCallback, target);
                 if (shouldCancel->load()) { return; }
                 regridTheVarData(ref_latData, ref_lonData, varNames.uwndVarName, vField, progressCallback, target);
                 if (shouldCancel->load()) { return; }
-                
+
                 refreshRgedLatLonData(ref_latData, ref_lonData);
-                
+
                 stepPgCallback(2, target);         // start cal rv
                 calculateRV(uField, vField, vorField);
                 if (shouldCancel->load()) { return; }
@@ -327,14 +326,14 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
                 if (shouldCancel->load()) { return; }
                 refreshRgedLatLonData(ref_latData, ref_lonData);
             }
-            
+
         } else {          // should not regrid
             vorField.setDims(timeLength, latGridNum, lonGridNum);
             if (!varNames.dataIsVor) {
                 auto uField = ThreeDArray(timeLength, latGridNum, lonGridNum);
                 auto vField = ThreeDArray(timeLength, latGridNum, lonGridNum);
                 auto uVar = iiFile->getVar(varNames.uwndVarName);
-                
+
                 if (zLevelIndex == -1) {
                     uVar.getVar(uField.get());
                     iiFile->getVar(varNames.vwndVarName).getVar(vField.get());
@@ -342,19 +341,19 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
                     uVar.getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { timeLength,1,latGridNum,lonGridNum }, uField.get());
                     iiFile->getVar(varNames.vwndVarName).getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { timeLength,1,latGridNum,lonGridNum }, vField.get());
                 }
-                
+
                 float fillValue = 0.0;
                 if (UtilFunc::checkIfHasVarAtt(uVar, "_FillValue")) {
                     uVar.getAtt("_FillValue").getValues(&fillValue);
                 } else {
                     fillValue = 9.96921e+36;
                 }
-                
+
                 stepPgCallback(2, target);         // start cal rv
                 for (int time_i = 0; time_i < timeLength; ++time_i) {
                     uv2vr_cfd().calRV(uField[time_i], vField[time_i], latArr.get(), lonArr.get(), latGridNum, lonGridNum, fillValue, 2, vorField[time_i]);
                 }
-                
+
             } else {
                 if (zLevelIndex == -1) {
                     iiFile->getVar(varNames.vorVarName).getVar(vorField.get());
@@ -368,10 +367,10 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
 //    Constants::RECURSION_MIN_ReVOR = 0.00005;
     //Constants::HAS_TP_MIN_ReVOR = isWrfoutFile ? 100e-5 : 8e-5;
     std::cout << "RECURSION_MIN_ReVOR: " << Constants::RECURSION_MIN_ReVOR << std::endl;
-    
+
     int completed_count = 0;
     unsigned long itsPerCheck = timeLength / 20;
-    
+
     stepPgCallback(3, target);         // start getVortexNum1Time
 #   pragma omp parallel for num_threads(threadNum)
     for (int timeIndex = 0; timeIndex < timeLength; ++timeIndex) {
@@ -385,15 +384,15 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
 //            }
 //        }
         // vorVar.getVar({timeIndex,0,0}, {1, latGridNum, lonGridNum}, vorField.get());
-        
+
         if (shouldCancel->load()) { continue; }
-        
+
         getVortexNum1Time(vorField, timeIndex);
 //        TCNum_prevTime = tpNum_timei;
-        
+
 #       pragma omp atomic
         ++completed_count;
-        
+
         if (completed_count % itsPerCheck == 0) {
 #       pragma omp critical
             progressCallback(static_cast<double>(completed_count)/timeLength*100, target);
@@ -402,14 +401,14 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
 //    dumpVortexes(allVorsCellsIndex);
 //    progressCallback(100, target);
     std::cout << "Done step1" << std::endl;
-    
+
 }
 
 /// 第二步：跟踪第一步生成的每个时次的气旋，生成真正的气旋对象。
 void Processor::getRealTC() {
     std::cout << "start get real TC" << std::endl;
     UtilFunc::modifyMaxDist(iiFile.get(), isWrfoutFile ? "XTIME" : varNames.timeVarName);
-    
+
     /// 当前时次和前一时次是否有气旋
     bool hasTCCurrentTime = false, hasTCPrevTime = false;
     /// 气旋编号，从1开始
@@ -422,7 +421,7 @@ void Processor::getRealTC() {
     int hasTCLastTimeIndex = getLastNotEmptyVecIndex();
     /// 跟踪时仍未确定消亡日期的气旋；跟踪完成的气旋
     std::vector<Typhoon> tempTCs{};
-    
+
     for (int timeIndex = 0; timeIndex < hasTCLastTimeIndex; ++timeIndex) {
         if (timeIndex % 1000 == 0)
             std::cout << timeIndex << std::endl;
@@ -436,7 +435,7 @@ void Processor::getRealTC() {
                 realTCs.insert(realTCs.end(), tempTCs.begin(), tempTCs.end());
                 tempTCs.clear();
             }
-            
+
         } else {             // 当前时次有气旋
             /// 当前时次的涡旋vector
             //auto currentTimeVortexes = allVortexes[hasVortex_notHandledYetIndex];
@@ -444,9 +443,9 @@ void Processor::getRealTC() {
             /// 当前时次的涡旋个数
             int currentTimeTCNum = currentTimeVortexes.size();
             //++hasVortex_notHandledYetIndex;
-            
+
             if (!hasTCPrevTime) {  // 当前时次有气旋，但前一时次无气旋，创建新的气旋对象
-                
+
                 for (int i = 0; i < currentTimeTCNum; ++i) {
                     tempTCs.push_back(Typhoon{
                         i+TC_No, {currentTimeVortexes[i].maxVorCellIndex}, {currentTimeVortexes[i].geoCenter}, timeIndex, timeIndex, {currentTimeVortexes[i].cellsIndex}
@@ -457,16 +456,16 @@ void Processor::getRealTC() {
             } else {             // 当前时次和前一时次都有气旋
                 int tempTCsSize = tempTCs.size();
                 int currentTVortexesSize = currentTimeVortexes.size();
-                
+
                 /// 当前时次的涡旋index
                 // std::vector<TC1Time> currentTVortexes_copy(currentTimeVortexes);
                 std::set<int> currentT_VorsRMIndex;
                 // std::iota(currentT_VorsIndex.begin(), currentT_VorsIndex.end(), 0);
-                
+
                 /// 正在跟踪的气旋index
                 // std::vector<Typhoon> tempTCS_copy(tempTCs);
                 std::set<int> tempTCsRMIndex;
-                
+
                 /// 正在跟踪的气旋index，用于判断每个台风是否被处理
                 // std::vector<Typhoon> tempTCS_ForD(tempTCs);
                 std::set<int> tempTCsIndexForD;
@@ -474,18 +473,18 @@ void Processor::getRealTC() {
                     // tempTCsIndex.insert(tempTCsIndex.end(), i);
                     tempTCsIndexForD.insert(tempTCsIndexForD.end(), i);
                 }
-                
-                
+
+
                 // 涡度最大点index实现
                 //std::vector<std::pair<int, int>> temp_TCs_max_pt, currentT_TCs_maxVorCellIndex;
                 //std::transform(tempTCs.begin(), tempTCs.end(), std::back_inserter(temp_TCs_max_pt), [](const Typhoon &temp_TC) {return temp_TC.maxVorCells.back();});
                 //std::transform(currentTimeVortexes.begin(), currentTimeVortexes.end(), std::back_inserter(currentT_TCs_maxVorCellIndex), [](const TC1Time &currentTimeVortex) {return currentTimeVortex.maxVorCellIndex;});
-                
+
                 // 几何中心实现
                 std::vector<std::pair<float, float>> tempTCsGeoCenters, currentT_TCs_GeoCenters;
                 std::transform(tempTCs.begin(), tempTCs.end(), std::back_inserter(tempTCsGeoCenters), [](const Typhoon& temp_TC) {return temp_TC.geoCenters.back(); });
                 std::transform(currentTimeVortexes.begin(), currentTimeVortexes.end(), std::back_inserter(currentT_TCs_GeoCenters), [](const TC1Time& currentTimeVortex) {return currentTimeVortex.geoCenter; });
-                
+
                 /// 距离矩阵（多维数组实现）
                 // float distMatrix[tempTCsSize][currentTVortexesSize];
                 // for (int i = 0; i < tempTCsSize; ++i) {
@@ -499,9 +498,9 @@ void Processor::getRealTC() {
                 // for (int i = 0; i < tempTCsSize; ++i)
                 //     distMatrix[i] = new float[currentTVortexesSize];
                 // float **distMatrix = new float[tempTCsSize][currentTVortexesSize];
-                
+
                 auto distMatrix = TwoDArray(tempTCsSize, currentTVortexesSize);
-                
+
                 // 涡度最大点index实现
                 //for (int i = 0; i < tempTCsSize; ++i) {
                 //    for (int j = 0; j < currentTVortexesSize; ++j) {
@@ -516,12 +515,12 @@ void Processor::getRealTC() {
                         distMatrix(i,j) = UtilFunc::cellDist(lat1, lon1, lat2, lon2);
                     }
                 }
-                
+
                 while (!tempTCsIndexForD.empty()) {
                     if (currentT_VorsRMIndex.size() == currentTVortexesSize) {
                         // 如果进入了这个条件，就说明当前时次的气旋比昨天的少，当前时次的气旋都已经对应成功
                         // 现在处理的是上一个时次的没有对应的气旋
-                        
+
                         /// 需要被删除的气旋在index中的iterator（删除第一个）
                         auto willBeRMTCIter = tempTCsIndexForD.begin();
                         realTCs.push_back(tempTCs[*willBeRMTCIter]);
@@ -537,16 +536,16 @@ void Processor::getRealTC() {
                     auto minDistIndex = minDist.first;
                     auto minD_tempTC = tempTCs[minDistIndex.first];
                     auto minD_currentTTC = currentTimeVortexes[minDistIndex.second];
-                    
+
                     if (minDist.second > Constants::LINK_TP_MAX_DIST) {  // 该台风昨天就消亡了
                         realTCs.push_back(minD_tempTC);
-                        
+
                         // 从临时数组中移去已消亡的台风
                         tempTCsRMIndex.insert(minDistIndex.first);
                         tempTCsIndexForD.erase(minDistIndex.first);
                         // tempTCS_copy.erase(std::remove(tempTCS_copy.begin(), tempTCS_copy.end(), minD_tempTC));
                         // tempTCS_ForD.erase(std::remove(tempTCS_ForD.begin(), tempTCS_ForD.end(), minD_tempTC));
-                        
+
                         // 处理完后将距离设为一个较大的值
                         // 不可设置distMatrix[:][minDistIndex.second] = 1e5！！！！
                         for (int i = 0; i < currentTVortexesSize; ++i) {
@@ -569,12 +568,12 @@ void Processor::getRealTC() {
                         tempTCs[minDistIndex.first].endTimeIndex = timeIndex;
                         // 更新台风涡旋包含的点的index
                         tempTCs[minDistIndex.first].vorsCellsIndex.push_back(minD_currentTTC.cellsIndex);
-                        
+
                         tempTCsIndexForD.erase(minDistIndex.first);
                         // 移除对应成功的当前时次的涡旋
                         // currentTVortexes_copy.erase(std::remove(currentTVortexes_copy.begin(), currentTVortexes_copy.end(), minD_currentTTC));
                         currentT_VorsRMIndex.insert(minDistIndex.second);
-                        
+
                         for (int i = 0; i < currentTVortexesSize; ++i)
                             distMatrix(minDistIndex.first, i) = 1e5;
                         for (int i = 0; i < tempTCsSize; ++i)
@@ -584,7 +583,7 @@ void Processor::getRealTC() {
                 // 根据index删除相应的消亡的气旋
                 for (auto rIter = tempTCsRMIndex.crbegin(); rIter != tempTCsRMIndex.crend(); ++rIter)
                     tempTCs.erase(tempTCs.cbegin() + *rIter);
-                
+
                 // 前一时次的所有的气旋对应完，today_tps_copy剩下新生成的、未被跟踪的气旋
                 if (currentT_VorsRMIndex.size() < currentTVortexesSize) {
                     // 根据index删除相应的处理完的当前时次的涡旋
@@ -600,11 +599,11 @@ void Processor::getRealTC() {
                     // 更新台风编号，注意更新后的编号所代表的台风仍未出现
                     TC_No += currentTTCsNum;
                 }
-                
+
             }
-            
+
             // TODO: 如果当前时次是最后一个时次，应处理tempTC
-            
+
         }
         hasTCPrevTime = hasTCCurrentTime;
     }
@@ -612,7 +611,7 @@ void Processor::getRealTC() {
         tempTC.endTimeIndex = hasTCLastTimeIndex - 1;
     realTCs.insert(realTCs.end(), tempTCs.begin(), tempTCs.end());
     tempTCs.clear();
-    
+
     std::cout << "msg from getRealTC, realTC number" << realTCs.size() << std::endl;
 }
 
@@ -621,22 +620,22 @@ void Processor::removeNoise() {
     int realTCsNum = realTCs.size();
     /// 需移除的气旋的index的set（会自动按升序排列）
     std::set<int> tcRMIndex;
-    
+
     auto addRMIndex = [&tcRMIndex](int i) {
         tcRMIndex.insert(i);
     };
-    
+
     // 获取陆地信息
     //std::vector<std::vector<std::pair<float, float>>> landPolygons;
     getLandPolygons();
-    
+
     for (int i = 0; i < realTCsNum; ++i) {
         auto realTC = realTCs[i];
         //float tcStartLat = latArr[realTC.maxVorCells.front().first], tcStartLon = lonArr[realTC.maxVorCells.front().second];
         //float tcEndLat = latArr[realTC.maxVorCells.back().first], tcEndLon = lonArr[realTC.maxVorCells.back().second];
         auto [tcStartLat, tcStartLon] = realTC.geoCenters.front();
         auto [tcEndLat, tcEndLon] = realTC.geoCenters.back();
-        
+
         // 去除不动的点（即包括单个点）
         if ((tcStartLon == tcEndLon) && (tcStartLat == tcEndLat)) {
             addRMIndex(i);
@@ -668,10 +667,10 @@ void Processor::removeNoise() {
     // 按index降序逐个删除需删除的气旋
     for (auto rIter = tcRMIndex.crbegin(); rIter != tcRMIndex.crend(); ++rIter)
         realTCs.erase(realTCs.cbegin() + *rIter);
-    
+
     std::cout << "remove noise completed" << std::endl;
     std::cout << "msg from removeNoise, realTC number: " << realTCs.size() << std::endl;
-    
+
 //    dumpStep3_proto3("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general.protobuf");
 //    dumpStep3_proto3("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/modelResult/CESM_result_1pt5.protobuf");
 }
@@ -686,32 +685,32 @@ int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex) {
     std::vector<TC1Time> vortexesThisTime{};
     /// 当前时次所有vortex的cells的index
     std::vector<std::unordered_set<std::pair<int, int>, pair_hash>> vortexesCellsIndex;
-    
+
     for (int i = 0; i < Constants::TODAY_MAX_TP_NUM; ++i) {
         // auto maxVorCell = UtilFunc::max_element_2d(vorField);
         auto maxVorCell = vorField.max(timeIndex);
         /// 当前vortex的cells的index
         std::unordered_set<std::pair<int, int>, pair_hash> allCellsIndex;
         getVortexCellsIndex(vorField, timeIndex, maxVorCell.first, allCellsIndex);
-        
+
         // auto a = allCellsIndex.begin();
         // while (a != allCellsIndex.end()) {
         //     std::cout << "(" << a->first << "," << a->second << ") ";
         //     ++a;
         // }
         // std::cout << std::endl;
-        
+
         if (allCellsIndex.empty())
             break;
 //        if ((allCellsIndex.size() <= Constants::TP_MIN_PTS) && (TCNum_prevTime == 0) )
 //            break;
-        
+
 //        if (!isWrfoutFile) {
 //            float e = get_e(allCellsIndex);
 //            if ((e > Constants::TP_MIN_E) && (TCNum_prevTime == 0))
 //                break;
 //        }
-        
+
         ++tpNum;
         auto vortexCenterLatLon = isWrfoutFile && !wrfChangeToRegular ? UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr2D, lonArr2D) : UtilFunc::getVortexCenterLatLon(allCellsIndex, latArr.get(), lonArr.get());
         vortexesCellsIndex.push_back(allCellsIndex);
@@ -722,7 +721,7 @@ int Processor::getVortexNum1Time(ThreeDArray &vorField, int timeIndex) {
     allVorsCellsIndex[timeIndex] = vortexesCellsIndex;
     allVortexes[timeIndex] = vortexesThisTime;
     return tpNum;
-    
+
 }
 
 /// 此函数接受一个点，递归返回所有在台风内的点（阈值采用相对涡度）
@@ -785,7 +784,7 @@ std::unordered_set<std::pair<int, int>, pair_hash> Processor::getSurroundingCell
 float Processor::get_e(std::unordered_set<std::pair<int, int>, pair_hash> &vortexCellsIndex) {
     std::vector<std::pair<int, int>> vortexCellsIndex_v(vortexCellsIndex.begin(), vortexCellsIndex.end());
     auto distMax = UtilFunc::getMaxDistance(vortexCellsIndex_v);
-    
+
     //float gridRatio = latArr[1] - latArr[0];
     float gridRatio = 1.0;
     /// 半长轴长度（单位：度）
@@ -800,16 +799,16 @@ float Processor::get_e(std::unordered_set<std::pair<int, int>, pair_hash> &vorte
     float minorAxisK = (majorAxisK == 0) ? std::numeric_limits<float>::infinity() : (-1 / majorAxisK);
     /// 椭圆中点纬度、经度
     auto centerLatLon = UtilFunc::getCellsCenterLatLon(vortexCellsIndex_v[distMax.first.first], vortexCellsIndex_v[distMax.first.second], latArr.get(), lonArr.get());
-    
+
     /// 半短轴估计值
     auto minorAxis = getMinorAxisLen(vortexCellsIndex_v, centerLatLon, minorAxisK, gridRatio, A);
     float approB = minorAxis.first / 2.0;
     if (approB > A)
         std::swap(approB, A);
-    
+
     float E = std::sqrt((A*A-approB*approB)/(A*A-approB*approB*minorAxis.second*minorAxis.second));
     return E;
-    
+
 }
 
 /// 此方法计算短轴长度
@@ -832,7 +831,7 @@ std::pair<float, float> Processor::getMinorAxisLen(const std::vector<std::pair<i
     // 如果没有一个点或只有一个点符合条件，说明太窄，排除
     if (validCellsIndex.size() <= 1)
         return {0.0, 1.0};
-    
+
     /// 取这些点中两个距离最远的点
     auto approMinorAxis = UtilFunc::getMaxDistance(validCellsIndex);
     /// 两个距离最远的点连线的弧度
@@ -841,11 +840,11 @@ std::pair<float, float> Processor::getMinorAxisLen(const std::vector<std::pair<i
     // float cosAlpha = std::abs(std::cos(appro_min_rad - minorAxisRad));
     // if (cosAlpha == 0)               // 短轴和长轴重合！
     //     return 0.0;                 // 可能使计算出的斜率严重出错（即与长轴有相同趋势）
-    
+
     float approMinorAxisDist = approMinorAxis.second * gridRatio;
-    
+
     return {approMinorAxisDist, std::sin(std::abs(appro_min_rad - minorAxisRad))};
-    
+
 }
 
 /// 此函数消除相对涡度大值中心，为识别多个台风服务，替换为1e-6
@@ -896,36 +895,36 @@ std::vector<float> Processor::getRgedLonArr(float spatialRes) {
 void Processor::regridTheVarData(const std::vector<float> &ref_latData, const std::vector<float> &ref_lonData, const std::string &theVarName, ThreeDArray &theVarField, void(*progressCallback)(double progressValue, void*), void* target) {
     int ref_latGridNum = ref_latData.size(), ref_lonGridNum = ref_lonData.size();
     auto theVar = iiFile->getVar(theVarName);
-    
+
     auto tempTheVarField = ThreeDArray(timeLength, latGridNum, lonGridNum);
-    
+
     if (zLevelIndex == -1) {
         theVar.getVar(tempTheVarField.get());
     } else {
         theVar.getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { timeLength,1,latGridNum,lonGridNum }, tempTheVarField.get());
     }
-    
+
     std::cout << "start regridding..." << std::endl;
 //    auto interp = Linint2();
-    
+
     int completed_count = 0;
     unsigned long itsPerCheck = timeLength / 50;
-    
+
 #   pragma omp parallel for num_threads(threadNum)
     for (int timeIndex = 0; timeIndex < timeLength; ++timeIndex) {
         if (shouldCancel->load()) { continue; }
-        
+
         NCL_cxx::linint2(lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempTheVarField.get()+timeIndex*lonGridNum*latGridNum, theVarField.get()+timeIndex*ref_lonGridNum*ref_latGridNum, false, -9999);
-        
+
 #       pragma omp atomic
         ++completed_count;
-        
+
         if (completed_count % itsPerCheck == 0) {
 #           pragma omp critical
             progressCallback(static_cast<double>(completed_count)/timeLength*100, target);
         }
     }
-    
+
 //    NCL_cxx::linint2(threadNum, timeLength, lonArr.get(), lonGridNum, latArr.get(), latGridNum, ref_lonData.data(), ref_lonGridNum, ref_latData.data(), ref_latGridNum, tempVorField.get(), vorField.get(), false, -9999);
 
 }
@@ -958,7 +957,7 @@ void Processor::unstaggerU(netCDF::NcFile *inFile, ThreeDArray &u_unstged, Three
     size_t nt = inFile->getDim("Time").getSize();
     size_t ny = inFile->getDim("south_north").getSize();
     size_t nx = inFile->getDim("west_east").getSize();
-    
+
     auto u_staggered = ThreeDArray(nt, ny, nx + 1);
     auto v_staggered = ThreeDArray(nt, ny + 1, nx);
     if (zLevelIndex == -1) {
@@ -968,7 +967,7 @@ void Processor::unstaggerU(netCDF::NcFile *inFile, ThreeDArray &u_unstged, Three
         inFile->getVar("U").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny,nx + 1 }, u_staggered.get());
         inFile->getVar("V").getVar({ 0,static_cast<size_t>(zLevelIndex),0,0 }, { nt,1,ny + 1,nx }, v_staggered.get());
     }
-    
+
     for (int t_i = 0; t_i < nt; ++t_i) {
         for (int y_i = 0; y_i < ny; ++y_i) {
             for (int x_i = 0; x_i < nx; ++x_i) {
@@ -997,7 +996,7 @@ void Processor::checkDirAndCreate(const std::string& folderName) {
     std::filesystem::path dumpDir(dumpDir);
     std::filesystem::path folderPath = dumpDir / folderName;
     this->dumpDir = folderPath.string();
-    
+
     // 文件或文件夹不存在，创建文件夹
     if (!std::filesystem::exists(folderPath)) {
         std::filesystem::create_directories(folderPath);
@@ -1008,14 +1007,14 @@ void Processor::checkDirAndCreate(const std::string& folderName) {
     // 存在文件，重命名原有文件，并创建新文件夹
     std::filesystem::rename(folderPath, dumpDir / (folderName+".original"));
     std::filesystem::create_directories(folderPath);
-    
+
 }
 
 /// 将第一步生成的Vortex数据用boost序列化为文件
 /// @param[in] ncFilePath 文件绝对路径
 void Processor::dumpStep1(const std::string ncFilePath) {
     //checkDirAndCreate("step1");
-    
+
     std::filesystem::path stepDumpDir(dumpDir);
     std::ofstream ofs(stepDumpDir / ( std::filesystem::path(ncFilePath).stem().string() + "_step1.dat" ), std::ios::binary);
     boost::archive::binary_oarchive oa(ofs);
@@ -1034,7 +1033,7 @@ void Processor::dumpStep2(const std::string ncFilePath) {
     boost::archive::binary_oarchive oa(ofs);
     TCs tcs(realTCs, tcInfo);
     oa << tcs;
-    
+
     //getLandPolygons();
     //std::cout << "test" << std::endl;
     //std::cout << pnpolys(24.764169, 112.762106) << std::endl;  // true
@@ -1062,7 +1061,7 @@ void Processor::dumpStep3(const std::string ncFilePath) {
 void Processor::getStep1DataFromFile(const std::string& filePath) {
     std::ifstream ifs(filePath, std::ios::binary);
     boost::archive::binary_iarchive ia(ifs);
-    
+
     allVortexes.clear();
     //        ia >> hasTC_timeIndex >> vortexes;
     Vortexes vortexes;
@@ -1076,7 +1075,7 @@ void Processor::getStep1DataFromFile(const std::string& filePath) {
 void Processor::getStep2DataFromFile(const std::string& filePath) {
     std::ifstream ifs(filePath, std::ios::binary);
     boost::archive::binary_iarchive ia(ifs);
-    
+
     realTCs.clear();
     TCs tcs;
     ia >> tcs;
@@ -1109,15 +1108,54 @@ void Processor::copyLatLonData(std::vector<float> &lat_data, std::vector<float> 
     std::copy(lonArr.get(), lonArr.get()+lonGridNum, std::back_inserter(lon_data));
 }
 
-/// 读取boost序列化的大陆mask文件并将数据读到landPolygons
+/// 读取GeoJSON大陆mask文件并将数据读到landPolygons
 void Processor::getLandPolygons() {
     /// Resource文件夹位置(macOS)或可执行文件位置(CLI)
     auto resBaseDirStr = resourceBaseDir.empty() ? boost::dll::program_location().parent_path().string() : resourceBaseDir;
 
     std::filesystem::path resBaseDir(resBaseDirStr);
-    std::ifstream ifs(resBaseDir / "data" / "myMap.dat", std::ios::binary);
-    boost::archive::binary_iarchive ia(ifs);
-    ia >> landPolygons;
+    auto mapPath = resBaseDir / "data" / "myMap.json";
+    std::ifstream ifs(mapPath);
+    if (!ifs) {
+        throw std::runtime_error("Cannot open map file: " + mapPath.string());
+    }
+
+    nlohmann::json mapJson;
+    ifs >> mapJson;
+
+    landPolygons.clear();
+
+    auto addPolygon = [this](const nlohmann::json& linearRing) {
+        std::vector<std::pair<float, float>> polygon;
+        polygon.reserve(linearRing.size());
+        for (const auto& point : linearRing) {
+            if (!point.is_array() || point.size() < 2) {
+                throw std::runtime_error("Invalid coordinate in myMap.json");
+            }
+            polygon.emplace_back(point.at(1).get<float>(), point.at(0).get<float>());
+        }
+        if (!polygon.empty()) {
+            landPolygons.push_back(std::move(polygon));
+        }
+    };
+
+    for (const auto& feature : mapJson.at("features")) {
+        const auto& geometry = feature.at("geometry");
+        const auto geometryType = geometry.at("type").get<std::string>();
+        const auto& coordinates = geometry.at("coordinates");
+
+        if (geometryType == "Polygon") {
+            addPolygon(coordinates.at(0));
+        } else if (geometryType == "MultiPolygon") {
+            for (const auto& polygon : coordinates) {
+                addPolygon(polygon.at(0));
+            }
+        }
+    }
+
+    if (landPolygons.empty()) {
+        throw std::runtime_error("No land polygons loaded from: " + mapPath.string());
+    }
 }
 
 
@@ -1150,4 +1188,3 @@ bool Processor::pnpolys(float testLat, float testLon) {
 }
 
 }
-

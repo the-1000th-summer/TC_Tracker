@@ -26,7 +26,7 @@ include_directories(
 add_executable(TC_Tracker_CLI main.cpp ${CORE_SOURCES})
 message("${CMAKE_BINARY_DIR}")
 add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/data")
-add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/../../../../../data/myMap/myMap.dat" "${CMAKE_BINARY_DIR}/data")
+add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/../../data/myMap.json" "${CMAKE_BINARY_DIR}/data/myMap.json")
 find_library(libncPath netcdf ${nccDir}/lib)
 find_library(libncxxPath netcdf_c++4 /wind1/home/16dengh/anaconda3/lib)
 find_library(libserPath

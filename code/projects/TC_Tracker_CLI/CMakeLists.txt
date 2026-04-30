@@ -16,7 +16,7 @@ if(MSVC)
 endif()
 target_link_libraries(TC_Tracker_CLI PRIVATE tc_tracker_core)
 
-set(TC_TRACKER_DATA_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../../data/myMap.dat")
+set(TC_TRACKER_DATA_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../../data/myMap.json")
 if(NOT EXISTS "${TC_TRACKER_DATA_FILE}")
     message(FATAL_ERROR "Data file not found: ${TC_TRACKER_DATA_FILE}")
 endif()
@@ -26,7 +26,7 @@ message(STATUS "Data file path: ${TC_TRACKER_DATA_FILE}")
 
 # create "data" dir in build dir and copy the data into it
 add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/data")
-add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TC_TRACKER_DATA_FILE}" "${CMAKE_BINARY_DIR}/data/myMap.dat")
+add_custom_command(TARGET TC_Tracker_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TC_TRACKER_DATA_FILE}" "${CMAKE_BINARY_DIR}/data/myMap.json")
 
 # install to -DCMAKE_INSTALL_PREFIX
 # (RUNTIME means executable file path)

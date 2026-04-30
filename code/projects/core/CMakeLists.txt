@@ -5,6 +5,7 @@ project(tc_tracker_core LANGUAGES CXX)
 find_package(Boost 1.70 REQUIRED COMPONENTS serialization filesystem)
 find_package(netCDF REQUIRED)
 find_package(netCDFCxx CONFIG QUIET)
+find_package(nlohmann_json CONFIG QUIET)
 find_package(OpenMP REQUIRED)
 # cmake may not find abseil if only write
 # `find_package(absl CONFIG REQUIRED)`
@@ -113,6 +114,11 @@ target_link_libraries(tc_tracker_core
         Boost::filesystem
         netCDF::netcdf-cxx4
 )
+
+if(TARGET nlohmann_json::nlohmann_json)
+    target_compile_definitions(tc_tracker_core PRIVATE TTCORE_USE_SYSTEM_NLOHMANN_JSON)
+    target_link_libraries(tc_tracker_core PRIVATE nlohmann_json::nlohmann_json)
+endif()
 
 if(TARGET netCDF::netcdf)
     target_link_libraries(tc_tracker_core PUBLIC netCDF::netcdf)

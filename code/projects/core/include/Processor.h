@@ -10,7 +10,6 @@
 #include <vector>
 #include "multiArray.h"
 #include "TC1Time.h"
-#include "json.hpp"
 
 namespace TTCore {
 

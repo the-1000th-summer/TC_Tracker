@@ -5,12 +5,9 @@
 #include <algorithm>
 #include <filesystem>
 #include <cmath>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/serialization/vector.hpp>
 #include <chrono>
+#include <nlohmann/json.hpp>
 
-#include "json.hpp"
 #include "NCFileInfo.h"
 #include "Processor.h"
 #include "Typhoon.h"
