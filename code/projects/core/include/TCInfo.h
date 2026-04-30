@@ -65,12 +65,13 @@ public:
     std::string uwndVarName;
     std::string vwndVarName;
     /// 存储的数据是否是涡度数据
-    bool dataIsVor;
-    
+    // give default value to avoid being false when asking user for vor variable name
+    bool dataIsVor = true;
+
     std::string theVarName() {
         return dataIsVor ? vorVarName : uwndVarName;
     }
-    
+
     void checkVarNames() {
         if (timeVarName.empty()) {
             std::cout << "Please enter time variable name:" << std::endl;

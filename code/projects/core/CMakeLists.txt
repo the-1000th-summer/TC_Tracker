@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.20)
 
 project(tc_tracker_core LANGUAGES CXX)
 
@@ -6,7 +6,10 @@ find_package(Boost 1.70 REQUIRED COMPONENTS serialization filesystem)
 find_package(netCDF REQUIRED)
 find_package(netCDFCxx CONFIG QUIET)
 find_package(OpenMP REQUIRED)
-find_package(Protobuf REQUIRED)
+# cmake may not find abseil if only write
+# `find_package(absl CONFIG REQUIRED)`
+set(protobuf_MODULE_COMPATIBLE TRUE)
+find_package(Protobuf CONFIG REQUIRED)
 
 if(NOT TARGET netCDF::netcdf-cxx4)
     find_program(NetCDFCxx_CONFIG_EXECUTABLE NAMES ncxx4-config)

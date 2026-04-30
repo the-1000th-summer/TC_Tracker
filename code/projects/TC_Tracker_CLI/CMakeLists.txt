@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.20)
 project(TC_Tracker_CLI VERSION 0.0.3)
 
 include(CTest)
