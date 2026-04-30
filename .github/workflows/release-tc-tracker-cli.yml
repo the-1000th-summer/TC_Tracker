@@ -12,20 +12,22 @@ on:
         type: string
 
 permissions:
+  actions: read
   contents: write
 
 env:
   CLI_SOURCE_DIR: code/projects/TC_Tracker_CLI
-  BUILD_DIR: ${{ github.workspace }}/build/tc-tracker-cli
-  INSTALL_DIR: ${{ github.workspace }}/dist/TC_Tracker_CLI
-  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-  VCPKG_DEFAULT_TRIPLET: x64-windows
   RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
 
 jobs:
   build-windows:
     name: Build Windows x64
     runs-on: windows-latest
+    env:
+      BUILD_DIR: ${{ github.workspace }}/build/tc-tracker-cli
+      INSTALL_DIR: ${{ github.workspace }}/dist/TC_Tracker_CLI
+      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+      VCPKG_DEFAULT_TRIPLET: x64-windows
 
     steps:
       - name: Checkout
@@ -102,12 +104,95 @@ jobs:
           Compress-Archive -Path "$env:INSTALL_DIR/*" -DestinationPath $assetPath -Force
           "asset_path=$assetPath" >> $env:GITHUB_OUTPUT
 
-      - name: Upload archive to GitHub Release
+      - name: Upload Windows archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tc-tracker-cli-windows-x64
+          path: ${{ steps.package.outputs.asset_path }}
+          if-no-files-found: error
+
+  build-macos:
+    name: Build macOS arm64
+    runs-on: macos-latest
+    env:
+      BUILD_DIR: ${{ github.workspace }}/build/tc-tracker-cli
+      INSTALL_DIR: ${{ github.workspace }}/dist/TC_Tracker_CLI
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install dependencies
+        run: brew install cmake ninja pkg-config boost protobuf netcdf netcdf-cxx libomp
+
+      - name: Configure CMake
+        run: |
+          BREW_PREFIX="$(brew --prefix)"
+          LIBOMP_PREFIX="$(brew --prefix libomp)"
+
+          cmake \
+            -S "$CLI_SOURCE_DIR" \
+            -B "$BUILD_DIR" \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="$BREW_PREFIX;$LIBOMP_PREFIX" \
+            -DOpenMP_ROOT="$LIBOMP_PREFIX" \
+            -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I$LIBOMP_PREFIX/include" \
+            -DOpenMP_CXX_LIB_NAMES=omp \
+            -DOpenMP_omp_LIBRARY="$LIBOMP_PREFIX/lib/libomp.dylib"
+
+      - name: Build
+        run: cmake --build "$BUILD_DIR" --target TC_Tracker_CLI --parallel
+
+      - name: Install
+        run: |
+          cmake --install "$BUILD_DIR" --prefix "$INSTALL_DIR"
+          find "$INSTALL_DIR" -maxdepth 3 -type f -print
+
+      - name: Create release archive
+        id: package
+        run: |
+          asset_name="TC_Tracker_CLI-$RELEASE_TAG-macos-arm64.tar.gz"
+          asset_path="$RUNNER_TEMP/$asset_name"
+          tar -czf "$asset_path" -C "$INSTALL_DIR" .
+          echo "asset_path=$asset_path" >> "$GITHUB_OUTPUT"
+
+      - name: Upload macOS archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tc-tracker-cli-macos-arm64
+          path: ${{ steps.package.outputs.asset_path }}
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - build-windows
+      - build-macos
+
+    steps:
+      - name: Download release archives
+        uses: actions/download-artifact@v4
+        with:
+          pattern: tc-tracker-cli-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: List release archives
+        run: find release-assets -maxdepth 1 -type f -print
+
+      - name: Upload archives to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: TC_Tracker_CLI ${{ env.RELEASE_TAG }}
-          files: ${{ steps.package.outputs.asset_path }}
+          files: release-assets/*
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
