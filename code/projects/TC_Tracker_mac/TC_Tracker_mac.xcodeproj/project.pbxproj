@@ -370,7 +370,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "set -euo pipefail\n\neval \"$(/opt/homebrew/bin/brew shellenv zsh)\"\n\nPROTO_DIR=\"${SRCROOT}/../core\"\nOUT_DIR=\"${SRCROOT}/TC_Tracker_mac/proto_include\"\n\nprotoc -I \"$PROTO_DIR\" --cpp_out=$OUT_DIR TCsP.proto\n# touch \"$OUT_DIR/aa.txt\"\n\n";
+			shellScript = "set -euo pipefail\n\neval \"$(/opt/homebrew/bin/brew shellenv zsh)\"\n\nPROTO_DIR=\"${SRCROOT}/../core\"\nOUT_DIR=\"${SRCROOT}/TC_Tracker_mac/proto_include\"\n\nmkdir -p \"$OUT_DIR\"\nprotoc -I \"$PROTO_DIR\" --cpp_out=\"$OUT_DIR\" TCsP.proto\n# touch \"$OUT_DIR/aa.txt\"\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
