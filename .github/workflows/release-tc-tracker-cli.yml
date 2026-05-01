@@ -211,12 +211,12 @@ jobs:
           lib_dir="$INSTALL_DIR/lib"
           mkdir -p "$lib_dir"
 
-          should_skip_library() {
+          should_bundle_library() {
             local library_name
             library_name="$(basename "$1")"
 
             case "$library_name" in
-              linux-vdso.so.*|ld-linux*.so*|libc.so.*|libm.so.*|libpthread.so.*|libdl.so.*|librt.so.*|libresolv.so.*|libnsl.so.*|libutil.so.*|libanl.so.*|libstdc++.so.*|libgcc_s.so.*)
+              libboost_filesystem.so.*|libboost_serialization.so.*|libnetcdf.so.*|libnetcdf_c++4.so.*|libhdf5*.so.*|libprotobuf*.so.*|libabsl_*.so.*|libutf8_range*.so.*|libgomp.so.*|libaec.so.*|libsz.so.*)
                 return 0
                 ;;
             esac
@@ -252,7 +252,7 @@ jobs:
 
               dependency_name="${dependency_entry%%|*}"
               dependency="${dependency_entry#*|}"
-              should_skip_library "$dependency" && continue
+              should_bundle_library "$dependency" || continue
 
               bundled_dependency="$lib_dir/$dependency_name"
 
