@@ -240,6 +240,7 @@ jobs:
     runs-on: macos-15
     env:
       DERIVED_DATA_DIR: ${{ github.workspace }}/build/tc-tracker-mac-derived-data
+      ARCHIVE_PATH: ${{ github.workspace }}/build/TC_Tracker_mac.xcarchive
       ARTIFACT_DIR: ${{ github.workspace }}/dist/TC_Tracker_mac
       HOMEBREW_NO_INSTALL_CLEANUP: "1"
 
@@ -256,39 +257,132 @@ jobs:
 
       - name: Build app
         run: |
-          xcodebuild \
+          xcodebuild clean archive \
             -project "$MAC_GUI_PROJECT_PATH" \
             -scheme "$MAC_GUI_SCHEME" \
             -configuration Release \
             -derivedDataPath "$DERIVED_DATA_DIR" \
             -destination "generic/platform=macOS" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
+            -archivePath "$ARCHIVE_PATH" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="-" \
+            DEVELOPMENT_TEAM="" \
             ARCHS=arm64 \
             ONLY_ACTIVE_ARCH=NO \
-            build
+            SKIP_INSTALL=NO
 
       - name: Collect app bundle
         id: collect
         run: |
-          app_path="$(find "$DERIVED_DATA_DIR/Build/Products/Release" -maxdepth 1 -type d -name "*.app" -print -quit)"
+          app_path="$(find "$ARCHIVE_PATH/Products/Applications" -maxdepth 1 -type d -name "*.app" -print -quit)"
           if [ -z "$app_path" ]; then
-            echo "No .app bundle found in Release products." >&2
+            echo "No .app bundle found in archive products." >&2
             exit 1
           fi
 
           mkdir -p "$ARTIFACT_DIR"
           ditto "$app_path" "$ARTIFACT_DIR/$(basename "$app_path")"
-          find "$ARTIFACT_DIR" -maxdepth 4 -print
+          echo "app_path=$ARTIFACT_DIR/$(basename "$app_path")" >> "$GITHUB_OUTPUT"
           echo "app_name=$(basename "$app_path")" >> "$GITHUB_OUTPUT"
+
+      - name: Bundle Homebrew dylibs and sign app
+        run: |
+          set -euo pipefail
+
+          app_path="${{ steps.collect.outputs.app_path }}"
+          executable="$app_path/Contents/MacOS/$(/usr/libexec/PlistBuddy -c "Print :CFBundleExecutable" "$app_path/Contents/Info.plist")"
+          frameworks_dir="$app_path/Contents/Frameworks"
+          brew_prefix="$(brew --prefix)"
+          mkdir -p "$frameworks_dir"
+
+          should_bundle_dylib() {
+            case "$1" in
+              /opt/homebrew/*|/usr/local/*|@rpath/*|@loader_path/*) return 0 ;;
+              *) return 1 ;;
+            esac
+          }
+
+          resolve_dylib_path() {
+            local dep="$1"
+            local dep_name
+            dep_name="$(basename "$dep")"
+
+            if [ -e "$dep" ]; then
+              echo "$dep"
+              return 0
+            fi
+
+            for candidate in \
+              "$brew_prefix/lib/$dep_name" \
+              "$brew_prefix"/opt/*/lib/"$dep_name" \
+              /usr/local/lib/"$dep_name" \
+              /usr/local/opt/*/lib/"$dep_name"; do
+              if [ -e "$candidate" ]; then
+                echo "$candidate"
+                return 0
+              fi
+            done
+
+            return 1
+          }
+
+          copy_dylib() {
+            local dep="$1"
+            local resolved_dep
+            local dep_name
+
+            resolved_dep="$(resolve_dylib_path "$dep")"
+            dep_name="$(basename "$dep")"
+
+            if [ ! -e "$frameworks_dir/$dep_name" ]; then
+              cp -L "$resolved_dep" "$frameworks_dir/$dep_name"
+              chmod u+w "$frameworks_dir/$dep_name"
+            fi
+
+            pending+=("$frameworks_dir/$dep_name")
+          }
+
+          rewrite_dependencies() {
+            local binary="$1"
+            while IFS= read -r dep; do
+              if should_bundle_dylib "$dep"; then
+                copy_dylib "$dep"
+                install_name_tool -change "$dep" "@executable_path/../Frameworks/$(basename "$dep")" "$binary"
+              fi
+            done < <(otool -L "$binary" | awk 'NR > 1 { print $1 }')
+          }
+
+          pending=("$executable")
+          processed=""
+          while [ "${#pending[@]}" -gt 0 ]; do
+            binary="${pending[0]}"
+            pending=("${pending[@]:1}")
+
+            case "$processed" in
+              *"|$binary|"*) continue ;;
+            esac
+            processed="$processed|$binary|"
+
+            rewrite_dependencies "$binary"
+          done
+
+          for dylib in "$frameworks_dir"/*.dylib; do
+            [ -e "$dylib" ] || continue
+            install_name_tool -id "@executable_path/../Frameworks/$(basename "$dylib")" "$dylib"
+          done
+
+          find "$frameworks_dir" -type f -name "*.dylib" -print0 | xargs -0 -I {} codesign --force --sign "-" --timestamp=none {}
+          codesign --force --deep --sign "-" --timestamp=none "$app_path"
+          codesign --verify --deep --strict --verbose=2 "$app_path"
+
+          find "$ARTIFACT_DIR" -maxdepth 4 -print
 
       - name: Create release archive
         id: package
         run: |
-          asset_name="TC_Tracker-$RELEASE_TAG-macos-arm64.tar.gz"
+          asset_name="TC_Tracker-$RELEASE_TAG-macos-arm64.zip"
           asset_path="$RUNNER_TEMP/$asset_name"
-          tar -czf "$asset_path" -C "$ARTIFACT_DIR" "${{ steps.collect.outputs.app_name }}"
+          ditto -c -k --sequesterRsrc --keepParent "${{ steps.collect.outputs.app_path }}" "$asset_path"
           echo "asset_path=$asset_path" >> "$GITHUB_OUTPUT"
 
       - name: Upload GUI macOS archive artifact
