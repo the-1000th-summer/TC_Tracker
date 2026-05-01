@@ -295,10 +295,15 @@ jobs:
           brew_prefix="$(brew --prefix)"
           mkdir -p "$frameworks_dir"
 
-          should_bundle_dylib() {
-            case "$1" in
-              /opt/homebrew/*|/usr/local/*|@rpath/*|@loader_path/*) return 0 ;;
-              *) return 1 ;;
+          bundled_dylib_name() {
+            case "$(basename "$1")" in
+              libomp*.dylib) echo "libomp.dylib" ;;
+              libabsl_log_internal_check_op*.dylib) echo "libabsl_log_internal_check_op.dylib" ;;
+              libabsl_log_internal_message*.dylib) echo "libabsl_log_internal_message.dylib" ;;
+              libnetcdf-cxx4*.dylib) echo "libnetcdf-cxx4.dylib" ;;
+              libboost_filesystem*.dylib) echo "libboost_filesystem.dylib" ;;
+              libboost_serialization*.dylib) echo "libboost_serialization.dylib" ;;
+              libprotobuf*.dylib) echo "libprotobuf.dylib" ;;
             esac
           }
 
@@ -328,43 +333,24 @@ jobs:
 
           copy_dylib() {
             local dep="$1"
+            local dep_name="$2"
             local resolved_dep
-            local dep_name
 
             resolved_dep="$(resolve_dylib_path "$dep")"
-            dep_name="$(basename "$dep")"
 
             if [ ! -e "$frameworks_dir/$dep_name" ]; then
               cp -L "$resolved_dep" "$frameworks_dir/$dep_name"
               chmod u+w "$frameworks_dir/$dep_name"
             fi
-
-            pending+=("$frameworks_dir/$dep_name")
           }
 
-          rewrite_dependencies() {
-            local binary="$1"
-            while IFS= read -r dep; do
-              if should_bundle_dylib "$dep"; then
-                copy_dylib "$dep"
-                install_name_tool -change "$dep" "@executable_path/../Frameworks/$(basename "$dep")" "$binary"
-              fi
-            done < <(otool -L "$binary" | awk 'NR > 1 { print $1 }')
-          }
-
-          pending=("$executable")
-          processed=""
-          while [ "${#pending[@]}" -gt 0 ]; do
-            binary="${pending[0]}"
-            pending=("${pending[@]:1}")
-
-            case "$processed" in
-              *"|$binary|"*) continue ;;
-            esac
-            processed="$processed|$binary|"
-
-            rewrite_dependencies "$binary"
-          done
+          while IFS= read -r dep; do
+            dep_name="$(bundled_dylib_name "$dep")"
+            if [ -n "$dep_name" ]; then
+              copy_dylib "$dep" "$dep_name"
+              install_name_tool -change "$dep" "@executable_path/../Frameworks/$dep_name" "$executable"
+            fi
+          done < <(otool -L "$executable" | awk 'NR > 1 { print $1 }')
 
           for dylib in "$frameworks_dir"/*.dylib; do
             [ -e "$dylib" ] || continue
