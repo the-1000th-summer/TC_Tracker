@@ -100,6 +100,15 @@
 
 @implementation NCFileInfo_Wrapper
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        m_instance = new TTCore::NCFileInfo();
+        m_shouldCancel.store(false);
+    }
+    return self;
+}
+
 - (id)initWithNcFilePath:(NSString *)filePath {
     self = [super init];
     if (self) {
@@ -154,6 +163,7 @@
 - (void)dealloc {
 //    m_instance = nil;
     delete m_instance;
+    m_instance = nullptr;
 //    [super dealloc];       // no need to call [super dealloc] when using ARC
 }
 
@@ -302,4 +312,3 @@
 }
 
 @end
-

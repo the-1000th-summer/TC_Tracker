@@ -64,6 +64,7 @@
 
 // if do not want default init method, uncomment next line
 //- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)init;
 - (id)initWithNcFilePath:(NSString *)filePath;
 - (id)initWithNcFilePath:(NSString *)filePath :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor;
 - (id)initWithNcFilePath:(NSString *)filePath :(bool)isWrfoutFile :(NSString *)time :(NSString *)lat :(NSString *)lon :(NSString *)vor :(NSString *)u :(NSString *)v :(bool)dataIsVor :(int)zLevelIndex :(int)threadNum :(double)toGridRes :(NSString *)tempFileDir;

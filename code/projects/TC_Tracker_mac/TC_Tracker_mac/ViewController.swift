@@ -59,6 +59,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     }
 //    private var realTCs: [Typhoon] = []
     private var tcs: TCs?
+    private var tracker: NCFileInfo_Wrapper?
     
     
     override func viewDidLoad() {
@@ -90,6 +91,8 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         exportBtn.isEnabled = false
         startTrackingBtn.isEnabled = false
         canceledLabel.isHidden = true
+        tcs = nil
+        tracker = nil
 
         guard checkFileValid(filePath: filePath) else {
             interpSwitch.isEnabled = false
@@ -126,6 +129,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         var threadNum = UserDefaults.standard.integer(forKey: "ThreadNum")
         if threadNum == 0 { threadNum = 1 }
         let tracker = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, Int32(threadNum), gridResValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/")!
+        self.tracker = tracker
         
         guard let progressVC = storyboard?.instantiateController(withIdentifier: "ProgressVC") as? ProgressViewController else { return }
         progressVC.tracker = tracker
@@ -142,6 +146,8 @@ class ViewController: NSViewController, NSComboBoxDataSource {
     }
     
     @IBAction func exportBtnClicked(_ sender: NSButton) {
+        guard let tcs = tcs else { return }
+        guard let exporter = tracker ?? NCFileInfo_Wrapper() else { return }
         let savePanel = NSSavePanel()
         savePanel.allowedContentTypes = [.json, UTType(filenameExtension: "pb")!, UTType(filenameExtension: "nc")!]
         savePanel.allowsOtherFileTypes = false
@@ -166,9 +172,9 @@ class ViewController: NSViewController, NSComboBoxDataSource {
             
             switch fileExtension {
             case "json":
-                NCFileInfo_Wrapper().exportFile_json(tcs, oNcFilePath: filePath)
+                exporter.exportFile_json(tcs, oNcFilePath: filePath)
             case "pb":
-                NCFileInfo_Wrapper().exportFile_proto3(tcs, oNcFilePath: filePath)
+                exporter.exportFile_proto3(tcs, oNcFilePath: filePath)
             case "nc":
                 let alert = NSAlert()
                 alert.messageText = "保存为compact形式？"
@@ -179,9 +185,9 @@ class ViewController: NSViewController, NSComboBoxDataSource {
                 
                 switch modalResult {
                 case .alertFirstButtonReturn:
-                    NCFileInfo_Wrapper().exportFile_nc(tcs, oNcFilePath: filePath, fullCommand: "exportFile_nc")
+                    exporter.exportFile_nc(tcs, oNcFilePath: filePath, fullCommand: "exportFile_nc")
                 case .alertSecondButtonReturn:
-                    NCFileInfo_Wrapper().exportFile_nc_compact(tcs, oNcFilePath: filePath, fullCommand: "exportFile_nc_compact")
+                    exporter.exportFile_nc_compact(tcs, oNcFilePath: filePath, fullCommand: "exportFile_nc_compact")
                 default:
                     break
                 }
@@ -407,4 +413,3 @@ class OnlyDoubleValueFormatter: NumberFormatter {
         return true
     }
 }
-
