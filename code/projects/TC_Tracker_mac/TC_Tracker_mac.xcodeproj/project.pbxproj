@@ -61,7 +61,7 @@
 		794FF9372FA0C445005C1A47 /* libomp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libomp.dylib; path = /opt/homebrew/opt/libomp/lib/libomp.dylib; sourceTree = "<absolute>"; };
 		795DA7B3286B3A7200909341 /* TCInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TCInfo.h; path = ../../core/include/TCInfo.h; sourceTree = "<group>"; };
 		796187BE2872E15B00FDAC2C /* path.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = path.html; sourceTree = "<group>"; };
-		79618E532867129C00539BAE /* 热带气旋路径识别软件.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "热带气旋路径识别软件.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		79618E532867129C00539BAE /* TC_Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TC_Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		79618E562867129C00539BAE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		79618E582867129C00539BAE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		79618E5A2867129D00539BAE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -161,7 +161,7 @@
 		79618E542867129C00539BAE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				79618E532867129C00539BAE /* 热带气旋路径识别软件.app */,
+				79618E532867129C00539BAE /* TC_Tracker.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -303,7 +303,7 @@
 			);
 			name = TC_Tracker_mac;
 			productName = TC_Tracker_mac;
-			productReference = 79618E532867129C00539BAE /* 热带气旋路径识别软件.app */;
+			productReference = 79618E532867129C00539BAE /* TC_Tracker.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -567,7 +567,7 @@
 					"-fopenmp",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.the1000thsummer.TC-Tracker-mac";
-				PRODUCT_NAME = "热带气旋路径识别软件";
+				PRODUCT_NAME = TC_Tracker;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "TC_Tracker_mac/TC_Tracker_mac-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -609,7 +609,7 @@
 					"-fopenmp",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.the1000thsummer.TC-Tracker-mac";
-				PRODUCT_NAME = "热带气旋路径识别软件";
+				PRODUCT_NAME = TC_Tracker;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "TC_Tracker_mac/TC_Tracker_mac-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
