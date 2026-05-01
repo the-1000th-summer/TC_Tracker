@@ -76,9 +76,16 @@ jobs:
         id: package
         shell: pwsh
         run: |
-          $assetName = "TC_Tracker_CLI-$env:RELEASE_TAG-windows-x64.zip"
+          $assetBaseName = "TC_Tracker_CLI-$env:RELEASE_TAG-windows-x64"
+          $assetName = "$assetBaseName.zip"
           $assetPath = Join-Path "$env:RUNNER_TEMP" $assetName
-          Compress-Archive -Path "$env:INSTALL_DIR/*" -DestinationPath $assetPath -Force
+          $packageDir = Join-Path "$env:RUNNER_TEMP" $assetBaseName
+          if (Test-Path $packageDir) {
+            Remove-Item $packageDir -Recurse -Force
+          }
+          New-Item -ItemType Directory -Force $packageDir | Out-Null
+          Copy-Item "$env:INSTALL_DIR/*" $packageDir -Recurse -Force
+          Compress-Archive -Path $packageDir -DestinationPath $assetPath -Force
           "asset_path=$assetPath" >> $env:GITHUB_OUTPUT
 
       - name: Upload Windows archive artifact
@@ -198,9 +205,14 @@ jobs:
       - name: Create release archive
         id: package
         run: |
-          asset_name="TC_Tracker_CLI-$RELEASE_TAG-linux-x64.tar.gz"
+          asset_base_name="TC_Tracker_CLI-$RELEASE_TAG-linux-x64"
+          asset_name="$asset_base_name.tar.gz"
           asset_path="$RUNNER_TEMP/$asset_name"
-          tar -czf "$asset_path" -C "$INSTALL_DIR" .
+          package_dir="$RUNNER_TEMP/$asset_base_name"
+          rm -rf "$package_dir"
+          mkdir -p "$package_dir"
+          cp -a "$INSTALL_DIR"/. "$package_dir"/
+          tar -czf "$asset_path" -C "$RUNNER_TEMP" "$asset_base_name"
           echo "asset_path=$asset_path" >> "$GITHUB_OUTPUT"
 
       - name: Upload Linux archive artifact
