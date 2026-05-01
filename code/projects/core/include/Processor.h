@@ -11,10 +11,16 @@
 #include "multiArray.h"
 #include "TC1Time.h"
 
+#if defined(_WIN32)
+#define TTCORE_STDCALL __stdcall
+#else
+#define TTCORE_STDCALL
+#endif
+
 namespace TTCore {
 
-using CppCallBack = void(__stdcall*)(int stepIdx, void*);
-using CppCallBack2 = void(__stdcall*)(double progressValue, void*);
+using CppCallBack = void(TTCORE_STDCALL *)(int stepIdx, void*);
+using CppCallBack2 = void(TTCORE_STDCALL *)(double progressValue, void*);
 
 class Processor {
 public:
