@@ -139,103 +139,6 @@ jobs:
           cmake --install "$BUILD_DIR" --prefix "$INSTALL_DIR"
           find "$INSTALL_DIR" -maxdepth 3 -type f -print
 
-      - name: Bundle macOS shared libraries
-        run: |
-          set -euo pipefail
-
-          executable="$INSTALL_DIR/TC_Tracker_CLI"
-          lib_dir="$INSTALL_DIR/lib"
-          brew_prefix="$(brew --prefix)"
-          mkdir -p "$lib_dir"
-
-          should_bundle_dylib() {
-            case "$1" in
-              /opt/homebrew/*|/usr/local/*|@rpath/*|@loader_path/*) return 0 ;;
-              *) return 1 ;;
-            esac
-          }
-
-          resolve_dylib_path() {
-            local dep="$1"
-            local dep_name
-            dep_name="$(basename "$dep")"
-
-            if [ -e "$dep" ]; then
-              echo "$dep"
-              return 0
-            fi
-
-            for candidate in \
-              "$lib_dir/$dep_name" \
-              "$brew_prefix/lib/$dep_name" \
-              "$brew_prefix"/opt/*/lib/"$dep_name" \
-              /usr/local/lib/"$dep_name" \
-              /usr/local/opt/*/lib/"$dep_name"; do
-              if [ -e "$candidate" ]; then
-                echo "$candidate"
-                return 0
-              fi
-            done
-
-            return 1
-          }
-
-          copy_dylib() {
-            local dep="$1"
-            local resolved_dep
-            local dep_name
-
-            resolved_dep="$(resolve_dylib_path "$dep")"
-            dep_name="$(basename "$dep")"
-
-            if [ ! -e "$lib_dir/$dep_name" ]; then
-              cp -L "$resolved_dep" "$lib_dir/$dep_name"
-              chmod u+w "$lib_dir/$dep_name"
-            fi
-
-            pending+=("$lib_dir/$dep_name")
-          }
-
-          rewrite_dependencies() {
-            local binary="$1"
-            while IFS= read -r dep; do
-              if should_bundle_dylib "$dep"; then
-                copy_dylib "$dep"
-                install_name_tool -change "$dep" "@executable_path/lib/$(basename "$dep")" "$binary"
-              fi
-            done < <(otool -L "$binary" | awk 'NR > 1 { print $1 }')
-          }
-
-          pending=("$executable")
-          processed="|"
-
-          while [ "${#pending[@]}" -gt 0 ]; do
-            binary="${pending[0]}"
-            pending=("${pending[@]:1}")
-
-            case "$processed" in
-              *"|$binary|"*) continue ;;
-            esac
-            processed="$processed$binary|"
-
-            rewrite_dependencies "$binary"
-          done
-
-          for dylib in "$lib_dir"/*.dylib; do
-            [ -e "$dylib" ] || continue
-            install_name_tool -id "@executable_path/lib/$(basename "$dylib")" "$dylib"
-          done
-
-          find "$lib_dir" -type f -name "*.dylib" -print0 | xargs -0 -I {} codesign --force --sign "-" --timestamp=none {}
-          codesign --force --sign "-" --timestamp=none "$executable"
-          codesign --verify --strict --verbose=2 "$executable"
-
-          echo "Bundled macOS shared libraries:"
-          find "$lib_dir" -maxdepth 1 -type f -name "*.dylib" -print | sort
-
-          echo "Resolved executable dependencies:"
-          otool -L "$executable"
-
       - name: Create release archive
         id: package
         run: |
@@ -313,7 +216,7 @@ jobs:
             library_name="$(basename "$1")"
 
             case "$library_name" in
-              linux-vdso.so.*|ld-linux*.so*|libc.so.*|libm.so.*|libpthread.so.*|libdl.so.*|librt.so.*|libresolv.so.*|libnsl.so.*|libutil.so.*|libanl.so.*)
+              linux-vdso.so.*|ld-linux*.so*|libc.so.*|libm.so.*|libpthread.so.*|libdl.so.*|librt.so.*|libresolv.so.*|libnsl.so.*|libutil.so.*|libanl.so.*|libstdc++.so.*|libgcc_s.so.*)
                 return 0
                 ;;
             esac
