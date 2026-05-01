@@ -10,7 +10,11 @@ find_package(OpenMP REQUIRED)
 # cmake may not find abseil if only write
 # `find_package(absl CONFIG REQUIRED)`
 set(protobuf_MODULE_COMPATIBLE TRUE)
-find_package(Protobuf CONFIG REQUIRED)
+find_package(Protobuf CONFIG QUIET)
+
+if(NOT Protobuf_FOUND)
+    find_package(Protobuf REQUIRED)
+endif()
 
 if(NOT TARGET netCDF::netcdf-cxx4)
     find_program(NetCDFCxx_CONFIG_EXECUTABLE NAMES ncxx4-config)
