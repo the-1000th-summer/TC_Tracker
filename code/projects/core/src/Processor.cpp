@@ -190,12 +190,12 @@ void Processor::recognizeTyphoon(void(*stepPgCallback)(int stepIdx, void*), void
             auto minLonD = lonArr2D.maxInColumn(0) / toGridRes;
             auto maxLonD = lonArr2D.minInColumn(lonGridNum-1) / toGridRes;
 
-            float minLatDIntegral, maxLatDIntegral;
-            float minLonDIntegral, maxLonDIntegral;
-            modf(minLatD, &minLatDIntegral);
-            modf(maxLatD, &maxLatDIntegral);
-            modf(minLonD, &minLonDIntegral);
-            modf(maxLonD, &maxLonDIntegral);
+            double minLatDIntegral, maxLatDIntegral;
+            double minLonDIntegral, maxLonDIntegral;
+            std::modf(minLatD, &minLatDIntegral);
+            std::modf(maxLatD, &maxLatDIntegral);
+            std::modf(minLonD, &minLonDIntegral);
+            std::modf(maxLonD, &maxLonDIntegral);
 
             const float minLat_rged = (minLatD <= 0) ? minLatDIntegral*toGridRes : (minLatDIntegral+1)*toGridRes;
             const float maxLat_rged = (maxLatD < 0) ? (maxLatDIntegral-1)*toGridRes : maxLatDIntegral*toGridRes;
