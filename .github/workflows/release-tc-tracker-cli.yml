@@ -147,6 +147,69 @@ jobs:
           path: ${{ steps.package.outputs.asset_path }}
           if-no-files-found: error
 
+  build-linux:
+    name: Build Linux x64
+    runs-on: ubuntu-latest
+    env:
+      BUILD_DIR: ${{ github.workspace }}/build/tc-tracker-cli
+      INSTALL_DIR: ${{ github.workspace }}/dist/TC_Tracker_CLI
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            cmake \
+            ninja-build \
+            pkg-config \
+            libboost-dev \
+            libboost-filesystem-dev \
+            libboost-serialization-dev \
+            libnetcdf-dev \
+            libnetcdf-c++4-dev \
+            libprotobuf-dev \
+            protobuf-compiler \
+            nlohmann-json3-dev
+
+      - name: Configure CMake
+        run: |
+          cmake \
+            -S "$CLI_SOURCE_DIR" \
+            -B "$BUILD_DIR" \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build "$BUILD_DIR" --target TC_Tracker_CLI --parallel
+
+      - name: Install
+        run: |
+          cmake --install "$BUILD_DIR" --prefix "$INSTALL_DIR"
+          find "$INSTALL_DIR" -maxdepth 3 -type f -print
+
+      - name: Create release archive
+        id: package
+        run: |
+          asset_name="TC_Tracker_CLI-$RELEASE_TAG-linux-x64.tar.gz"
+          asset_path="$RUNNER_TEMP/$asset_name"
+          tar -czf "$asset_path" -C "$INSTALL_DIR" .
+          echo "asset_path=$asset_path" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Linux archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tc-tracker-cli-linux-x64
+          path: ${{ steps.package.outputs.asset_path }}
+          if-no-files-found: error
+
   build-gui-windows:
     name: Build GUI Windows x64
     runs-on: windows-latest
@@ -398,6 +461,7 @@ jobs:
     needs:
       - build-windows
       - build-macos
+      - build-linux
       - build-gui-windows
       - build-gui-macos
 
