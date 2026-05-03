@@ -88,8 +88,6 @@
 		79E9167A286C4582002CED06 /* Processor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Processor.cpp; path = ../../core/src/Processor.cpp; sourceTree = "<group>"; };
 		79E9167C286C458D002CED06 /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Utils.cpp; path = ../../core/src/Utils.cpp; sourceTree = "<group>"; };
 		79E9167E286C45AB002CED06 /* TC1Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TC1Time.h; path = ../../core/include/TC1Time.h; sourceTree = "<group>"; };
-		79E91680286C4642002CED06 /* json.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = json.hpp; path = ../../core/include/json.hpp; sourceTree = "<group>"; };
-		79E91681286C53FC002CED06 /* cxxopts.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = cxxopts.hpp; sourceTree = "<group>"; };
 		79E91688286C570E002CED06 /* TC1Time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TC1Time.cpp; path = ../../core/src/TC1Time.cpp; sourceTree = "<group>"; };
 		79E9168A286C5765002CED06 /* VortexesDumper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VortexesDumper.h; path = ../../core/include/VortexesDumper.h; sourceTree = "<group>"; };
 		79E9168B286C576D002CED06 /* VortexesDumper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VortexesDumper.cpp; path = ../../core/src/VortexesDumper.cpp; sourceTree = "<group>"; };
@@ -265,8 +263,6 @@
 		79E9167F286C462B002CED06 /* 3rdPartyLib */ = {
 			isa = PBXGroup;
 			children = (
-				79E91681286C53FC002CED06 /* cxxopts.hpp */,
-				79E91680286C4642002CED06 /* json.hpp */,
 			);
 			name = 3rdPartyLib;
 			sourceTree = "<group>";

@@ -38,3 +38,6 @@ x64/
 # protobuf generated files
 TCsP.pb.h
 TCsP.pb.cc
+
+# Windows Nuget packages
+/code/projects/TC_Tracker/packages/
