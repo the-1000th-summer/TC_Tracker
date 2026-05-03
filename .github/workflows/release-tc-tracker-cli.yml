@@ -112,7 +112,7 @@ jobs:
           submodules: recursive
 
       - name: Install dependencies
-        run: brew install cmake ninja pkg-config boost protobuf netcdf netcdf-cxx libomp nlohmann-json
+        run: brew install cmake ninja pkg-config boost protobuf netcdf netcdf-cxx libomp nlohmann-json cxxopts
 
       - name: Configure CMake
         run: |
@@ -185,7 +185,8 @@ jobs:
             libnetcdf-c++4-dev \
             libprotobuf-dev \
             protobuf-compiler \
-            nlohmann-json3-dev
+            nlohmann-json3-dev \
+            libcxxopts-dev
 
       - name: Configure CMake
         run: |

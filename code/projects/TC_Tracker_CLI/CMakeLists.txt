@@ -4,6 +4,8 @@ project(TC_Tracker_CLI VERSION 0.0.3)
 include(CTest)
 enable_testing()
 
+find_package(cxxopts CONFIG REQUIRED)
+
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../core" "${CMAKE_CURRENT_BINARY_DIR}/core")
 
 add_executable(TC_Tracker_CLI main.cpp)
@@ -14,7 +16,7 @@ set_target_properties(TC_Tracker_CLI PROPERTIES
 if(MSVC)
     target_compile_options(TC_Tracker_CLI PRIVATE /utf-8)
 endif()
-target_link_libraries(TC_Tracker_CLI PRIVATE tc_tracker_core)
+target_link_libraries(TC_Tracker_CLI PRIVATE tc_tracker_core cxxopts::cxxopts)
 
 set(TC_TRACKER_DATA_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../../data/myMap.json")
 if(NOT EXISTS "${TC_TRACKER_DATA_FILE}")
