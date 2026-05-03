@@ -261,9 +261,9 @@ void tryCXXOPTS(int argc, char * argv[]) {
     
     try {
         result = std::make_unique<cxxopts::ParseResult>(options.parse(argc, argv));
-    } catch (cxxopts::OptionParseException &e) {
+    } catch (const cxxopts::exceptions::parsing &e) {
         abortWithMsg(e.what());
-    } catch (std::exception &e) {
+    } catch (const std::exception &e) {
         abortWithMsg("Unhandled exception!\nException message:\n" + std::string(e.what()));
     }
 

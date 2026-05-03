@@ -561,7 +561,7 @@
 					/opt/homebrew/lib,
 					/opt/homebrew/opt/libomp/lib,
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				OTHER_CFLAGS = (
 					"-Xpreprocessor",
 					"-fopenmp",
@@ -602,7 +602,7 @@
 					/opt/homebrew/lib,
 					/opt/homebrew/opt/libomp/lib,
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Xpreprocessor",
