@@ -5,7 +5,6 @@
 # Xcode user data
 xcuserdata/
 # build
-/code/pureCpp/build
 /code/pythonScripts/vorticity/cxxVer/build
 /code/scripts/myMap2BoostBin/build
 /code/projects/TC_Tracker/TC_Tracker_CLI/TC_Tracker_CLI/build
@@ -21,7 +20,6 @@ __pycache__/
 .vs/
 vcpkg_installed/
 .idea/
-
 Debug/
 bin/
 obj/
@@ -31,9 +29,8 @@ x64/
 # /code/projects/TC_Tracker/TTWrapper/x64/
 # /code/projects/TC_Tracker/x64/
 
-/code/projects/TC_Tracker_dotnetF/
-/code/projects/tryFixDLL/
-/code/projects/tryFixDLL_dotnetF/
+# visual studio user files
+*.user
 
 # protobuf generated files
 TCsP.pb.h
@@ -41,3 +38,6 @@ TCsP.pb.cc
 
 # Windows Nuget packages
 /code/projects/TC_Tracker/packages/
+
+# my custom scripts
+/code/scripts/
