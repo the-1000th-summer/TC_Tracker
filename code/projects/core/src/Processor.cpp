@@ -664,9 +664,6 @@ void Processor::removeNoise() {
 
     std::cout << "remove noise completed" << std::endl;
     std::cout << "msg from removeNoise, realTC number: " << realTCs.size() << std::endl;
-
-//    dumpStep3_proto3("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/JRA-55_general.protobuf");
-//    dumpStep3_proto3("/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/modelResult/CESM_result_1pt5.protobuf");
 }
 
 /// 此方法识别某个时次是否有台风以及台风的个数
@@ -1081,7 +1078,7 @@ void Processor::getStep2DataFromFile(const std::string& filePath) {
 /// 将第1步生成的vortexes输出为nc文件
 /// @param allVorsCellsIndex 包含所有时次的vortex数据的vector
 void Processor::dumpVortexes(const std::vector<std::vector<std::unordered_set<std::pair<int, int>, pair_hash>>> &allVorsCellsIndex) {
-    VortexesDumper dumper(iFilePath, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/ERA5_onlyVortexes.nc", tcInfo);
+    VortexesDumper dumper(iFilePath, "onlyVortexes.nc", tcInfo);
     dumper.setLatLonData(latArr.get(), latGridNum, lonArr.get(), lonGridNum);
     dumper.dumpVortexes2NC(allVorsCellsIndex);
 }

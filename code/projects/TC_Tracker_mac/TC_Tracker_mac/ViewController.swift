@@ -128,7 +128,7 @@ class ViewController: NSViewController, NSComboBoxDataSource {
         
         var threadNum = UserDefaults.standard.integer(forKey: "ThreadNum")
         if threadNum == 0 { threadNum = 1 }
-        let tracker = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, Int32(threadNum), gridResValue, "/Users/richard/Documents/p_learn/cpp_learn/TC_Tracker/data/out/")!
+        let tracker = NCFileInfo_Wrapper(ncFilePath: filePathTextField.stringValue, isWrfoutFile, timeVarStr, latVarStr, lonVarStr, vorVarStr, uwndVarStr, vwndVarStr, !vorVarStr.isEmpty, (zLvDimLen == 0) ? -1 : zLvComboBox.intValue, Int32(threadNum), gridResValue, FileManager.default.temporaryDirectory.path)!
         self.tracker = tracker
         
         guard let progressVC = storyboard?.instantiateController(withIdentifier: "ProgressVC") as? ProgressViewController else { return }
