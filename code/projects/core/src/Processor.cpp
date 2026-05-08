@@ -55,15 +55,8 @@ Processor::Processor(std::atomic_bool* shouldCancel, const std::string &iFilePat
     }
 
     // std::cout << a << std::endl;
-    // iFile = netCDF::NcFile("/mnt/e/University/TC_Tracker/data/Vorticity_JRA-55_hourly.nc", netCDF::NcFile::read)
     checkDirAndCreate(Constants::STEP_FILE_NAME);
 }
-
-//Processor::Processor(netCDF::NcFile& iFile, bool isWrfoutFile, const std::string& dumpDirectory) {
-//    if (!isWrfoutFile) { throw std::runtime_error("should use another method!"); }
-//    iiFile = &iFile;
-//    isWrfoutFile = true;
-//}
 
 Processor::~Processor() {
     iiFile->close();
