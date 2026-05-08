@@ -2,7 +2,7 @@
 //  PreferencesViewController.swift
 //  TC_Tracker_mac
 //
-//  Created by 邓浩 on 2022/7/29.
+//  Created on 2022/7/29.
 //
 
 import Cocoa

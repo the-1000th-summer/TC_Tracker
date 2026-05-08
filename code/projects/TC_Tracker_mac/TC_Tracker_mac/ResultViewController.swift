@@ -2,7 +2,7 @@
 //  ResultViewController.swift
 //  TC_Tracker_mac
 //
-//  Created by 邓浩 on 2022/7/3.
+//  Created on 2022/7/3.
 //
 
 import Cocoa

@@ -2,7 +2,7 @@
 //  uv2vr_cfd.h
 //  calRelativeVor_cxx
 //
-//  Created by 邓浩 on 2021/10/30.
+//  Created on 2021/10/30.
 //
 
 #pragma once
