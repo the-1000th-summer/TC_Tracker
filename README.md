@@ -52,3 +52,17 @@ For WRF output files, the program automatically uses variable names such as `XTI
 ## Build from Source
 
 The CLI source code is located in `code/projects/TC_Tracker_CLI`. You can refer to the release workflow to build it from source.
+
+## How to Cite
+
+If you use this software in your work, please cite the associated paper:
+
+https://doi.org/10.3389/fenvs.2022.1046890
+
+## Software Copyright
+
+The following software copyright registrations are protected in China. The official registered titles are kept in Chinese:
+
+1. 热带气旋路径识别软件（命令行界面版）V1.0（软著登字第 10410070 号）
+2. 热带气旋路径识别软件（Windows 版）V1.0（软著登字第 10410207 号）
+3. 热带气旋路径识别软件（Mac 版）V1.0（软著登字第 10415820 号）
